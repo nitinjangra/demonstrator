@@ -1,0 +1,64 @@
+.landing {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  &-greeting {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    &-heading {
+      font-size: 2.5rem;
+      font-weight: 800;
+      background: linear-gradient(90deg, #00f5ff, #8b5cf6, #ec4899, #00f5ff);
+      background-size: 400% 100%;
+      color: transparent;
+      -webkit-background-clip: text;
+      background-clip: text;
+      animation: aurora 8s linear infinite reverse;
+      &-icon {
+        display: inline-block;
+        font-size: 2.5rem;
+        margin-left: 0.5rem;
+      }
+    }
+    &-description {
+      font-size: 1.25rem;
+      margin-bottom: 2rem;
+    }
+  }
+  &-focus {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    &-content {
+      width: 50%;
+      h2 {
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin-bottom: 1rem;
+      }
+      p {
+        font-size: 1rem;
+        margin-bottom: 2rem;
+      }
+    }
+    &-announcements {
+      width: 50%;
+      height: 35rem;
+    }
+  }
+}
+
+@keyframes aurora {
+  0% {
+    background-position: 0%;
+  }
+  100% {
+    background-position: 400%;
+  }
+}

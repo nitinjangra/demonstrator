@@ -1,0 +1,58 @@
+/* You can add global styles to this file, and also import other style files */
+
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-family: Roboto, 'Helvetica Neue', sans-serif;
+}
+
+.sweet-grey {
+    background-color: #d8d8d8;
+}
+/* Convert bg-blue-500 to simple CSS */
+.bg-blue-500 {
+  background-color: #3b82f6;
+}
+
+/* Convert text-white to simple CSS */
+.text-white {
+  color: #fff;
+}
+
+/* Convert p-4 to simple CSS */
+.p-4 {
+  padding: 1rem;
+}
+
+/* Convert rounded-lg to simple CSS */
+.rounded-lg {
+  border-radius: 1rem;
+}
+
+/* Convert flex to simple CSS */
+.flex {
+  display: flex;
+}
+
+/* Convert items-center to simple CSS */
+.items-center {
+  align-items: center;
+}
+
+/* Convert justify-center to simple CSS */
+.justify-center {
+  justify-content: center;
+}
+
+/* Convert h-32 to simple CSS */
+.h-32 {
+  height: 8rem;
+}
+
+/* Convert w-64 to simple CSS */
+.w-64 {
+  width: 16rem;
+}
