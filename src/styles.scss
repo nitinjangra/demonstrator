@@ -1,5 +1,5 @@
 /* You can add global styles to this file, and also import other style files */
-
+@use 'app/shared/style/style.scss';
 html,
 body {
   height: 100%;
@@ -7,19 +7,6 @@ body {
 body {
   margin: 0;
   font-family: Roboto, 'Helvetica Neue', sans-serif;
-}
-
-.sweet-grey {
-    background-color: #d8d8d8;
-}
-/* Convert bg-blue-500 to simple CSS */
-.bg-blue-500 {
-  background-color: #3b82f6;
-}
-
-/* Convert text-white to simple CSS */
-.text-white {
-  color: #fff;
 }
 
 /* Convert p-4 to simple CSS */
