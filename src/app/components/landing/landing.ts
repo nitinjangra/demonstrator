@@ -1,32 +1,40 @@
 import { Component, OnInit } from '@angular/core';
-import { Announcements } from '../announcements-widget/announcements';
+import { AnnouncementsWidgetComponent } from '../announcements-widget/announcements';
 import { Hours } from '../../shared/constants/time.const';
+import { WeatherIcon } from '../../shared/constants/icon.const';
 
 @Component({
   selector: 'app-landing',
   standalone: true,
-  imports: [Announcements],
+  imports: [AnnouncementsWidgetComponent],
   templateUrl: './landing.html',
   styleUrls: ['./landing.scss'],
 })
 export class Landing implements OnInit {
   timeGreeting = '';
   greetingIcon = '';
+  get greetingIconData(): string {
+    return this.greetingIcon;
+  }
+  get timeGreetingData(): string {
+    return this.timeGreeting;
+  }
+
   ngOnInit(): void {
     this.timeGreeting = this.getGreeting();
   }
 
   getGreeting(): string {
     const hour = new Date().getHours();
-    if (hour < Hours.Tweleve) {
-      this.greetingIcon = '☀️';
+    if (hour < Hours.Twelve) {
+      this.greetingIcon = WeatherIcon.Sun;
       return 'Good Morning!!';
     }
     if (hour < Hours.Seventeen) {
-      this.greetingIcon = '🌤️';
+      this.greetingIcon = WeatherIcon.Cloud;
       return 'Good Afternoon!!';
     }
-    this.greetingIcon = '🌙';
+    this.greetingIcon = WeatherIcon.Moon;
     return 'Good Evening!!';
   }
 }

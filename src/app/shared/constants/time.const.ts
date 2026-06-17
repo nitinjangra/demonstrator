@@ -1,4 +1,4 @@
 export const Hours = {
-  Tweleve: 12,
+  Twelve: 12,
   Seventeen: 17,
 };

@@ -1,25 +1,29 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { AnnouncementsApiService } from './services/announcements-api.service';
-import { Announcement } from '../../shared/announcement.interface';
+import { Announcement } from '../../shared/interfaces/announcement.interface';
 import { Observable, of } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
+import { AnnouncementsActionService } from './services/announcements-action.service';
 
 @Component({
   selector: 'app-announcements',
   standalone: true,
   imports: [AsyncPipe],
-  providers: [AnnouncementsApiService],
   templateUrl: './announcements.html',
-  styleUrl: './announcements.scss',
+  styleUrls: ['./announcements.scss'],
 })
-export class Announcements implements OnInit {
+export class AnnouncementsWidgetComponent implements OnInit {
   announcements: Observable<Announcement[]> = of([]);
-  private readonly announcementsApiService = inject(AnnouncementsApiService);
+  private readonly announcementsActionService = inject(AnnouncementsActionService);
 
   ngOnInit(): void {
-    this.announcements = this.announcementsApiService.getAnnouncements();
+    this.announcements = this.announcementsActionService.getAnnouncements();
   }
   handleAnnouncementClick(linkUrl: string): void {
-    window.open(linkUrl, '_blank', 'noopener,noreferrer');
+    if (!linkUrl) return;
+    this.announcementsActionService.handleAnnouncementClick(linkUrl);
+  }
+
+  trackByAnnouncement(index: number, announcement: Announcement): string {
+    return announcement.id;
   }
 }

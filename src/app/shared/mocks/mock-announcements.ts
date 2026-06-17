@@ -1,6 +1,6 @@
-import { Announcements } from '../announcement.interface';
+import { Announcement } from '../interfaces/announcement.interface';
 
-export const mockAnnouncements: Announcements = [
+export const mockAnnouncements: Announcement[] = [
   {
     title: '💪Enhancements to table functionality',
     description:
