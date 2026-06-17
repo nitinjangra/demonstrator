@@ -1,0 +1,18 @@
+<div class="announcements">
+  <p class="announcements-title">Announcements</p>
+  @let announcementsData = announcements | async;
+  <div class="announcements-list">
+    @if (announcementsData) {
+      @for (announcement of announcementsData; track announcement) {
+        <section
+          [class.announcements-list-item-link]="announcement.linkUrl"
+          class="announcements-list-item"
+          (click)="announcement.linkUrl && handleAnnouncementClick(announcement.linkUrl)"
+        >
+          <p class="announcement-title">{{ announcement.title }}</p>
+          <p class="announcement-content">{{ announcement.description }}</p>
+        </section>
+      }
+    }
+  </div>
+</div>
