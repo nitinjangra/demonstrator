@@ -1,30 +1,30 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { of } from 'rxjs';
 
-import { Announcements } from './announcements';
-import { AnnouncementsApiService } from './services/announcements-api.service';
+import { AnnouncementsWidgetComponent } from './announcements';
 import { mockAnnouncements } from '../../shared/mocks/mock-announcements';
 import { CoreTestingModule } from '../../shared/core/core-testing.module';
 import { AsyncPipe } from '@angular/common';
-describe('Announcements', () => {
-  let component: Announcements;
-  let fixture: ComponentFixture<Announcements>;
-  let announcementsApiServiceSpy: jasmine.SpyObj<AnnouncementsApiService>;
+import { AnnouncementsActionService } from './services/announcements-action.service';
+describe('AnnouncementsWidgetComponent', () => {
+  let component: AnnouncementsWidgetComponent;
+  let fixture: ComponentFixture<AnnouncementsWidgetComponent>;
+  let announcementsActionServiceSpy: jasmine.SpyObj<AnnouncementsActionService>;
 
   beforeEach(async () => {
-    announcementsApiServiceSpy = jasmine.createSpyObj<AnnouncementsApiService>(
-      'AnnouncementsApiService',
-      ['getAnnouncements'],
+    announcementsActionServiceSpy = jasmine.createSpyObj<AnnouncementsActionService>(
+      'announcementsActionService',
+      ['getAnnouncements', 'handleAnnouncementClick'],
     );
 
     await TestBed.configureTestingModule({
-      imports: [Announcements, CoreTestingModule, AsyncPipe],
-      providers: [{ provide: AnnouncementsApiService, useValue: announcementsApiServiceSpy }],
+      imports: [AnnouncementsWidgetComponent, CoreTestingModule, AsyncPipe],
+      providers: [{ provide: AnnouncementsActionService, useValue: announcementsActionServiceSpy }],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(Announcements);
+    fixture = TestBed.createComponent(AnnouncementsWidgetComponent);
     component = fixture.componentInstance;
-    announcementsApiServiceSpy.getAnnouncements.and.returnValue(of(mockAnnouncements));
+    announcementsActionServiceSpy.getAnnouncements.and.returnValue(of(mockAnnouncements));
 
     await fixture.whenStable();
   });
@@ -36,9 +36,9 @@ describe('Announcements', () => {
   describe('ngOnInit', () => {
     it('should set announcements observable', () => {
       const mockAnnouncement = [
-        { id: '1', title: 'Test', message: 'Test message', linkUrl: '', description: '' },
+        { id: '1', title: 'Test', description: 'Test message', linkUrl: '' },
       ];
-      announcementsApiServiceSpy.getAnnouncements.and.returnValue(of(mockAnnouncement));
+      announcementsActionServiceSpy.getAnnouncements.and.returnValue(of(mockAnnouncement));
 
       component.ngOnInit();
 
@@ -48,12 +48,11 @@ describe('Announcements', () => {
 
   describe('handleAnnouncementClick', () => {
     it('should open window with correct parameters', () => {
-      spyOn(window, 'open');
       const testUrl = 'https://example.com';
 
       component.handleAnnouncementClick(testUrl);
 
-      expect(window.open).toHaveBeenCalledWith(testUrl, '_blank', 'noopener,noreferrer');
+      expect(announcementsActionServiceSpy.handleAnnouncementClick).toHaveBeenCalledWith(testUrl);
     });
 
     it('should handle empty string URL', () => {
@@ -61,7 +60,8 @@ describe('Announcements', () => {
 
       component.handleAnnouncementClick('');
 
-      expect(window.open).toHaveBeenCalledWith('', '_blank', 'noopener,noreferrer');
+      expect(window.open).not.toHaveBeenCalled();
+      expect(announcementsActionServiceSpy.handleAnnouncementClick).not.toHaveBeenCalled();
     });
   });
 });
