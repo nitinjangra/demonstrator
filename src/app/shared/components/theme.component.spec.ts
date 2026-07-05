@@ -1,20 +1,23 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { signal, WritableSignal } from '@angular/core';
 import { ThemeToggleComponent } from './theme.component';
-import { ThemeService } from '../services/theme.service';
+import { Theme, ThemeService } from '../services/theme.service';
 import { By } from '@angular/platform-browser';
 
 describe('ThemeToggleComponent', () => {
   let component: ThemeToggleComponent;
   let fixture: ComponentFixture<ThemeToggleComponent>;
   let themeServiceSpy: jasmine.SpyObj<ThemeService>;
+  let themeSignal: WritableSignal<Theme>;
 
   beforeEach(async () => {
+    themeSignal = signal<Theme>('light');
     themeServiceSpy = jasmine.createSpyObj<ThemeService>('ThemeService', [
       'getTheme',
       'toggleTheme',
       'setTheme',
     ]);
-    themeServiceSpy.getTheme.and.returnValue('light');
+    (themeServiceSpy as unknown as { theme: WritableSignal<Theme> }).theme = themeSignal;
 
     await TestBed.configureTestingModule({
       imports: [ThemeToggleComponent],
@@ -31,9 +34,7 @@ describe('ThemeToggleComponent', () => {
   });
 
   it('should display the correct button label for light mode', () => {
-    const button = fixture.debugElement.query(By.css('button')).nativeElement as HTMLButtonElement;
-
-    expect(button.textContent?.trim()).toBe('Switch to Dark Mode');
+    expect(component.label()).toBe('Switch to Dark Mode');
   });
 
   it('should call toggleTheme on the ThemeService when clicked', () => {
@@ -45,11 +46,9 @@ describe('ThemeToggleComponent', () => {
   });
 
   it('should update the button label when theme toggles to dark', () => {
-    themeServiceSpy.getTheme.and.returnValue('dark');
+    themeSignal.set('dark');
     fixture.detectChanges();
 
-    const button = fixture.debugElement.query(By.css('button')).nativeElement as HTMLButtonElement;
-
-    expect(button.textContent?.trim()).toBe('Switch to Light Mode');
+    expect(component.label()).toBe('Switch to Light Mode');
   });
 });

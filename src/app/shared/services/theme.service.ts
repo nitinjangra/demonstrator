@@ -1,19 +1,37 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Signal, signal } from '@angular/core';
+
+export type Theme = 'light' | 'dark';
+
+const STORAGE_KEY = 'theme';
 
 @Injectable({ providedIn: 'root' })
 export class ThemeService {
-  private currentTheme: 'light' | 'dark' = 'light';
+  private readonly themeSignal = signal<Theme>(this.resolveInitialTheme());
+  readonly theme: Signal<Theme> = this.themeSignal.asReadonly();
 
-  setTheme(theme: 'light' | 'dark') {
-    this.currentTheme = theme;
+  constructor() {
+    document.documentElement.setAttribute('data-theme', this.themeSignal());
+  }
+
+  setTheme(theme: Theme) {
+    this.themeSignal.set(theme);
     document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem(STORAGE_KEY, theme);
   }
 
   toggleTheme = () => {
-    this.setTheme(this.currentTheme === 'light' ? 'dark' : 'light');
+    this.setTheme(this.themeSignal() === 'light' ? 'dark' : 'light');
   };
 
   getTheme() {
-    return this.currentTheme;
+    return this.themeSignal();
+  }
+
+  private resolveInitialTheme(): Theme {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored === 'light' || stored === 'dark') {
+      return stored;
+    }
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
   }
 }

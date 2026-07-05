@@ -1,0 +1,29 @@
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--color-text);
+  cursor: pointer;
+
+  &:hover {
+    background: color-mix(in srgb, var(--color-text) 8%, transparent);
+  }
+
+  &__icon {
+    font-family: 'Material Symbols Outlined';
+    font-size: 20px;
+    line-height: 1;
+
+    &::before {
+      content: 'dark_mode';
+    }
+  }
+
+  &--dark &__icon::before {
+    content: 'light_mode';
+  }
+}

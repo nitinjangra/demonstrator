@@ -1,17 +1,17 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { Globalheader } from './global-header';
+import { GlobalHeaderComponent } from './global-header';
 
 describe('Globalheader', () => {
-  let component: Globalheader;
-  let fixture: ComponentFixture<Globalheader>;
+  let component: GlobalHeaderComponent;
+  let fixture: ComponentFixture<GlobalHeaderComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [Globalheader],
+      imports: [GlobalHeaderComponent],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(Globalheader);
+    fixture = TestBed.createComponent(GlobalHeaderComponent);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });

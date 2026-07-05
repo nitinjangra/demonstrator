@@ -5,10 +5,17 @@ describe('ThemeService', () => {
   let service: ThemeService;
 
   beforeEach(() => {
+    localStorage.clear();
+    spyOn(window, 'matchMedia').and.returnValue({ matches: false } as MediaQueryList);
+
     TestBed.configureTestingModule({
       providers: [ThemeService],
     });
     service = TestBed.inject(ThemeService);
+  });
+
+  afterEach(() => {
+    localStorage.clear();
   });
 
   it('should be created', () => {

@@ -1,16 +1,20 @@
-import { Component, inject } from '@angular/core';
+import { Component, computed, inject } from '@angular/core';
 import { ThemeService } from '../services/theme.service';
 
 @Component({
   selector: 'app-theme-toggle',
-  template: `
-    <button mat-button (click)="toggleTheme()">
-      Switch to {{ themeService.getTheme() === 'light' ? 'Dark' : 'Light' }} Mode
-    </button>
-  `,
+  standalone: true,
+  templateUrl: './theme.component.html',
+  styleUrls: ['./theme.component.scss'],
 })
 export class ThemeToggleComponent {
-  themeService = inject(ThemeService);
+  private readonly themeService = inject(ThemeService);
+
+  readonly isDarkMode = computed(() => this.themeService.theme() === 'dark');
+  readonly label = computed(() =>
+    this.isDarkMode() ? 'Switch to Light Mode' : 'Switch to Dark Mode',
+  );
+
   toggleTheme() {
     this.themeService.toggleTheme();
   }
