@@ -11,7 +11,8 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "lint": "eslint . --ext .ts,.html",
-    "ci": "npm ci && npm run lint && npm test -- --watch=false --browsers=ChromeHeadless"
+    "ci": "npm ci && npm run lint && npm test -- --watch=false --browsers=ChromeHeadless",
+    "release": "node src/scripts/release.js"
   },
   "repository": {
     "type": "git",
