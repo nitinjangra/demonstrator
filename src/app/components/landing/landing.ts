@@ -2,11 +2,12 @@ import { Component, OnInit } from '@angular/core';
 import { AnnouncementsWidgetComponent } from '../announcements-widget/announcements';
 import { Hours } from '../../shared/constants/time.const';
 import { WeatherIcon } from '../../shared/constants/icon.const';
+import { ActionsTableWrapper } from '../actions-table-wrapper/actions-table-wrapper';
 
 @Component({
   selector: 'app-landing',
   standalone: true,
-  imports: [AnnouncementsWidgetComponent],
+  imports: [AnnouncementsWidgetComponent,ActionsTableWrapper],
   templateUrl: './landing.html',
   styleUrls: ['./landing.scss'],
 })
