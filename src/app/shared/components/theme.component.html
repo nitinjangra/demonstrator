@@ -1,0 +1,9 @@
+<button
+  type="button"
+  class="theme-toggle"
+  [class.theme-toggle--dark]="isDarkMode()"
+  (click)="toggleTheme()"
+  [attr.aria-label]="label()"
+>
+  <span class="theme-toggle__icon" aria-hidden="true"></span>
+</button>

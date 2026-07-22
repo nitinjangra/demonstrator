@@ -1,5 +1,18 @@
 /* You can add global styles to this file, and also import other style files */
+@use '@angular/material' as mat;
 @use 'app/shared/style/style.scss';
+
+// Lives here (true global scope) rather than in global-header.scss, because Angular's emulated
+// view encapsulation rewrites a component-scoped `:root` selector so it never matches <html>.
+:root {
+  @include mat.toolbar-overrides(
+    (
+      container-background-color: var(--color-bg),
+      container-text-color: var(--color-text),
+    )
+  );
+}
+
 html,
 body {
   height: 100%;
@@ -7,6 +20,11 @@ body {
 body {
   margin: 0;
   font-family: Roboto, 'Helvetica Neue', sans-serif;
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
 }
 
 /* Convert p-4 to simple CSS */
