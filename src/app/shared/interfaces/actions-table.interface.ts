@@ -4,6 +4,6 @@ export interface ActionTableRow {
   id: number;
   entityName: string;
   entityId: string;
-  dueDate: Date;
+  dueDate: Date | string | null;
   priority?: Priority;
 }
