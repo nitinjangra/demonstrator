@@ -1,18 +1,57 @@
-<div class="announcements">
-  <p class="announcements-title">Announcements</p>
+<section class="announcements" aria-labelledby="announcements-title">
+  <h2 id="announcements-title" class="announcements-title">Announcements</h2>
   @let announcementsData = announcements | async;
-  <div class="announcements-list">
-    @if (announcementsData) {
-      @for (announcement of announcementsData; track announcement) {
-        <section
-          [class.announcements-list-item-link]="announcement.linkUrl"
-          class="announcements-list-item"
-          (click)="announcement.linkUrl && handleAnnouncementClick(announcement.linkUrl)"
-        >
-          <p class="announcement-title">{{ announcement.title }}</p>
-          <p class="announcement-content">{{ announcement.description }}</p>
-        </section>
+  <div class="announcements-panel">
+    <ul class="announcements-list">
+      @if (announcementsData) {
+        @for (announcement of announcementsData; track announcement.id) {
+          <li class="announcements-list-item">
+            <article>
+              <h3 class="announcement-title">{{ announcement.title }}</h3>
+              @if (announcement.description) {
+                <p
+                  class="announcement-content"
+                  [class.announcement-content--expanded]="isExpanded(announcement.id)"
+                  [id]="'announcement-description-' + announcement.id"
+                  [attr.data-announcement-id]="announcement.id"
+                  #announcementDescription
+                >
+                  {{ announcement.description }}
+                </p>
+              }
+              @if (announcement.linkUrl) {
+                <a
+                  class="announcement-link"
+                  [href]="announcement.linkUrl"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Read announcement
+                  <span aria-hidden="true"> →</span>
+                  <span class="visually-hidden">: {{ announcement.title }} (opens in a new tab)</span>
+                </a>
+              }
+              @if (announcement.description && (isTruncated(announcement.id) || isExpanded(announcement.id))) {
+                <button
+                  class="announcement-expand"
+                  type="button"
+                  [attr.aria-expanded]="isExpanded(announcement.id)"
+                  [attr.aria-controls]="'announcement-description-' + announcement.id"
+                  (click)="toggleDescription(announcement.id)"
+                >
+                  {{
+                    isExpanded(announcement.id)
+                      ? 'Show less'
+                      : announcement.linkUrl
+                        ? 'Expand'
+                        : 'Show more'
+                  }}
+                </button>
+              }
+            </article>
+          </li>
+        }
       }
-    }
+    </ul>
   </div>
-</div>
+</section>

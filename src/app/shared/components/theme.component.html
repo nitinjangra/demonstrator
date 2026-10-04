@@ -2,8 +2,17 @@
   type="button"
   class="theme-toggle"
   [class.theme-toggle--dark]="isDarkMode()"
-  (click)="toggleTheme()"
+  [class.theme-toggle--holding]="isHolding()"
+  (click)="onClick($event)"
+  (pointerdown)="onPointerDown($event)"
+  (pointerup)="cancelHold()"
+  (pointerleave)="cancelHold()"
+  (pointercancel)="cancelHold()"
+  (keydown)="onKeyDown($event)"
+  (keyup)="onKeyUp($event)"
+  (blur)="cancelHold()"
   [attr.aria-label]="label()"
+  aria-description="Press and hold for 2 seconds to switch themes"
 >
   <span class="theme-toggle__icon" aria-hidden="true"></span>
 </button>

@@ -1,3 +1,73 @@
-<div class="content">
-  <ag-grid-angular class="ag-actions-table" [rowData]="rowData | async" [columnDefs]="colDefs" />
+<div class="actions-summary" aria-live="polite">
+  <span>{{ actionCount() }} actions</span>
+  <span class="actions-summary-separator" aria-hidden="true"></span>
+  <span class="high-priority-summary">
+    <span class="high-priority-summary-indicator" aria-hidden="true"></span>
+    {{ highPriorityCount() }} high priority
+  </span>
+</div>
+
+<div class="table-scroll">
+  <table class="actions-table">
+    <caption class="visually-hidden">
+      Actions with their entity, due date, and priority. Select a column heading to sort.
+    </caption>
+    <thead>
+      <tr>
+        <th scope="col" [attr.aria-sort]="sortDirection('id')">
+          <button type="button" (click)="sortBy('id')">
+            ID <span aria-hidden="true">{{ sortIndicator('id') }}</span>
+          </button>
+        </th>
+        <th scope="col" [attr.aria-sort]="sortDirection('entityName')">
+          <button type="button" (click)="sortBy('entityName')">
+            Entity Name <span aria-hidden="true">{{ sortIndicator('entityName') }}</span>
+          </button>
+        </th>
+        <th scope="col" [attr.aria-sort]="sortDirection('dueDate')">
+          <button type="button" (click)="sortBy('dueDate')">
+            Due Date <span aria-hidden="true">{{ sortIndicator('dueDate') }}</span>
+          </button>
+        </th>
+        <th scope="col" [attr.aria-sort]="sortDirection('priority')">
+          <button type="button" (click)="sortBy('priority')">
+            Priority <span aria-hidden="true">{{ sortIndicator('priority') }}</span>
+          </button>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (row of sortedRows(); track row.id) {
+        <tr>
+          <th scope="row">{{ row.id }}</th>
+          <td class="entity-name" [attr.title]="row.entityName">{{ row.entityName }}</td>
+          <td>
+            @if (isValidDate(row.dueDate)) {
+              {{ row.dueDate | date: 'mediumDate' }}
+            } @else {
+              <span class="no-due-date" aria-label="No due date">—</span>
+            }
+          </td>
+          <td>
+            @if (row.priority) {
+              <span
+                class="priority-badge"
+                [class.priority-badge--high]="row.priority === 'High'"
+                [class.priority-badge--medium]="row.priority === 'Medium'"
+                [class.priority-badge--low]="row.priority === 'Low'"
+              >
+                {{ row.priority }}
+              </span>
+            } @else {
+              <span class="no-priority" aria-label="No priority">—</span>
+            }
+          </td>
+        </tr>
+      } @empty {
+        <tr>
+          <td class="empty-state" colspan="4">No actions to show.</td>
+        </tr>
+      }
+    </tbody>
+  </table>
 </div>
