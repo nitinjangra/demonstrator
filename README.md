@@ -6,15 +6,15 @@ A simple Angular demonstration project with source code, styles, and tooling con
 
 ## Project overview
 
-- Angular version: 21.x
-- TypeScript version: 5.9.x
+- Angular version: 22.x
+- TypeScript version: 6.0.x
 - Build system: Angular CLI / `@angular/build`
 - Linting: ESLint
 - Formatting: Prettier
 
 ## Prerequisites
 
-- Node.js 20+ and npm 10+
+- Node.js 22.22.3+ and npm 10+
 - Git
 
 ## Setup
