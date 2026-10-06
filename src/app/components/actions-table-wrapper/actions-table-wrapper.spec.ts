@@ -16,7 +16,10 @@ describe('ActionsTableWrapper', () => {
     await fixture.whenStable();
   });
 
-  it('should create', () => {
+  it('should render the actions table', () => {
+    fixture.detectChanges();
+
     expect(component).toBeTruthy();
+    expect(fixture.nativeElement.querySelector('app-actions-table')).not.toBeNull();
   });
 });

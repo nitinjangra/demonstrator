@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { of } from 'rxjs';
+import { firstValueFrom, of } from 'rxjs';
 import { CoreTestingModule } from '../../../shared/core/core-testing.module';
 import { Announcement } from '../../../shared/interfaces/announcement.interface';
 import { AnnouncementsActionService } from './announcements-action.service';
@@ -36,12 +36,11 @@ describe('AnnouncementsActionService', () => {
     expect(service).toBeTruthy();
   });
 
-  it('should proxy getAnnouncements to AnnouncementsApiService', (done) => {
-    service.getAnnouncements().subscribe((announcements) => {
-      expect(announcements).toBe(mockAnnouncements);
-      expect(apiServiceSpy.getAnnouncements).toHaveBeenCalledOnceWith();
-      done();
-    });
+  it('should proxy getAnnouncements to AnnouncementsApiService', async () => {
+    const announcements = await firstValueFrom(service.getAnnouncements());
+
+    expect(announcements).toEqual(mockAnnouncements);
+    expect(apiServiceSpy.getAnnouncements).toHaveBeenCalledOnceWith();
   });
 
   describe('handleAnnouncementClick', () => {
