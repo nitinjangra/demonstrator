@@ -1,6 +1,8 @@
 import { TestBed } from '@angular/core/testing';
+import { firstValueFrom } from 'rxjs';
 
 import { AgTableApiService } from './ag-table-api.service';
+import { mockTableData } from '../mock/actions-table.mock';
 
 describe('AgGridApi', () => {
   let service: AgTableApiService;
@@ -10,7 +12,7 @@ describe('AgGridApi', () => {
     service = TestBed.inject(AgTableApiService);
   });
 
-  it('should be created', () => {
-    expect(service).toBeTruthy();
+  it('should return the action table data', async () => {
+    await expectAsync(firstValueFrom(service.fetchTableData())).toBeResolvedTo(mockTableData);
   });
 });

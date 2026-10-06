@@ -49,7 +49,7 @@ describe('AnnouncementsWidgetComponent', () => {
   });
 
   describe('handleAnnouncementClick', () => {
-    it('should open window with correct parameters', () => {
+    it('should delegate clicks with a URL to the action service', () => {
       const testUrl = 'https://example.com';
 
       component.handleAnnouncementClick(testUrl);
