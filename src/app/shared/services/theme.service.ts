@@ -10,12 +10,12 @@ export class ThemeService {
   readonly theme: Signal<Theme> = this.themeSignal.asReadonly();
 
   constructor() {
-    document.documentElement.setAttribute('data-theme', this.themeSignal());
+    this.applyTheme(this.themeSignal());
   }
 
   setTheme(theme: Theme) {
     this.themeSignal.set(theme);
-    document.documentElement.setAttribute('data-theme', theme);
+    this.applyTheme(theme);
     localStorage.setItem(STORAGE_KEY, theme);
   }
 
@@ -25,6 +25,11 @@ export class ThemeService {
 
   getTheme() {
     return this.themeSignal();
+  }
+
+  private applyTheme(theme: Theme): void {
+    document.documentElement.setAttribute('data-theme', theme);
+    document.documentElement.setAttribute('data-ag-theme-mode', theme);
   }
 
   private resolveInitialTheme(): Theme {

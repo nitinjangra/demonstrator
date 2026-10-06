@@ -33,6 +33,7 @@ describe('ThemeService', () => {
 
     expect(service.getTheme()).toBe('dark');
     expect(setAttributeSpy).toHaveBeenCalledWith('data-theme', 'dark');
+    expect(setAttributeSpy).toHaveBeenCalledWith('data-ag-theme-mode', 'dark');
   });
 
   it('should toggle the theme from light to dark', () => {
@@ -42,6 +43,7 @@ describe('ThemeService', () => {
 
     expect(service.getTheme()).toBe('dark');
     expect(setAttributeSpy).toHaveBeenCalledWith('data-theme', 'dark');
+    expect(setAttributeSpy).toHaveBeenCalledWith('data-ag-theme-mode', 'dark');
   });
 
   it('should toggle the theme from dark back to light', () => {
@@ -52,5 +54,6 @@ describe('ThemeService', () => {
 
     expect(service.getTheme()).toBe('light');
     expect(setAttributeSpy).toHaveBeenCalledWith('data-theme', 'light');
+    expect(setAttributeSpy).toHaveBeenCalledWith('data-ag-theme-mode', 'light');
   });
 });
