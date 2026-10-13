@@ -3,6 +3,7 @@ import { signal, WritableSignal } from '@angular/core';
 import { ThemeToggleComponent } from './theme.component';
 import { Theme, ThemeService } from '../services/theme.service';
 import { By } from '@angular/platform-browser';
+import { MatTooltip } from '@angular/material/tooltip';
 
 describe('ThemeToggleComponent', () => {
   let component: ThemeToggleComponent;
@@ -11,7 +12,16 @@ describe('ThemeToggleComponent', () => {
   let themeSignal: WritableSignal<Theme>;
 
   beforeEach(async () => {
-    spyOn(window, 'matchMedia').and.returnValue({ matches: true } as MediaQueryList);
+    spyOn(window, 'matchMedia').and.returnValue({
+      matches: true,
+      media: '(prefers-color-scheme: dark)',
+      onchange: null,
+      addListener: () => undefined,
+      removeListener: () => undefined,
+      addEventListener: () => undefined,
+      removeEventListener: () => undefined,
+      dispatchEvent: () => true,
+    } as MediaQueryList);
     themeSignal = signal<Theme>('light');
     themeServiceSpy = jasmine.createSpyObj<ThemeService>('ThemeService', [
       'getTheme',
@@ -41,6 +51,19 @@ describe('ThemeToggleComponent', () => {
     expect(getComputedStyle(button).width).toBe('44px');
     expect(getComputedStyle(button).height).toBe('44px');
   });
+
+  it('shows the press-and-hold tooltip on hover', fakeAsync(() => {
+    const button = fixture.debugElement.query(By.css('button')).nativeElement as HTMLButtonElement;
+    button.dispatchEvent(new MouseEvent('mouseenter'));
+    tick();
+    fixture.detectChanges();
+
+    expect(document.querySelector('.mat-mdc-tooltip')?.textContent).toContain(
+      'press and hold to switch theme',
+    );
+    fixture.debugElement.query(By.css('button')).injector.get(MatTooltip).hide();
+    tick();
+  }));
 
   it('should call toggleTheme on the ThemeService when clicked', () => {
     const button = fixture.debugElement.query(By.css('button')).nativeElement as HTMLButtonElement;
@@ -76,6 +99,41 @@ describe('ThemeToggleComponent', () => {
 
     expect(themeServiceSpy.toggleTheme).not.toHaveBeenCalled();
     expect(component.isHolding()).toBeFalse();
+  }));
+
+  it('ignores non-primary and non-left pointer presses', fakeAsync(() => {
+    const button = fixture.debugElement.query(By.css('button')).nativeElement as HTMLButtonElement;
+    button.dispatchEvent(new PointerEvent('pointerdown', { button: 0, isPrimary: false }));
+    button.dispatchEvent(new PointerEvent('pointerdown', { button: 2, isPrimary: true }));
+
+    expect(component.isHolding()).toBeFalse();
+    tick(2000);
+    expect(themeServiceSpy.toggleTheme).not.toHaveBeenCalled();
+  }));
+
+  it('ignores unrelated keys and repeated keydown events', fakeAsync(() => {
+    const button = fixture.debugElement.query(By.css('button')).nativeElement as HTMLButtonElement;
+    button.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', cancelable: true }));
+    button.dispatchEvent(new KeyboardEvent('keyup', { key: 'Escape', cancelable: true }));
+
+    expect(component.isHolding()).toBeFalse();
+    button.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', cancelable: true }));
+    button.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', repeat: true, cancelable: true }));
+    expect(component.isHolding()).toBeTrue();
+    tick(2000);
+    expect(themeServiceSpy.toggleTheme).toHaveBeenCalledTimes(1);
+  }));
+
+  it('ignores the synthetic click after a keyboard hold', fakeAsync(() => {
+    const button = fixture.debugElement.query(By.css('button')).nativeElement as HTMLButtonElement;
+    button.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', cancelable: true }));
+    button.dispatchEvent(new KeyboardEvent('keyup', { key: 'Enter', cancelable: true }));
+    button.click();
+
+    expect(themeServiceSpy.toggleTheme).not.toHaveBeenCalled();
+    tick();
+    button.click();
+    expect(themeServiceSpy.toggleTheme).toHaveBeenCalledTimes(1);
   }));
 
   it('should switch themes after the button is held with the keyboard for two seconds', fakeAsync(() => {

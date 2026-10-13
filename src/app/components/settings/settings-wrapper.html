@@ -1,0 +1,52 @@
+<mat-sidenav-container class="settings-layout">
+  <mat-sidenav class="settings-sidebar" mode="side" opened aria-label="Settings navigation">
+    <h1 class="settings-title">Settings</h1>
+    <mat-nav-list>
+      <h2 matSubheader>General</h2>
+      <a
+        mat-list-item
+        routerLink="/settings/general/branding"
+        routerLinkActive="settings-nav-link--active"
+        [routerLinkActiveOptions]="{ exact: true }"
+      >
+        <span matListItemTitle>Branding</span>
+      </a>
+      <a
+        mat-list-item
+        routerLink="/settings/general/feature-toggles"
+        routerLinkActive="settings-nav-link--active"
+        [routerLinkActiveOptions]="{ exact: true }"
+      >
+        <span matListItemTitle>Feature toggles</span>
+      </a>
+      <a
+        mat-list-item
+        routerLink="/settings/general/notifications"
+        routerLinkActive="settings-nav-link--active"
+        [routerLinkActiveOptions]="{ exact: true }"
+      >
+        <span matListItemTitle>Notifications</span>
+      </a>
+      <a
+        mat-list-item
+        routerLink="/settings/general/theme"
+        routerLinkActive="settings-nav-link--active"
+        [routerLinkActiveOptions]="{ exact: true }"
+      >
+        <span matListItemTitle>Theme</span>
+      </a>
+      <a
+        mat-list-item
+        routerLink="/settings/general/time"
+        routerLinkActive="settings-nav-link--active"
+        [routerLinkActiveOptions]="{ exact: true }"
+      >
+        <span matListItemTitle>Time setting</span>
+      </a>
+    </mat-nav-list>
+  </mat-sidenav>
+
+  <mat-sidenav-content class="settings-content">
+    <router-outlet></router-outlet>
+  </mat-sidenav-content>
+</mat-sidenav-container>

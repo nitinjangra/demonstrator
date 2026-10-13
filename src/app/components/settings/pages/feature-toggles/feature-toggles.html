@@ -1,0 +1,34 @@
+<section class="feature-toggles" aria-labelledby="feature-toggles-title">
+  <h2 id="feature-toggles-title">Feature toggles</h2>
+  <p>Choose which application features are enabled.</p>
+
+  <fieldset>
+    <legend>Actions table (one selection required)</legend>
+    <mat-slide-toggle
+      class="feature-toggle-row"
+      [checked]="agGridEnabled()"
+      (change)="setTableFeature('ag-grid', $event.checked)"
+    >
+      AG Grid
+    </mat-slide-toggle>
+    <mat-slide-toggle
+      class="feature-toggle-row"
+      [checked]="materialTableEnabled()"
+      (change)="setTableFeature('material-table', $event.checked)"
+    >
+      Material table
+    </mat-slide-toggle>
+  </fieldset>
+
+  <fieldset>
+    <legend>Dashboard</legend>
+    <mat-slide-toggle
+      class="feature-toggle-row"
+      [checked]="dashboardEnabled()"
+      (change)="setDashboardEnabled($event.checked)"
+    >
+      Enable dashboard
+    </mat-slide-toggle>
+
+  </fieldset>
+</section>

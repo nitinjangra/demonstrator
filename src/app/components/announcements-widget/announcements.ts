@@ -9,6 +9,7 @@ import {
   signal,
   viewChildren,
 } from '@angular/core';
+import { MatIconModule } from '@angular/material/icon';
 import { Announcement } from '../../shared/interfaces/announcement.interface';
 import { Observable, of } from 'rxjs';
 import { AsyncPipe } from '@angular/common';
@@ -17,7 +18,7 @@ import { AnnouncementsActionService } from './services/announcements-action.serv
 @Component({
   selector: 'app-announcements',
   standalone: true,
-  imports: [AsyncPipe],
+  imports: [AsyncPipe, MatIconModule],
   templateUrl: './announcements.html',
   styleUrls: ['./announcements.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
