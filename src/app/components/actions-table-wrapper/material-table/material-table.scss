@@ -1,0 +1,141 @@
+:host {
+  display: block;
+  overflow-x: auto;
+}
+
+.actions-summary {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  margin-bottom: 0.6rem;
+  color: var(--color-muted-text);
+  font-size: 0.9rem;
+}
+
+.priority-count {
+  font-weight: 600;
+}
+
+.priority-count--high {
+  color: var(--color-error);
+}
+
+.priority-count--medium {
+  color: var(--color-warning);
+}
+
+.priority-count--low {
+  color: var(--color-success);
+}
+
+.mat-mdc-table {
+  width: 100%;
+  min-width: 36rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.625rem;
+  border-collapse: separate;
+  border-spacing: 0;
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  overflow: hidden;
+}
+
+.mat-mdc-header-row {
+  background-color: var(--color-table-header);
+  color: var(--color-text);
+}
+
+.mat-mdc-row {
+  background-color: var(--color-surface);
+  color: var(--color-text);
+}
+
+.mat-mdc-row:hover {
+  background-color: var(--color-hover);
+}
+
+.mat-mdc-header-cell,
+.mat-mdc-cell {
+  border-right: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+  color: inherit;
+}
+
+.mat-mdc-header-cell:last-child,
+.mat-mdc-cell:last-child {
+  border-right: 0;
+}
+
+.priority-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0.6rem;
+  border: 1px solid var(--color-border);
+  border-radius: 999px;
+  background-color: var(--color-hover);
+  color: var(--color-text);
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.priority-badge mat-icon {
+  width: 1rem;
+  height: 1rem;
+  font-size: 1rem;
+  line-height: 1rem;
+}
+
+.priority-badge--high {
+  border-color: color-mix(in srgb, var(--color-error) 55%, var(--color-border));
+  background-color: color-mix(in srgb, var(--color-error) 12%, var(--color-surface));
+}
+
+.priority-badge--high mat-icon {
+  color: var(--color-error);
+}
+
+.priority-badge--medium {
+  border-color: color-mix(in srgb, var(--color-warning) 55%, var(--color-border));
+  background-color: color-mix(in srgb, var(--color-warning) 12%, var(--color-surface));
+}
+
+.priority-badge--medium mat-icon {
+  color: var(--color-warning);
+}
+
+.priority-badge--low {
+  border-color: color-mix(in srgb, var(--color-success) 55%, var(--color-border));
+  background-color: color-mix(in srgb, var(--color-success) 12%, var(--color-surface));
+}
+
+.priority-badge--low mat-icon {
+  color: var(--color-success);
+}
+
+.mat-column-id {
+  width: 5rem;
+}
+
+.mat-column-dueDate,
+.mat-column-priority {
+  width: 10rem;
+}
+
+.entity-name {
+  max-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.no-due-date,
+.no-priority {
+  color: var(--color-muted-text);
+}
+
+.empty-state {
+  padding: 1.5rem;
+  text-align: center;
+}

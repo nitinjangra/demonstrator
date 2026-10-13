@@ -1,1 +1,7 @@
-<app-actions-table></app-actions-table>
+@if (agGridEnabled()) {
+  <app-ag-grid-table></app-ag-grid-table>
+} @else if (materialTableEnabled()) {
+  <app-material-table></app-material-table>
+} @else {
+  <p role="status">Nothing to display</p>
+}
