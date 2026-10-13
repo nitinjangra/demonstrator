@@ -1,0 +1,17 @@
+.dashboard {
+  width: min(100% - 2rem, 90rem);
+  box-sizing: border-box;
+  margin-inline: auto;
+  padding: 1.5rem clamp(0rem, 2vw, 1.5rem) 2rem;
+
+  h1 {
+    margin: 0;
+    color: var(--color-text);
+    font-size: clamp(1.5rem, 2.5vw, 1.9rem);
+  }
+
+  p {
+    margin: 0.5rem 0 0;
+    color: var(--color-muted-text);
+  }
+}

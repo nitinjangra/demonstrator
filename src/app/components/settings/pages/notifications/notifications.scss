@@ -1,0 +1,38 @@
+.notifications-settings {
+  display: grid;
+  max-width: 36rem;
+  gap: 1rem;
+}
+
+.notification-channel {
+  display: block;
+  padding: 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.625rem;
+  background-color: var(--color-surface);
+}
+
+.notification-toggle {
+  width: 100%;
+}
+
+.notification-toggle ::ng-deep .mdc-form-field {
+  width: 100%;
+  justify-content: space-between;
+}
+
+.notification-toggle ::ng-deep .mdc-label {
+  flex: 1;
+}
+
+.notification-toggle ::ng-deep .mdc-switch {
+  order: 2;
+}
+
+.notification-subtoggles {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0.75rem 0 0 1rem;
+  padding-left: 1rem;
+  border-left: 2px solid var(--color-border);
+}

@@ -1,0 +1,26 @@
+.feature-toggles fieldset {
+  display: grid;
+  gap: 0.75rem;
+  max-width: 32rem;
+  margin-block: 1.5rem;
+  padding: 1rem;
+  border: 1px solid var(--color-border, #d9dce1);
+}
+
+.feature-toggle-row {
+  width: 100%;
+}
+
+.feature-toggle-row ::ng-deep .mdc-form-field {
+  width: 100%;
+  justify-content: space-between;
+}
+
+.feature-toggle-row ::ng-deep .mdc-label {
+  flex: 1;
+}
+
+.feature-toggle-row ::ng-deep .mdc-switch {
+  order: 2;
+}
+
