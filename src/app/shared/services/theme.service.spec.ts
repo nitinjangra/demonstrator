@@ -3,10 +3,22 @@ import { ThemeService } from './theme.service';
 
 describe('ThemeService', () => {
   let service: ThemeService;
+  let systemThemeIsDark: boolean;
+  let systemThemeListener: ((event: MediaQueryListEvent) => void) | undefined;
 
   beforeEach(() => {
     localStorage.clear();
-    spyOn(window, 'matchMedia').and.returnValue({ matches: false } as MediaQueryList);
+    systemThemeIsDark = false;
+    systemThemeListener = undefined;
+    const mediaQuery = {
+      get matches() {
+        return systemThemeIsDark;
+      },
+      addEventListener: (_type: string, listener: (event: MediaQueryListEvent) => void) => {
+        systemThemeListener = listener;
+      },
+    } as unknown as MediaQueryList;
+    spyOn(window, 'matchMedia').and.returnValue(mediaQuery);
 
     TestBed.configureTestingModule({
       providers: [ThemeService],
@@ -55,5 +67,17 @@ describe('ThemeService', () => {
     expect(service.getTheme()).toBe('light');
     expect(setAttributeSpy).toHaveBeenCalledWith('data-theme', 'light');
     expect(setAttributeSpy).toHaveBeenCalledWith('data-ag-theme-mode', 'light');
+  });
+
+  it('should apply system theme changes while following the system preference', () => {
+    service.setTheme('system');
+    expect(service.getTheme()).toBe('light');
+
+    systemThemeIsDark = true;
+    systemThemeListener?.({ matches: true } as MediaQueryListEvent);
+
+    expect(service.preference()).toBe('system');
+    expect(service.getTheme()).toBe('dark');
+    expect(document.documentElement.getAttribute('data-theme')).toBe('dark');
   });
 });

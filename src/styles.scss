@@ -1,5 +1,6 @@
 /* You can add global styles to this file, and also import other style files */
 @use '@angular/material' as mat;
+@use 'app/shared/style/theme';
 @use 'app/shared/style/style.scss';
 
 // Lives here (true global scope) rather than in global-header.scss, because Angular's emulated

@@ -8,7 +8,16 @@
       <button mat-menu-item>Item 2</button>
     </mat-menu>
   }
-  <span class="global-header-brand">Demonstrator</span>
+  <a class="global-header-brand" routerLink="/landing" [attr.aria-label]="brandName() + ' home'">
+    <mat-icon class="global-header-home-icon" aria-hidden="true">home</mat-icon>
+    {{ brandName() }}
+  </a>
   <span class="example-spacer"></span>
+  @if (dashboardEnabled()) {
+    <a class="global-header-dashboard" routerLink="/dashboard">Dashboard</a>
+  }
   <app-theme-toggle></app-theme-toggle>
+  <button class="settings-icon" type="button" routerLink="/settings" aria-label="Open settings">
+    <mat-icon aria-hidden="true">settings</mat-icon>
+  </button>
 </mat-toolbar>

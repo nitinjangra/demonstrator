@@ -1,0 +1,53 @@
+<section class="notifications-settings" aria-labelledby="notifications-title">
+  <h2 id="notifications-title">Notifications</h2>
+  <p>Choose how and when you receive notifications.</p>
+
+  <div class="notification-channel">
+    <mat-slide-toggle
+      class="notification-toggle"
+      [checked]="preferences().email"
+      (change)="setPreference('email', $event.checked)"
+    >
+      Email
+    </mat-slide-toggle>
+
+    <div
+      class="notification-subtoggles"
+      role="group"
+      aria-label="Email notification types"
+    >
+      <mat-slide-toggle
+        class="notification-toggle"
+        [checked]="preferences().emailAsRespondent"
+        [disabled]="!preferences().email"
+        (change)="setPreference('emailAsRespondent', $event.checked)"
+      >
+        When added as a respondent
+      </mat-slide-toggle>
+      <mat-slide-toggle
+        class="notification-toggle"
+        [checked]="preferences().emailAsApprover"
+        [disabled]="!preferences().email"
+        (change)="setPreference('emailAsApprover', $event.checked)"
+      >
+        When added as an approver
+      </mat-slide-toggle>
+    </div>
+  </div>
+
+  <mat-slide-toggle
+    class="notification-toggle notification-channel"
+    [checked]="preferences().sms"
+    (change)="setPreference('sms', $event.checked)"
+  >
+    SMS
+  </mat-slide-toggle>
+
+  <mat-slide-toggle
+    class="notification-toggle notification-channel"
+    [checked]="preferences().call"
+    (change)="setPreference('call', $event.checked)"
+  >
+    Phone call
+  </mat-slide-toggle>
+</section>
