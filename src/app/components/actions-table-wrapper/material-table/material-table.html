@@ -1,8 +1,8 @@
 <div class="actions-summary" aria-live="polite">
   <span>{{ dataSource.data.length }} actions</span>
-  <span class="priority-count priority-count--high">{{ highPriorityCount() }} high</span>
-  <span class="priority-count priority-count--medium">{{ mediumPriorityCount() }} medium</span>
-  <span class="priority-count priority-count--low">{{ lowPriorityCount() }} low</span>
+  <span class="priority-count priority-count--high">{{ highPriorityCount() }} high priority</span>
+  <span class="priority-count priority-count--medium">{{ mediumPriorityCount() }} medium priority</span>
+  <span class="priority-count priority-count--low">{{ lowPriorityCount() }} low priority</span>
 </div>
 
 <table mat-table [dataSource]="dataSource" matSort aria-label="Actions">

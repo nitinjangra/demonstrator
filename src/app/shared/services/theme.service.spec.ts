@@ -38,6 +38,27 @@ describe('ThemeService', () => {
     expect(service.getTheme()).toBe('light');
   });
 
+  it('should restore a stored theme preference on startup', () => {
+    localStorage.setItem('theme', 'dark');
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({ providers: [ThemeService] });
+    service = TestBed.inject(ThemeService);
+
+    expect(service.preference()).toBe('dark');
+    expect(service.getTheme()).toBe('dark');
+    expect(document.documentElement.getAttribute('data-theme')).toBe('dark');
+  });
+
+  it('should ignore an invalid stored theme preference', () => {
+    localStorage.setItem('theme', 'sepia');
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({ providers: [ThemeService] });
+    service = TestBed.inject(ThemeService);
+
+    expect(service.preference()).toBe('system');
+    expect(service.getTheme()).toBe('light');
+  });
+
   it('should set the theme to dark and update the document attribute', () => {
     const setAttributeSpy = spyOn(document.documentElement, 'setAttribute');
 
@@ -79,5 +100,14 @@ describe('ThemeService', () => {
     expect(service.preference()).toBe('system');
     expect(service.getTheme()).toBe('dark');
     expect(document.documentElement.getAttribute('data-theme')).toBe('dark');
+  });
+
+  it('should ignore system theme changes when a fixed preference is selected', () => {
+    service.setTheme('light');
+    systemThemeIsDark = true;
+    systemThemeListener?.({ matches: true } as MediaQueryListEvent);
+
+    expect(service.preference()).toBe('light');
+    expect(service.getTheme()).toBe('light');
   });
 });

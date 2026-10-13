@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { ThemeSetting } from '../../../../components/settings/pages/theme-setting/Theme-setting';
+import { ThemeSetting } from './theme-setting';
 
 describe('ThemeSetting', () => {
   let fixture: ComponentFixture<ThemeSetting>;
@@ -29,6 +29,9 @@ describe('ThemeSetting', () => {
   });
 
   it('should select the system theme preference', () => {
+    fixture.componentInstance.setTheme('dark');
+    fixture.detectChanges();
+
     const systemButton = fixture.nativeElement.querySelector(
       'mat-button-toggle[value="system"] button',
     ) as HTMLButtonElement;

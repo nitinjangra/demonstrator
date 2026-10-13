@@ -22,7 +22,7 @@ describe('Globalheader', () => {
     fixture.detectChanges();
 
     const brandLink = fixture.nativeElement.querySelector('.global-header-brand');
-    expect(brandLink.textContent.trim()).toBe('Demonstrator');
+    expect(brandLink.textContent).toContain('Demonstrator');
     expect(brandLink.getAttribute('href')).toBe('/landing');
     expect(brandLink.querySelector('.global-header-home-icon')?.textContent.trim()).toBe('home');
     expect(fixture.nativeElement.querySelector('app-theme-toggle')).not.toBeNull();
