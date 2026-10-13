@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MaterialTable } from './material-table';
+import { ActionTableRow } from '../../../shared/interfaces/actions-table.interface';
 
 describe('MaterialTable', () => {
   let fixture: ComponentFixture<MaterialTable>;
@@ -29,5 +30,42 @@ describe('MaterialTable', () => {
     expect(table.querySelector('tbody tr td.mat-column-entityName')?.textContent?.trim()).toBe(
       'Berkshire investments insights',
     );
+  });
+
+  it('uses each supported sort accessor and an empty fallback for unknown columns', () => {
+    const row: ActionTableRow = {
+      id: 42,
+      entityName: 'Example',
+      entityId: 'example-id',
+      dueDate: '2024-01-05',
+      priority: undefined,
+    };
+    const accessor = fixture.componentInstance.dataSource.sortingDataAccessor;
+
+    expect(accessor(row, 'id')).toBe(42);
+    expect(accessor(row, 'entityName')).toBe('Example');
+    expect(accessor(row, 'dueDate')).toBe(new Date('2024-01-05').getTime());
+    expect(accessor(row, 'priority')).toBe('');
+    expect(accessor(row, 'other-column')).toBe('');
+  });
+
+  it('sorts invalid and missing due dates as empty values', () => {
+    const base = { id: 1, entityName: 'Example', entityId: 'example-id' };
+    expect(fixture.componentInstance.isValidDate(null)).toBeFalse();
+    expect(fixture.componentInstance.isValidDate('invalid')).toBeFalse();
+    expect(fixture.componentInstance.isValidDate(new Date('invalid'))).toBeFalse();
+    expect(fixture.componentInstance.isValidDate(new Date(2024, 0, 5))).toBeTrue();
+    expect(
+      fixture.componentInstance.dataSource.sortingDataAccessor(
+        { ...base, dueDate: null },
+        'dueDate',
+      ),
+    ).toBe('');
+    expect(
+      fixture.componentInstance.dataSource.sortingDataAccessor(
+        { ...base, dueDate: 'invalid' },
+        'dueDate',
+      ),
+    ).toBe('');
   });
 });

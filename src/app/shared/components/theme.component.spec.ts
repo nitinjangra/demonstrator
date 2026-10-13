@@ -78,6 +78,41 @@ describe('ThemeToggleComponent', () => {
     expect(component.isHolding()).toBeFalse();
   }));
 
+  it('ignores non-primary and non-left pointer presses', fakeAsync(() => {
+    const button = fixture.debugElement.query(By.css('button')).nativeElement as HTMLButtonElement;
+    button.dispatchEvent(new PointerEvent('pointerdown', { button: 0, isPrimary: false }));
+    button.dispatchEvent(new PointerEvent('pointerdown', { button: 2, isPrimary: true }));
+
+    expect(component.isHolding()).toBeFalse();
+    tick(2000);
+    expect(themeServiceSpy.toggleTheme).not.toHaveBeenCalled();
+  }));
+
+  it('ignores unrelated keys and repeated keydown events', fakeAsync(() => {
+    const button = fixture.debugElement.query(By.css('button')).nativeElement as HTMLButtonElement;
+    button.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', cancelable: true }));
+    button.dispatchEvent(new KeyboardEvent('keyup', { key: 'Escape', cancelable: true }));
+
+    expect(component.isHolding()).toBeFalse();
+    button.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', cancelable: true }));
+    button.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', repeat: true, cancelable: true }));
+    expect(component.isHolding()).toBeTrue();
+    tick(2000);
+    expect(themeServiceSpy.toggleTheme).toHaveBeenCalledTimes(1);
+  }));
+
+  it('ignores the synthetic click after a keyboard hold', fakeAsync(() => {
+    const button = fixture.debugElement.query(By.css('button')).nativeElement as HTMLButtonElement;
+    button.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', cancelable: true }));
+    button.dispatchEvent(new KeyboardEvent('keyup', { key: 'Enter', cancelable: true }));
+    button.click();
+
+    expect(themeServiceSpy.toggleTheme).not.toHaveBeenCalled();
+    tick();
+    button.click();
+    expect(themeServiceSpy.toggleTheme).toHaveBeenCalledTimes(1);
+  }));
+
   it('should switch themes after the button is held with the keyboard for two seconds', fakeAsync(() => {
     const button = fixture.debugElement.query(By.css('button')).nativeElement as HTMLButtonElement;
 

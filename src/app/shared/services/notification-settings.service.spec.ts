@@ -45,4 +45,21 @@ describe('NotificationSettingsService', () => {
     expect(localStorage.getItem('notification-preference:emailAsApprover')).toBe('false');
     expect(localStorage.getItem('notification-preference:sms')).toBe('true');
   });
+
+  it('restores saved true and false values and treats other values as false', () => {
+    localStorage.setItem('notification-preference:email', 'false');
+    localStorage.setItem('notification-preference:sms', 'true');
+    localStorage.setItem('notification-preference:call', 'yes');
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({ providers: [NotificationSettingsService] });
+    service = TestBed.inject(NotificationSettingsService);
+
+    expect(service.preferences()).toEqual({
+      email: false,
+      emailAsRespondent: true,
+      emailAsApprover: true,
+      sms: true,
+      call: false,
+    });
+  });
 });
