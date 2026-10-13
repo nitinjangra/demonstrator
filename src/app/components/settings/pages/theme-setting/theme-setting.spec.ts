@@ -6,7 +6,16 @@ describe('ThemeSetting', () => {
 
   beforeEach(async () => {
     localStorage.clear();
-    spyOn(window, 'matchMedia').and.returnValue({ matches: false } as MediaQueryList);
+    spyOn(window, 'matchMedia').and.returnValue({
+      matches: false,
+      media: '(prefers-color-scheme: dark)',
+      onchange: null,
+      addListener: () => undefined,
+      removeListener: () => undefined,
+      addEventListener: () => undefined,
+      removeEventListener: () => undefined,
+      dispatchEvent: () => true,
+    } as MediaQueryList);
 
     await TestBed.configureTestingModule({ imports: [ThemeSetting] }).compileComponents();
     fixture = TestBed.createComponent(ThemeSetting);
