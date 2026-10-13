@@ -1,5 +1,8 @@
 .announcements {
   &-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
     margin: 0 0 0.5rem;
     font-size: 1.25rem;
   }
