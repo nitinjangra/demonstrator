@@ -12,7 +12,16 @@ describe('ThemeToggleComponent', () => {
   let themeSignal: WritableSignal<Theme>;
 
   beforeEach(async () => {
-    spyOn(window, 'matchMedia').and.returnValue({ matches: true } as MediaQueryList);
+    spyOn(window, 'matchMedia').and.returnValue({
+      matches: true,
+      media: '(prefers-color-scheme: dark)',
+      onchange: null,
+      addListener: () => undefined,
+      removeListener: () => undefined,
+      addEventListener: () => undefined,
+      removeEventListener: () => undefined,
+      dispatchEvent: () => true,
+    } as MediaQueryList);
     themeSignal = signal<Theme>('light');
     themeServiceSpy = jasmine.createSpyObj<ThemeService>('ThemeService', [
       'getTheme',
