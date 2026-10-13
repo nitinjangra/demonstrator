@@ -1,0 +1,62 @@
+<div class="actions-summary" aria-live="polite">
+  <span>{{ dataSource.data.length }} actions</span>
+  <span class="priority-count priority-count--high">{{ highPriorityCount() }} high</span>
+  <span class="priority-count priority-count--medium">{{ mediumPriorityCount() }} medium</span>
+  <span class="priority-count priority-count--low">{{ lowPriorityCount() }} low</span>
+</div>
+
+<table mat-table [dataSource]="dataSource" matSort aria-label="Actions">
+  <ng-container matColumnDef="id">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>ID</th>
+    <td mat-cell *matCellDef="let row">{{ row.id }}</td>
+  </ng-container>
+
+  <ng-container matColumnDef="entityName">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Entity name</th>
+    <td mat-cell *matCellDef="let row" class="entity-name" [attr.title]="row.entityName">
+      {{ row.entityName }}
+    </td>
+  </ng-container>
+
+  <ng-container matColumnDef="dueDate">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Due date</th>
+    <td mat-cell *matCellDef="let row">
+      @if (isValidDate(row.dueDate)) {
+        {{ dateTimeSettings.formatDateTime(row.dueDate) }}
+      } @else {
+        <span class="no-due-date" aria-label="No due date">—</span>
+      }
+    </td>
+  </ng-container>
+
+  <ng-container matColumnDef="priority">
+    <th mat-header-cell *matHeaderCellDef mat-sort-header>Priority</th>
+    <td mat-cell *matCellDef="let row">
+      @if (row.priority) {
+        <span
+          class="priority-badge"
+          [class.priority-badge--high]="row.priority === 'High'"
+          [class.priority-badge--medium]="row.priority === 'Medium'"
+          [class.priority-badge--low]="row.priority === 'Low'"
+        >
+          @if (row.priority === 'High') {
+            <mat-icon aria-hidden="true">arrow_upward</mat-icon>
+          } @else if (row.priority === 'Medium') {
+            <mat-icon aria-hidden="true">remove</mat-icon>
+          } @else {
+            <mat-icon aria-hidden="true">arrow_downward</mat-icon>
+          }
+          <span>{{ row.priority }}</span>
+        </span>
+      } @else {
+        <span class="no-priority" aria-label="No priority">—</span>
+      }
+    </td>
+  </ng-container>
+
+  <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+  <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+  <tr *matNoDataRow>
+    <td class="empty-state" [attr.colspan]="displayedColumns.length">No actions to show.</td>
+  </tr>
+</table>

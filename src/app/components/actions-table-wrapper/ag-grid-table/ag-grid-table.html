@@ -1,0 +1,17 @@
+<div class="actions-summary" aria-live="polite">
+  <span>{{ rowData().length }} actions</span>
+  <span class="priority-count priority-count--high">{{ highPriorityCount() }} high</span>
+  <span class="priority-count priority-count--medium">{{ mediumPriorityCount() }} medium</span>
+  <span class="priority-count priority-count--low">{{ lowPriorityCount() }} low</span>
+</div>
+
+<div class="ag-grid-frame">
+  <ag-grid-angular
+    class="actions-grid"
+    aria-label="Actions"
+    [rowData]="rowData()"
+    [columnDefs]="columnDefs"
+    [defaultColDef]="defaultColDef"
+    [theme]="gridTheme"
+  />
+</div>
