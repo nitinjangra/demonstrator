@@ -46,6 +46,12 @@
       }
     }
 
+    &-content h2.landing-section-heading {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
     &-announcements {
       display: block;
       min-width: 0;
