@@ -1,4 +1,5 @@
 import { Component, computed, DestroyRef, ElementRef, inject, signal } from '@angular/core';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { ThemeService } from '../services/theme.service';
 
 const HOLD_DURATION_MS = 2000;
@@ -6,6 +7,7 @@ const HOLD_DURATION_MS = 2000;
 @Component({
   selector: 'app-theme-toggle',
   standalone: true,
+  imports: [MatTooltipModule],
   templateUrl: './theme.component.html',
   styleUrls: ['./theme.component.scss'],
 })

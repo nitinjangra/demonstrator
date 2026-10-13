@@ -3,6 +3,7 @@ import { signal, WritableSignal } from '@angular/core';
 import { ThemeToggleComponent } from './theme.component';
 import { Theme, ThemeService } from '../services/theme.service';
 import { By } from '@angular/platform-browser';
+import { MatTooltip } from '@angular/material/tooltip';
 
 describe('ThemeToggleComponent', () => {
   let component: ThemeToggleComponent;
@@ -41,6 +42,19 @@ describe('ThemeToggleComponent', () => {
     expect(getComputedStyle(button).width).toBe('44px');
     expect(getComputedStyle(button).height).toBe('44px');
   });
+
+  it('shows the press-and-hold tooltip on hover', fakeAsync(() => {
+    const button = fixture.debugElement.query(By.css('button')).nativeElement as HTMLButtonElement;
+    button.dispatchEvent(new MouseEvent('mouseenter'));
+    tick();
+    fixture.detectChanges();
+
+    expect(document.querySelector('.mat-mdc-tooltip')?.textContent).toContain(
+      'press and hold to switch theme',
+    );
+    fixture.debugElement.query(By.css('button')).injector.get(MatTooltip).hide();
+    tick();
+  }));
 
   it('should call toggleTheme on the ThemeService when clicked', () => {
     const button = fixture.debugElement.query(By.css('button')).nativeElement as HTMLButtonElement;
