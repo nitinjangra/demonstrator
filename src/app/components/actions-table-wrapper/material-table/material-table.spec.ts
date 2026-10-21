@@ -18,7 +18,7 @@ describe('MaterialTable', () => {
     expect(table).not.toBeNull();
     const summary = fixture.nativeElement.querySelector('.actions-summary') as HTMLElement;
     expect(summary.textContent).toContain('10 actions');
-    expect(summary.textContent).toContain('3 high priority');
+    expect(summary.textContent).toContain('3 High');
     expect(table.querySelectorAll('th[mat-header-cell]').length).toBe(4);
     expect(table.querySelectorAll('tr[mat-row]').length).toBe(10);
 

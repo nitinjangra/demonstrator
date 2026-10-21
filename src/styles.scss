@@ -18,6 +18,28 @@ html,
 body {
   height: 100%;
 }
+
+.announcement-context-menu.mat-mdc-menu-panel {
+  min-width: 13rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.625rem;
+  background-color: var(--color-surface);
+  color: var(--color-text);
+}
+
+.announcement-context-menu .mat-mdc-menu-item {
+  min-height: 3rem;
+  color: var(--color-text);
+}
+
+.announcement-context-menu .mat-mdc-menu-item:hover:not([disabled]) {
+  background-color: var(--color-hover);
+}
+
+.announcement-context-menu .mat-icon {
+  color: var(--color-muted-text);
+}
+
 body {
   margin: 0;
   font-family: Roboto, 'Helvetica Neue', sans-serif;

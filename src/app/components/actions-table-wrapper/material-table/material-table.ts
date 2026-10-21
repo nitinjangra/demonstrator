@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal, ViewChild } from '@angular/core';
+import { Component, inject, signal, ViewChild } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatSort, MatSortModule } from '@angular/material/sort';
@@ -8,11 +8,12 @@ import { ActionTableRow } from '../../../shared/interfaces/actions-table.interfa
 import { DateTimeSettingsService } from '../../../shared/services/date-time-settings.service';
 import { AgTableActionService } from '../shared/services/ag-table-action.service';
 import { AgTableStateService } from '../shared/services/ag-table-state.service';
+import { PrioritySummaryComponent } from '../priority-summary/priority-summary';
 
 @Component({
   selector: 'app-material-table',
   standalone: true,
-  imports: [MatIconModule, MatSortModule, MatTableModule],
+  imports: [MatIconModule, MatSortModule, MatTableModule, PrioritySummaryComponent],
   templateUrl: './material-table.html',
   styleUrl: './material-table.scss',
 })
@@ -31,17 +32,6 @@ export class MaterialTable {
   readonly displayedColumns = ['id', 'entityName', 'dueDate', 'priority'];
   readonly dataSource = new MatTableDataSource<ActionTableRow>();
   private readonly rowData = signal<ActionTableRow[]>([]);
-  readonly highPriorityCount = computed(
-    () => this.rowData().filter((row) => row.priority === Priority.High).length,
-  );
-  readonly mediumPriorityCount = computed(
-    () => this.rowData().filter((row) => row.priority === Priority.Medium).length,
-  );
-  readonly lowPriorityCount = computed(
-    () => this.rowData().filter((row) => row.priority === Priority.Low).length,
-  );
-  readonly noPriorityCount = computed(() => this.rowData().filter((row) => !row.priority).length);
-
   constructor() {
     this.dataSource.filterPredicate = (row, filter) =>
       filter === 'none' ? !row.priority : !filter || row.priority === filter;

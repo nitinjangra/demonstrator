@@ -6,6 +6,7 @@ import { AllCommunityModule, ModuleRegistry, themeQuartz } from 'ag-grid-communi
 import { Priority } from '../../../shared/enums/priority.enum';
 import { ActionTableRow } from '../../../shared/interfaces/actions-table.interface';
 import { DateTimeSettingsService } from '../../../shared/services/date-time-settings.service';
+import { PrioritySummaryComponent } from '../priority-summary/priority-summary';
 import { AgTableActionService } from '../shared/services/ag-table-action.service';
 import { AgTableStateService } from '../shared/services/ag-table-state.service';
 
@@ -14,7 +15,7 @@ ModuleRegistry.registerModules([AllCommunityModule]);
 @Component({
   selector: 'app-ag-grid-table',
   standalone: true,
-  imports: [AgGridAngular],
+  imports: [AgGridAngular, PrioritySummaryComponent],
   templateUrl: './ag-grid-table.html',
   styleUrl: './ag-grid-table.scss',
 })
@@ -33,18 +34,6 @@ export class AgGridTable {
     }
     return priority ? this.sourceRowData().filter((row) => row.priority === priority) : this.sourceRowData();
   });
-  readonly highPriorityCount = computed(
-    () => this.sourceRowData().filter((row) => row.priority === Priority.High).length,
-  );
-  readonly mediumPriorityCount = computed(
-    () => this.sourceRowData().filter((row) => row.priority === Priority.Medium).length,
-  );
-  readonly lowPriorityCount = computed(
-    () => this.sourceRowData().filter((row) => row.priority === Priority.Low).length,
-  );
-  readonly noPriorityCount = computed(
-    () => this.sourceRowData().filter((row) => !row.priority).length,
-  );
   readonly gridTheme = themeQuartz.withParams({
     accentColor: 'var(--color-primary)',
     backgroundColor: 'var(--color-surface)',

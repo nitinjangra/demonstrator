@@ -28,19 +28,45 @@ describe('AnnouncementsActionService', () => {
       providers: [{ provide: AnnouncementsApiService, useValue: apiServiceSpy }],
     });
 
-    service = TestBed.inject<AnnouncementsActionService>(AnnouncementsActionService);
     apiServiceSpy.getAnnouncements.and.returnValue(of(mockAnnouncements));
+    service = TestBed.inject<AnnouncementsActionService>(AnnouncementsActionService);
   });
 
   it('should be created', () => {
     expect(service).toBeTruthy();
   });
 
-  it('should proxy getAnnouncements to AnnouncementsApiService', async () => {
+  it('should load announcements once and expose the shared list', async () => {
     const announcements = await firstValueFrom(service.getAnnouncements());
 
     expect(announcements).toEqual(mockAnnouncements);
     expect(apiServiceSpy.getAnnouncements).toHaveBeenCalledOnceWith();
+  });
+
+  it('keeps added announcements in shared state for later subscribers', async () => {
+    service.addAnnouncement({ title: 'Created announcement' });
+
+    const announcements = await firstValueFrom(service.getAnnouncements());
+
+    expect(announcements.map(({ title }) => title)).toContain('Created announcement');
+  });
+
+  it('filters future and expired announcements using their active dates', async () => {
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    service.addAnnouncement({ title: 'Expired', endDate: yesterday });
+    service.addAnnouncement({ title: 'Future', startDate: tomorrow });
+    service.addAnnouncement({ title: 'Active' });
+
+    const announcements = await firstValueFrom(service.getAnnouncements());
+
+    expect(announcements.map(({ title }) => title)).toEqual([
+      ...mockAnnouncements.map(({ title }) => title),
+      'Active',
+    ]);
   });
 
   describe('handleAnnouncementClick', () => {
