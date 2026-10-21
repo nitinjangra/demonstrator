@@ -2,7 +2,27 @@
   <h2 id="announcements-title" class="announcements-title">
     <mat-icon aria-hidden="true">campaign</mat-icon>
     Announcements
+    <button
+      class="announcement-menu-trigger"
+      appHoldFeedback
+      mat-icon-button
+      type="button"
+      [matMenuTriggerFor]="announcementMenu"
+      aria-label="Announcement options"
+    >
+      <mat-icon aria-hidden="true">more_vert</mat-icon>
+    </button>
   </h2>
+  <mat-menu #announcementMenu="matMenu" panelClass="announcement-context-menu">
+    <button mat-menu-item routerLink="/settings/announcements">
+      <mat-icon aria-hidden="true">settings</mat-icon>
+      <span>Settings</span>
+    </button>
+    <button mat-menu-item type="button" (click)="openCreateAnnouncementDialog()">
+      <mat-icon aria-hidden="true">add</mat-icon>
+      <span>Add announcement</span>
+    </button>
+  </mat-menu>
   @let announcementsData = announcements | async;
   <div class="announcements-panel">
     <ul class="announcements-list">
@@ -32,6 +52,16 @@
                   Read announcement
                   <span aria-hidden="true"> →</span>
                   <span class="visually-hidden">: {{ announcement.title }} (opens in a new tab)</span>
+                </a>
+              }
+              @if (announcement.attachmentUrl && announcement.attachmentName) {
+                <a
+                  class="announcement-attachment"
+                  [href]="announcement.attachmentUrl"
+                  [download]="announcement.attachmentName"
+                >
+                  <mat-icon aria-hidden="true">attach_file</mat-icon>
+                  {{ announcement.attachmentName }}
                 </a>
               }
               @if (announcement.description && (isTruncated(announcement.id) || isExpanded(announcement.id))) {

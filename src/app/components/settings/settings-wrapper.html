@@ -43,6 +43,15 @@
       >
         <span matListItemTitle>Time setting</span>
       </a>
+      <h2 matSubheader>Announcements</h2>
+      <a
+        mat-list-item
+        routerLink="/settings/announcements"
+        routerLinkActive="settings-nav-link--active"
+        [routerLinkActiveOptions]="{ exact: true }"
+      >
+        <span matListItemTitle>Announcement settings</span>
+      </a>
     </mat-nav-list>
   </mat-sidenav>
 
