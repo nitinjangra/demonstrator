@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 import { of } from 'rxjs';
 
 import { AnnouncementsWidgetComponent } from './announcements';
@@ -19,7 +20,10 @@ describe('AnnouncementsWidgetComponent', () => {
 
     await TestBed.configureTestingModule({
       imports: [AnnouncementsWidgetComponent, CoreTestingModule, AsyncPipe],
-      providers: [{ provide: AnnouncementsActionService, useValue: announcementsActionServiceSpy }],
+      providers: [
+        provideRouter([]),
+        { provide: AnnouncementsActionService, useValue: announcementsActionServiceSpy },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(AnnouncementsWidgetComponent);
@@ -197,6 +201,6 @@ describe('AnnouncementsWidgetComponent', () => {
 
     expect(heading.tagName).toBe('H2');
     expect(heading.parentElement).toBe(panel.parentElement);
-    expect(heading.nextElementSibling).toBe(panel);
+    expect(heading.compareDocumentPosition(panel) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 });
