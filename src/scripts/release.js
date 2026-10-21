@@ -108,10 +108,6 @@ function bumpVersion(current, bump) {
 const nextVersion = bumpVersion(currentVersion, bumpArg);
 const tagName = `v${nextVersion}`;
 
-if (nextVersion === currentVersion) {
-  fail(`Version ${currentVersion} is already current. Choose a new version or use the patch, minor, or major bump.`);
-}
-
 // Refuse to reuse an existing tag
 const existingTags = run("git tag --list").split("\n").filter(Boolean);
 if (existingTags.includes(tagName)) {
@@ -143,23 +139,37 @@ if (commits.length === 0) {
   log("\n⚠ No new commits found since the last tag — changelog entry will be minimal.");
 }
 
-// Include only Conventional Commit feature and bug-fix entries.
+// Group commits by conventional-commit type where possible
 const groups = {
   feat: [],
   fix: [],
+  docs: [],
+  chore: [],
+  refactor: [],
+  perf: [],
+  test: [],
+  other: [],
 };
 
-const typeRe = /^(feat|fix)(?:\([^)]+\))?!?:\s*(.+)$/;
+const typeRe = /^(feat|fix|docs|chore|refactor|perf|test)(\(.+\))?:\s*(.+)$/;
 for (const c of commits) {
   const m = c.match(typeRe);
   if (m) {
     groups[m[1]].push(m[3]);
+  } else {
+    groups.other.push(c);
   }
 }
 
 const sectionTitles = {
   feat: "Features",
   fix: "Fixes",
+  docs: "Documentation",
+  refactor: "Refactoring",
+  perf: "Performance",
+  test: "Tests",
+  chore: "Chores",
+  other: "Other Changes",
 };
 
 const today = new Date().toISOString().split("T")[0];
@@ -177,7 +187,7 @@ for (const key of Object.keys(sectionTitles)) {
   }
 }
 if (!hasContent) {
-  changelogEntry += "- No feature or bug-fix commits recorded.\n\n";
+  changelogEntry += "- No notable changes recorded.\n\n";
 }
 
 // --- 4. Preview in dry-run mode --------------------------------------------
@@ -195,11 +205,7 @@ if (dryRun) {
 
 // --- 5. Write package.json and synchronize package-lock.json ----------------
 
-try {
-  run(`npm version ${nextVersion} --no-git-tag-version`);
-} catch (error) {
-  fail(`npm could not update the package version to ${nextVersion}: ${error.message}`);
-}
+run(`npm version ${nextVersion} --no-git-tag-version`);
 log(`\nUpdated package.json to ${nextVersion}`);
 
 const lockPath = path.join(CWD, "package-lock.json");
