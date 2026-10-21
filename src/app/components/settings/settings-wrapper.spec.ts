@@ -27,11 +27,13 @@ describe('SettingsWrapper', () => {
     expect(sidebar.textContent).toContain('Theme');
     expect(sidebar.textContent).toContain('Feature toggles');
     expect(sidebar.textContent).toContain('Notifications');
+    expect(sidebar.textContent).toContain('Announcement settings');
     expect(sidebar.querySelector('a[href="/settings/general/branding"]')).not.toBeNull();
     expect(sidebar.querySelector('a[href="/settings/general/time"]')).not.toBeNull();
     expect(sidebar.querySelector('a[href="/settings/general/theme"]')).not.toBeNull();
     expect(sidebar.querySelector('a[href="/settings/general/feature-toggles"]')).not.toBeNull();
     expect(sidebar.querySelector('a[href="/settings/general/notifications"]')).not.toBeNull();
+    expect(sidebar.querySelector('a[href="/settings/announcements"]')).not.toBeNull();
 
     const itemNames = Array.from(
       sidebar.querySelectorAll<HTMLAnchorElement>('a[mat-list-item]'),
@@ -42,6 +44,7 @@ describe('SettingsWrapper', () => {
       'Notifications',
       'Theme',
       'Time setting',
+      'Announcement settings',
     ]);
   });
 });
