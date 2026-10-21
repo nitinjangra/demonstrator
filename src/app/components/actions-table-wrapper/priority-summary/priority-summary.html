@@ -1,0 +1,24 @@
+<div class="actions-summary" aria-live="polite">
+  <span>{{ rowData().length }} actions</span>
+  @for (filter of filters; track filter.value) {
+    <span
+      [class]="'priority-filter priority-filter--' + filter.className"
+      [class.is-active]="selectedPriority() === filter.value"
+    >
+      <button
+        class="priority-count"
+        type="button"
+        [attr.aria-pressed]="selectedPriority() === filter.value"
+        (click)="prioritySelected.emit(filter.value)"
+      >{{ counts()[filter.countKey] }} {{ filter.label }}</button>
+      @if (selectedPriority() === filter.value) {
+        <button
+          class="priority-filter-clear"
+          type="button"
+          [attr.aria-label]="filter.clearLabel"
+          (click)="filterCleared.emit()"
+        >&times;</button>
+      }
+    </span>
+  }
+</div>

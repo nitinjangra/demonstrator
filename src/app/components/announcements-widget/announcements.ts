@@ -15,11 +15,11 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { RouterLink } from '@angular/router';
 import { AsyncPipe } from '@angular/common';
-import { Observable, filter, map, of, switchMap, take } from 'rxjs';
-import { Announcement } from '../../shared/interfaces/announcement.interface';
+import { Observable, filter, of } from 'rxjs';
+import type { Announcement } from '../../shared/interfaces/announcement.interface';
 import { HoldFeedbackDirective } from '../../shared/directives/hold-feedback.directive';
 import { CreateAnnouncementDialogComponent } from './create-announcement-dialog/create-announcement-dialog';
-import { CreateAnnouncementResult } from './types/create-announcement.types';
+import type { CreateAnnouncementResult } from './types/create-announcement.types';
 import { AnnouncementsActionService } from './services/announcements-action.service';
 
 @Component({
@@ -49,7 +49,6 @@ export class AnnouncementsWidgetComponent implements OnInit {
   announcements: Observable<Announcement[]> = of([]);
   private readonly announcementsActionService = inject(AnnouncementsActionService);
   private readonly dialog = inject(MatDialog);
-  private readonly attachmentUrls = new Set<string>();
 
   constructor() {
     afterEveryRender(() => {
@@ -76,9 +75,6 @@ export class AnnouncementsWidgetComponent implements OnInit {
 
     inject(DestroyRef).onDestroy(() => {
       this.resizeObserver.disconnect();
-      for (const attachmentUrl of this.attachmentUrls) {
-        URL.revokeObjectURL(attachmentUrl);
-      }
     });
   }
 
@@ -94,30 +90,8 @@ export class AnnouncementsWidgetComponent implements OnInit {
       .afterClosed()
       .pipe(
         filter((announcement): announcement is CreateAnnouncementResult => !!announcement),
-        switchMap((announcement) =>
-          this.announcements.pipe(
-            take(1),
-            map((currentAnnouncements) => {
-              const { attachment, ...announcementFields } = announcement;
-              const attachmentUrl = attachment ? URL.createObjectURL(attachment) : undefined;
-              if (attachmentUrl) this.attachmentUrls.add(attachmentUrl);
-
-              return [
-                ...currentAnnouncements,
-                {
-                  ...announcementFields,
-                  id: crypto.randomUUID(),
-                  attachmentUrl,
-                  attachmentName: attachment?.name,
-                },
-              ];
-            }),
-          ),
-        ),
       )
-      .subscribe((updatedAnnouncements) => {
-        this.announcements = of(updatedAnnouncements);
-      });
+      .subscribe((announcement) => this.announcementsActionService.addAnnouncement(announcement));
   }
 
   handleAnnouncementClick(linkUrl: string): void {

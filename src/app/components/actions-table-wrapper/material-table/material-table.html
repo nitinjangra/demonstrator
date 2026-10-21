@@ -1,30 +1,9 @@
-<div class="actions-summary" aria-live="polite">
-  <span>{{ dataSource.data.length }} actions</span>
-  <span class="priority-filter priority-filter--high" [class.is-active]="selectedPriority() === Priority.High">
-    <button class="priority-count" [attr.aria-pressed]="selectedPriority() === Priority.High" type="button" (click)="togglePriorityFilter(Priority.High)">{{ highPriorityCount() }} High</button>
-    @if (selectedPriority() === Priority.High) {
-      <button class="priority-filter-clear" type="button" aria-label="Clear high priority filter" (click)="clearPriorityFilter()">×</button>
-    }
-  </span>
-  <span class="priority-filter priority-filter--medium" [class.is-active]="selectedPriority() === Priority.Medium">
-    <button class="priority-count" [attr.aria-pressed]="selectedPriority() === Priority.Medium" type="button" (click)="togglePriorityFilter(Priority.Medium)">{{ mediumPriorityCount() }} Medium</button>
-    @if (selectedPriority() === Priority.Medium) {
-      <button class="priority-filter-clear" type="button" aria-label="Clear medium priority filter" (click)="clearPriorityFilter()">×</button>
-    }
-  </span>
-  <span class="priority-filter priority-filter--low" [class.is-active]="selectedPriority() === Priority.Low">
-    <button class="priority-count" [attr.aria-pressed]="selectedPriority() === Priority.Low" type="button" (click)="togglePriorityFilter(Priority.Low)">{{ lowPriorityCount() }} Low</button>
-    @if (selectedPriority() === Priority.Low) {
-      <button class="priority-filter-clear" type="button" aria-label="Clear low priority filter" (click)="clearPriorityFilter()">×</button>
-    }
-  </span>
-  <span class="priority-filter priority-filter--none" [class.is-active]="selectedPriority() === 'none'">
-    <button class="priority-count" [attr.aria-pressed]="selectedPriority() === 'none'" type="button" (click)="togglePriorityFilter('none')">{{ noPriorityCount() }} no priority</button>
-    @if (selectedPriority() === 'none') {
-      <button class="priority-filter-clear" type="button" aria-label="Clear no priority filter" (click)="clearPriorityFilter()">&times;</button>
-    }
-  </span>
-</div>
+<app-priority-summary
+  [rowData]="rowData()"
+  [selectedPriority]="selectedPriority()"
+  (prioritySelected)="togglePriorityFilter($event)"
+  (filterCleared)="clearPriorityFilter()"
+/>
 
 <table mat-table [dataSource]="dataSource" matSort aria-label="Actions">
   <ng-container matColumnDef="id">
