@@ -31,6 +31,13 @@ export const routes: Routes = [
         redirectTo: 'general/time',
       },
       {
+        path: 'announcements',
+        loadComponent: () =>
+          import('./components/settings/pages/announcements/announcement-settings').then(
+            (m) => m.AnnouncementSettings,
+          ),
+      },
+      {
         path: 'general',
         children: [
           { path: '', pathMatch: 'full', redirectTo: 'time' },

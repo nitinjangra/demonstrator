@@ -6,6 +6,8 @@ export interface Announcement {
   title: string;
   description?: string;
   imageUrl?: string;
+  attachmentUrl?: string;
+  attachmentName?: string;
   linkUrl?: string;
   startDate?: Date;
   endDate?: Date;

@@ -1,0 +1,53 @@
+<h2 mat-dialog-title>Add announcement</h2>
+<form [formGroup]="form" (ngSubmit)="submit()">
+  <mat-dialog-content>
+    <mat-form-field appearance="outline">
+      <mat-label>Title</mat-label>
+      <input matInput formControlName="title" required maxlength="120" />
+      @if (form.controls.title.hasError('required') && form.controls.title.touched) {
+        <mat-error>Enter a title.</mat-error>
+      }
+      @if (form.controls.title.hasError('maxlength') && form.controls.title.touched) {
+        <mat-error>Use 120 characters or fewer.</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Description</mat-label>
+      <textarea matInput formControlName="description" rows="4"></textarea>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Link (optional)</mat-label>
+      <input matInput formControlName="linkUrl" type="url" />
+      @if (form.controls.linkUrl.hasError('url') && form.controls.linkUrl.touched) {
+        <mat-error>Enter a valid http or https URL.</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Start date (optional)</mat-label>
+      <input matInput formControlName="startDate" type="date" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>End date (optional)</mat-label>
+      <input matInput formControlName="endDate" type="date" />
+    </mat-form-field>
+    @if (form.hasError('dateRange') && (form.controls.startDate.touched || form.controls.endDate.touched)) {
+      <p class="form-error" role="alert">End date must be on or after the start date.</p>
+    }
+
+    <div class="attachment-field">
+      <label for="announcement-attachment">Attachment (optional)</label>
+      <input id="announcement-attachment" type="file" (change)="onAttachmentSelected($event)" />
+      @if (selectedAttachment) {
+        <span class="attachment-name">{{ selectedAttachment.name }}</span>
+      }
+    </div>
+  </mat-dialog-content>
+  <mat-dialog-actions align="end">
+    <button matButton type="button" mat-dialog-close>Cancel</button>
+    <button matButton="filled" type="submit">Add announcement</button>
+  </mat-dialog-actions>
+</form>

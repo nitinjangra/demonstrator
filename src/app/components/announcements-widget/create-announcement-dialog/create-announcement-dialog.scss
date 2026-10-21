@@ -1,0 +1,21 @@
+mat-form-field {
+  display: block;
+}
+
+.attachment-field {
+  display: grid;
+  gap: 0.5rem;
+  margin-block: 0.5rem 1rem;
+}
+
+.attachment-name {
+  color: var(--color-muted-text);
+  font-size: 0.875rem;
+  overflow-wrap: anywhere;
+}
+
+.form-error {
+  margin: -0.5rem 0 1rem;
+  color: var(--color-error);
+  font-size: 0.875rem;
+}
