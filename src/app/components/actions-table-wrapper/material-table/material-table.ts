@@ -20,6 +20,8 @@ export class MaterialTable {
   private readonly actionService = inject(AgTableActionService);
   private readonly state = inject(AgTableStateService);
   readonly dateTimeSettings = inject(DateTimeSettingsService);
+  readonly Priority = Priority;
+  readonly selectedPriority = signal<Priority | 'none' | null>(null);
 
   @ViewChild(MatSort)
   set matSort(sort: MatSort) {
@@ -38,8 +40,11 @@ export class MaterialTable {
   readonly lowPriorityCount = computed(
     () => this.rowData().filter((row) => row.priority === Priority.Low).length,
   );
+  readonly noPriorityCount = computed(() => this.rowData().filter((row) => !row.priority).length);
 
   constructor() {
+    this.dataSource.filterPredicate = (row, filter) =>
+      filter === 'none' ? !row.priority : !filter || row.priority === filter;
     this.dataSource.sortingDataAccessor = (row, column) => {
       switch (column) {
         case 'id':
@@ -63,6 +68,19 @@ export class MaterialTable {
         this.rowData.set(rows);
         this.dataSource.data = rows;
       });
+  }
+
+  togglePriorityFilter(priority: Priority | 'none'): void {
+    this.selectedPriority.update((selected) => {
+      const nextPriority = selected === priority ? null : priority;
+      this.dataSource.filter = nextPriority ?? '';
+      return nextPriority;
+    });
+  }
+
+  clearPriorityFilter(): void {
+    this.selectedPriority.set(null);
+    this.dataSource.filter = '';
   }
 
   isValidDate(value: ActionTableRow['dueDate']): value is Date | string {

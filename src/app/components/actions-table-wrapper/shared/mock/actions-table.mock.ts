@@ -14,6 +14,7 @@ export const mockTableData: ActionTableRow[] = [
     entityName: 'copilot insights',
     entityId: '8c6fccd7-080d-4805-a308-fe02e45556b5',
     dueDate: new Date('2027-06-25T15:00:00'),
+    priority: Priority['Low'],
   },
   {
     id: 28,
@@ -41,6 +42,7 @@ export const mockTableData: ActionTableRow[] = [
     entityName: 'Windows insights',
     entityId: '8c6fccd7-080d-4805-a308-fe02e45556b5',
     dueDate: new Date('2027-06-25T15:00:00'),
+    priority: Priority['Low'],
   },
   {
     id: 93,
@@ -54,6 +56,7 @@ export const mockTableData: ActionTableRow[] = [
     entityName: 'Samsung insights',
     entityId: '8c6fccd7-080d-4805-a308-fe02e45556b5',
     dueDate: new Date('2027-03-29T15:00:00'),
+    priority: Priority['Low'],
   },
   {
     id: 213,
