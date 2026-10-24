@@ -4,6 +4,7 @@
 export interface Announcement {
   id: string;
   title: string;
+  status: AnnouncementStatus;
   description?: string;
   imageUrl?: string;
   attachmentUrl?: string;
@@ -12,5 +13,7 @@ export interface Announcement {
   startDate?: Date;
   endDate?: Date;
 }
+
+export type AnnouncementStatus = 'Published' | 'Scheduled' | 'Draft';
 
 export type Announcements = Announcement[];

@@ -18,11 +18,11 @@ export const announcementDateRangeValidator: ValidatorFn = (
   const startDate = control.get('startDate')?.value;
   const endDate = control.get('endDate')?.value;
 
-  if (typeof startDate !== 'string' || typeof endDate !== 'string') {
+  if (!(startDate instanceof Date) || !(endDate instanceof Date)) {
     return null;
   }
 
-  return startDate && endDate && endDate < startDate ? { dateRange: true } : null;
+  return endDate < startDate ? { dateRange: true } : null;
 };
 
 export const trimmedRequiredValidator: ValidatorFn = (control): ValidationErrors | null =>

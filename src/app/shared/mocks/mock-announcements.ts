@@ -1,6 +1,6 @@
-import { Announcement } from '../interfaces/announcement.interface';
+import { Announcements } from '../interfaces/announcement.interface';
 
-export const mockAnnouncements: Announcement[] = [
+export const mockAnnouncements: Announcements = [
   {
     title: '💪Enhancements to table functionality',
     description:
@@ -8,6 +8,7 @@ export const mockAnnouncements: Announcement[] = [
     startDate: new Date(),
     endDate: new Date(),
     id: '1',
+    status: 'Published',
   },
   {
     title: '🚀 Release 2026.2',
@@ -17,6 +18,7 @@ export const mockAnnouncements: Announcement[] = [
     endDate: new Date(),
     linkUrl: 'https://www.postman.com/release-notes/postman-app/#12-14-3',
     id: '2',
+    status: 'Published',
   },
   {
     title: '📢 New Announcement related to downtime',
@@ -25,5 +27,6 @@ export const mockAnnouncements: Announcement[] = [
     startDate: new Date(),
     endDate: new Date(),
     id: '3',
+    status: 'Published',
   },
 ];
