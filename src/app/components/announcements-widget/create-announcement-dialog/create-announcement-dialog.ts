@@ -6,6 +6,8 @@ import {
 } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import {
@@ -20,9 +22,11 @@ import { CreateAnnouncementResult } from '../types/create-announcement.types';
   standalone: true,
   imports: [
     MatButtonModule,
+    MatDatepickerModule,
     MatDialogModule,
     MatFormFieldModule,
     MatInputModule,
+    MatNativeDateModule,
     ReactiveFormsModule,
   ],
   templateUrl: './create-announcement-dialog.html',
@@ -34,7 +38,7 @@ export class CreateAnnouncementDialogComponent {
     MatDialogRef<CreateAnnouncementDialogComponent, CreateAnnouncementResult>,
   );
 
-  readonly form = this.formBuilder.nonNullable.group({
+  readonly form = this.formBuilder.group({
     title: [
       '',
       [
@@ -44,8 +48,8 @@ export class CreateAnnouncementDialogComponent {
     ],
     description: [''],
     linkUrl: ['', httpUrlValidator],
-    startDate: [''],
-    endDate: [''],
+    startDate: [null as Date | null],
+    endDate: [null as Date | null],
   }, { validators: announcementDateRangeValidator });
 
   selectedAttachment: File | undefined;
@@ -63,19 +67,17 @@ export class CreateAnnouncementDialogComponent {
 
     const value = this.form.getRawValue();
     this.dialogRef.close({
-      title: value.title.trim(),
-      description: value.description.trim() || undefined,
-      linkUrl: value.linkUrl.trim() || undefined,
+      title: (value.title ?? '').trim(),
+      description: value.description?.trim() || undefined,
+      linkUrl: value.linkUrl?.trim() || undefined,
       startDate: this.toDate(value.startDate),
       endDate: this.toDate(value.endDate),
       attachment: this.selectedAttachment,
     });
   }
 
-  private toDate(value: string): Date | undefined {
+  private toDate(value: Date | null): Date | undefined {
     if (!value) return undefined;
-
-    const [year, month, day] = value.split('-').map(Number);
-    return new Date(year, month - 1, day);
+    return new Date(value.getFullYear(), value.getMonth(), value.getDate());
   }
 }

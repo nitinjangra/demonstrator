@@ -18,7 +18,7 @@
     </mat-form-field>
 
     <mat-form-field appearance="outline">
-      <mat-label>Link (optional)</mat-label>
+      <mat-label>Link</mat-label>
       <input matInput formControlName="linkUrl" type="url" />
       @if (form.controls.linkUrl.hasError('url') && form.controls.linkUrl.touched) {
         <mat-error>Enter a valid http or https URL.</mat-error>
@@ -26,20 +26,20 @@
     </mat-form-field>
 
     <mat-form-field appearance="outline">
-      <mat-label>Start date (optional)</mat-label>
-      <input matInput formControlName="startDate" type="date" />
-    </mat-form-field>
-
-    <mat-form-field appearance="outline">
-      <mat-label>End date (optional)</mat-label>
-      <input matInput formControlName="endDate" type="date" />
+      <mat-label>Announcement date range </mat-label>
+      <mat-date-range-input [rangePicker]="rangePicker">
+        <input matStartDate formControlName="startDate" placeholder="Start date" />
+        <input matEndDate formControlName="endDate" placeholder="End date" />
+      </mat-date-range-input>
+      <mat-datepicker-toggle matIconSuffix [for]="rangePicker"></mat-datepicker-toggle>
+      <mat-date-range-picker #rangePicker></mat-date-range-picker>
     </mat-form-field>
     @if (form.hasError('dateRange') && (form.controls.startDate.touched || form.controls.endDate.touched)) {
       <p class="form-error" role="alert">End date must be on or after the start date.</p>
     }
 
     <div class="attachment-field">
-      <label for="announcement-attachment">Attachment (optional)</label>
+      <label for="announcement-attachment">Attachment</label>
       <input id="announcement-attachment" type="file" (change)="onAttachmentSelected($event)" />
       @if (selectedAttachment) {
         <span class="attachment-name">{{ selectedAttachment.name }}</span>
@@ -48,6 +48,6 @@
   </mat-dialog-content>
   <mat-dialog-actions align="end">
     <button matButton type="button" mat-dialog-close>Cancel</button>
-    <button matButton="filled" type="submit">Add announcement</button>
+    <button matButton="filled" type="submit" [disabled]="form.invalid">Add announcement</button>
   </mat-dialog-actions>
 </form>

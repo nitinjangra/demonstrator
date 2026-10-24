@@ -36,6 +36,7 @@ export class AnnouncementsActionService {
       {
         ...fields,
         id: crypto.randomUUID(),
+        status: fields.status ?? 'Draft',
         attachmentUrl,
         attachmentName: attachment?.name,
       },
