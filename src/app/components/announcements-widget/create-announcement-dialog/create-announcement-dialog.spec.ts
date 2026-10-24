@@ -26,8 +26,8 @@ describe('CreateAnnouncementDialogComponent', () => {
 
     expect(host.querySelector('input[formControlName="title"]')).not.toBeNull();
     expect(host.querySelector('input[formControlName="linkUrl"]')).not.toBeNull();
-    expect(host.querySelector('input[formControlName="startDate"]')).not.toBeNull();
-    expect(host.querySelector('input[formControlName="endDate"]')).not.toBeNull();
+    expect(host.querySelector('input[matStartDate]')).not.toBeNull();
+    expect(host.querySelector('input[matEndDate]')).not.toBeNull();
     expect(host.querySelector('input[type="file"]')).not.toBeNull();
   });
 
@@ -46,8 +46,8 @@ describe('CreateAnnouncementDialogComponent', () => {
       title: '  Planned maintenance  ',
       description: '  Service is unavailable.  ',
       linkUrl: 'https://example.com/maintenance',
-      startDate: '2026-11-02',
-      endDate: '2026-11-03',
+      startDate: new Date(2026, 10, 2),
+      endDate: new Date(2026, 10, 3),
     });
     fixture.componentInstance.selectedAttachment = attachment;
 

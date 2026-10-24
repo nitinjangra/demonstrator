@@ -13,6 +13,7 @@ describe('AnnouncementsActionService', () => {
     {
       id: '1',
       title: 'Test announcement',
+      status: 'Published',
       description: 'A short test announcement.',
       linkUrl: 'https://example.com',
     },
