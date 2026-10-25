@@ -10,6 +10,8 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatOptionModule } from '@angular/material/core';
+import { MatSelectModule } from '@angular/material/select';
 import {
   announcementDateRangeValidator,
   httpUrlValidator,
@@ -26,6 +28,8 @@ import { CreateAnnouncementResult } from '../types/create-announcement.types';
     MatDialogModule,
     MatFormFieldModule,
     MatInputModule,
+    MatOptionModule,
+    MatSelectModule,
     MatNativeDateModule,
     ReactiveFormsModule,
   ],
@@ -46,6 +50,7 @@ export class CreateAnnouncementDialogComponent {
         Validators.maxLength(120),
       ],
     ],
+    status: this.formBuilder.control<'Draft' | 'Scheduled' | 'Published'>('Draft'),
     description: [''],
     linkUrl: ['', httpUrlValidator],
     startDate: [null as Date | null],
@@ -68,6 +73,7 @@ export class CreateAnnouncementDialogComponent {
     const value = this.form.getRawValue();
     this.dialogRef.close({
       title: (value.title ?? '').trim(),
+      status: value.status ?? 'Draft',
       description: value.description?.trim() || undefined,
       linkUrl: value.linkUrl?.trim() || undefined,
       startDate: this.toDate(value.startDate),

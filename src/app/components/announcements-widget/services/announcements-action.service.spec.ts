@@ -45,11 +45,33 @@ describe('AnnouncementsActionService', () => {
   });
 
   it('keeps added announcements in shared state for later subscribers', async () => {
-    service.addAnnouncement({ title: 'Created announcement' });
+    service.addAnnouncement({ title: 'Created announcement', status: 'Published' });
 
     const announcements = await firstValueFrom(service.getAnnouncements());
 
     expect(announcements.map(({ title }) => title)).toContain('Created announcement');
+  });
+
+  it('preserves explicit statuses for announcements in the active feed', async () => {
+    service.addAnnouncement({ title: 'Draft notice', status: 'Draft' });
+    service.addAnnouncement({ title: 'Scheduled notice', status: 'Scheduled' });
+    service.addAnnouncement({ title: 'Published notice', status: 'Published' });
+
+    const announcements = await firstValueFrom(service.getAnnouncements());
+
+    expect(announcements.map(({ title, status }) => ({ title, status }))).toEqual([
+      { title: 'Test announcement', status: 'Published' },
+      { title: 'Scheduled notice', status: 'Scheduled' },
+      { title: 'Published notice', status: 'Published' },
+    ]);
+  });
+
+  it('does not expose Draft announcements in the active feed', async () => {
+    service.addAnnouncement({ title: 'Draft notice', status: 'Draft' });
+
+    const announcements = await firstValueFrom(service.getAnnouncements());
+
+    expect(announcements.map(({ title }) => title)).not.toContain('Draft notice');
   });
 
   it('filters future and expired announcements using their active dates', async () => {
@@ -58,9 +80,9 @@ describe('AnnouncementsActionService', () => {
     yesterday.setDate(yesterday.getDate() - 1);
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
-    service.addAnnouncement({ title: 'Expired', endDate: yesterday });
-    service.addAnnouncement({ title: 'Future', startDate: tomorrow });
-    service.addAnnouncement({ title: 'Active' });
+    service.addAnnouncement({ title: 'Expired', endDate: yesterday, status: 'Draft' });
+    service.addAnnouncement({ title: 'Future', startDate: tomorrow, status: 'Scheduled' });
+    service.addAnnouncement({ title: 'Active', status: 'Published' });
 
     const announcements = await firstValueFrom(service.getAnnouncements());
 

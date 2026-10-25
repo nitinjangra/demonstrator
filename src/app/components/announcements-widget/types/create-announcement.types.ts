@@ -2,5 +2,5 @@ import { Announcement } from '../../../shared/interfaces/announcement.interface'
 
 export type CreateAnnouncementResult = Pick<
   Announcement,
-  'title' | 'description' | 'linkUrl' | 'startDate' | 'endDate'
+  'title' | 'description' | 'linkUrl' | 'startDate' | 'endDate' | 'status'
 > & { attachment?: File };
