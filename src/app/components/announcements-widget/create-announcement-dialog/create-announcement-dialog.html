@@ -13,6 +13,15 @@
     </mat-form-field>
 
     <mat-form-field appearance="outline">
+      <mat-label>Status</mat-label>
+      <mat-select formControlName="status" aria-label="Announcement status">
+        <mat-option value="Draft">Draft</mat-option>
+        <mat-option value="Scheduled">Scheduled</mat-option>
+        <mat-option value="Published">Published</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
       <mat-label>Description</mat-label>
       <textarea matInput formControlName="description" rows="4"></textarea>
     </mat-form-field>

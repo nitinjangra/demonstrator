@@ -15,14 +15,22 @@ export const httpUrlValidator: ValidatorFn = (control): ValidationErrors | null 
 export const announcementDateRangeValidator: ValidatorFn = (
   control,
 ): ValidationErrors | null => {
-  const startDate = control.get('startDate')?.value;
-  const endDate = control.get('endDate')?.value;
+  const startDate = parseAnnouncementDate(control.get('startDate')?.value);
+  const endDate = parseAnnouncementDate(control.get('endDate')?.value);
 
-  if (!(startDate instanceof Date) || !(endDate instanceof Date)) {
-    return null;
-  }
+  if (startDate === null || endDate === null) return { dateRange: true };
+  if (startDate === undefined || endDate === undefined) return null;
 
   return endDate < startDate ? { dateRange: true } : null;
+};
+
+const parseAnnouncementDate = (value: unknown): Date | undefined | null => {
+  if (value === null || value === undefined || value === '') return undefined;
+
+  const date = value instanceof Date ? new Date(value.getTime()) :
+    typeof value === 'string' ? new Date(value) : null;
+
+  return date && !Number.isNaN(date.getTime()) ? date : null;
 };
 
 export const trimmedRequiredValidator: ValidatorFn = (control): ValidationErrors | null =>

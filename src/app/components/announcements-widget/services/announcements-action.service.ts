@@ -19,7 +19,11 @@ export class AnnouncementsActionService {
 
   getAnnouncements(): Observable<Announcement[]> {
     return this.announcementsSubject.pipe(
-      map((announcements) => announcements.filter((announcement) => this.isActive(announcement))),
+      map((announcements) =>
+        announcements.filter(
+          (announcement) => announcement.status !== 'Draft' && this.isActive(announcement),
+        ),
+      ),
     );
   }
 
@@ -36,7 +40,7 @@ export class AnnouncementsActionService {
       {
         ...fields,
         id: crypto.randomUUID(),
-        status: fields.status ?? 'Draft',
+        status: fields.status,
         attachmentUrl,
         attachmentName: attachment?.name,
       },
