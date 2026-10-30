@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
+import { MatNativeDateModule } from '@angular/material/core';
 import { AnnouncementsWidgetComponent } from '../announcements-widget/announcements';
 import { Hours } from '../../shared/constants/time.const';
 import { WeatherIcon } from '../../shared/constants/icon.const';
@@ -8,7 +9,7 @@ import { ActionsTableWrapper } from '../actions-table-wrapper/actions-table-wrap
 @Component({
   selector: 'app-landing',
   standalone: true,
-  imports: [AnnouncementsWidgetComponent, ActionsTableWrapper, MatIconModule],
+  imports: [AnnouncementsWidgetComponent, ActionsTableWrapper, MatIconModule, MatNativeDateModule],
   templateUrl: './landing.html',
   styleUrls: ['./landing.scss'],
 })

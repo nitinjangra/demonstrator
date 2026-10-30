@@ -20,6 +20,7 @@ describe('AnnouncementsActionService', () => {
   ];
 
   beforeEach(() => {
+    localStorage.removeItem('announcements');
     apiServiceSpy = jasmine.createSpyObj<AnnouncementsApiService>('AnnouncementsApiService', [
       'getAnnouncements',
     ]);
@@ -32,6 +33,8 @@ describe('AnnouncementsActionService', () => {
     apiServiceSpy.getAnnouncements.and.returnValue(of(mockAnnouncements));
     service = TestBed.inject<AnnouncementsActionService>(AnnouncementsActionService);
   });
+
+  afterEach(() => localStorage.removeItem('announcements'));
 
   it('should be created', () => {
     expect(service).toBeTruthy();
@@ -52,7 +55,27 @@ describe('AnnouncementsActionService', () => {
     expect(announcements.map(({ title }) => title)).toContain('Created announcement');
   });
 
-  it('preserves explicit statuses for announcements in the active feed', async () => {
+  it('caps all stored announcements at ten regardless of status or expiry', async () => {
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 1);
+    const existing = Array.from({ length: 9 }, (_, index) => ({
+      id: `existing-${index}`,
+      title: `Existing ${index}`,
+      status: index % 2 === 0 ? 'Published' as const : 'Draft' as const,
+      ...(index === 0 ? { endDate: yesterday } : {}),
+    }));
+    service.saveAnnouncements(existing);
+
+    expect(service.addAnnouncement({ title: 'Tenth announcement', status: 'Published' })).toBeTrue();
+    expect(service.canAddAnnouncement).toBeFalse();
+    expect(service.addAnnouncement({ title: 'Eleventh announcement', status: 'Draft' })).toBeFalse();
+
+    const allAnnouncements = await firstValueFrom(service.getAllAnnouncements());
+    expect(allAnnouncements.length).toBe(10);
+    expect(allAnnouncements.map(({ title }) => title)).not.toContain('Eleventh announcement');
+  });
+
+  it('shows only Published announcements in the active feed', async () => {
     service.addAnnouncement({ title: 'Draft notice', status: 'Draft' });
     service.addAnnouncement({ title: 'Scheduled notice', status: 'Scheduled' });
     service.addAnnouncement({ title: 'Published notice', status: 'Published' });
@@ -61,7 +84,6 @@ describe('AnnouncementsActionService', () => {
 
     expect(announcements.map(({ title, status }) => ({ title, status }))).toEqual([
       { title: 'Test announcement', status: 'Published' },
-      { title: 'Scheduled notice', status: 'Scheduled' },
       { title: 'Published notice', status: 'Published' },
     ]);
   });
@@ -74,20 +96,35 @@ describe('AnnouncementsActionService', () => {
     expect(announcements.map(({ title }) => title)).not.toContain('Draft notice');
   });
 
-  it('filters future and expired announcements using their active dates', async () => {
+  it('exposes and persists Draft announcements in the complete store', async () => {
+    service.addAnnouncement({ title: 'Draft notice', status: 'Draft' });
+
+    const allAnnouncements = await firstValueFrom(service.getAllAnnouncements());
+    const homeAnnouncements = await firstValueFrom(service.getAnnouncements());
+
+    expect(allAnnouncements.map(({ title }) => title)).toContain('Draft notice');
+    expect(homeAnnouncements.map(({ title }) => title)).not.toContain('Draft notice');
+    const savedTitles = (JSON.parse(localStorage.getItem('announcements') ?? '[]') as Announcement[])
+      .map(({ title }) => title);
+    expect(savedTitles).toEqual(allAnnouncements.map(({ title }) => title));
+  });
+
+  it('filters expired and non-published announcements from the visible feed', async () => {
     const today = new Date();
     const yesterday = new Date(today);
     yesterday.setDate(yesterday.getDate() - 1);
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
-    service.addAnnouncement({ title: 'Expired', endDate: yesterday, status: 'Draft' });
-    service.addAnnouncement({ title: 'Future', startDate: tomorrow, status: 'Scheduled' });
+    service.addAnnouncement({ title: 'Expired', endDate: yesterday, status: 'Published' });
+    service.addAnnouncement({ title: 'Future', startDate: tomorrow, status: 'Published' });
+    service.addAnnouncement({ title: 'Scheduled', status: 'Scheduled' });
     service.addAnnouncement({ title: 'Active', status: 'Published' });
 
     const announcements = await firstValueFrom(service.getAnnouncements());
 
     expect(announcements.map(({ title }) => title)).toEqual([
       ...mockAnnouncements.map(({ title }) => title),
+      'Future',
       'Active',
     ]);
   });

@@ -1,3 +1,156 @@
-<section aria-labelledby="announcement-settings-title">
-  <h2 id="announcement-settings-title">Announcement settings</h2>
+<section class="announcement-settings-page" aria-labelledby="announcement-settings-title">
+  <header class="settings-header">
+    <div>
+      <h2 id="announcement-settings-title">Announcement settings</h2>
+      <p>Preview announcements, arrange their order, and remove items from the list.</p>
+    </div>
+  </header>
+
+  <div class="announcement-manager">
+    <app-announcement-preview class="preview-pane" [announcements]="announcements" />
+
+    <section class="list-pane" aria-labelledby="announcement-list-title">
+      <div class="list-heading">
+        <h3 id="announcement-list-title">All announcements ({{ announcements.length }})</h3>
+        <button
+          class="announcement-add"
+          matButton="outlined"
+          type="button"
+          [disabled]="!canAddAnnouncement"
+          [attr.aria-label]="canAddAnnouncement ? 'Add announcement' : 'Add announcement (limit of 10 reached)'"
+          [attr.title]="canAddAnnouncement ? 'Add announcement' : 'Announcement limit reached (10)'"
+          (click)="openCreateAnnouncementDialog()"
+        >
+          <mat-icon aria-hidden="true">add</mat-icon>
+          Add announcement
+        </button>
+      </div>
+      @if (announcements.length) {
+        <ol class="announcement-list">
+          @for (announcement of announcements; track announcement.id; let index = $index) {
+            <li class="announcement-row">
+              <div class="announcement-select">
+                <span class="row-title" tabindex="0" [attr.title]="announcement.title">
+                  {{ announcement.title }}
+                </span>
+                <span
+                  class="status-badge"
+                  [attr.data-status]="announcement.status"
+                >
+                  {{ announcement.status }}
+                </span>
+              </div>
+              <div
+                class="row-actions"
+                role="group"
+                [attr.aria-label]="'Actions for ' + announcement.title"
+              >
+                <button
+                  mat-icon-button
+                  type="button"
+                  [attr.aria-label]="
+                    index === 0
+                      ? 'Move ' + announcement.title + ' up (already first)'
+                      : 'Move ' + announcement.title + ' up'
+                  "
+                  [disabled]="index === 0"
+                  (click)="moveAnnouncement(index, -1)"
+                >
+                  <mat-icon aria-hidden="true">arrow_upward</mat-icon>
+                </button>
+                <button
+                  mat-icon-button
+                  type="button"
+                  [attr.aria-label]="
+                    index === announcements.length - 1
+                      ? 'Move ' + announcement.title + ' down (already last)'
+                      : 'Move ' + announcement.title + ' down'
+                  "
+                  [disabled]="index === announcements.length - 1"
+                  (click)="moveAnnouncement(index, 1)"
+                >
+                  <mat-icon aria-hidden="true">arrow_downward</mat-icon>
+                </button>
+                <button
+                  mat-icon-button
+                  type="button"
+                  class="announcement-edit"
+                  [attr.aria-label]="'Edit ' + announcement.title"
+                  [attr.title]="'Edit ' + announcement.title"
+                  (click)="openEditAnnouncement(announcement.id)"
+                >
+                  <mat-icon aria-hidden="true">edit</mat-icon>
+                </button>
+                <button
+                  mat-icon-button
+                  type="button"
+                  [attr.aria-label]="'Delete ' + announcement.title"
+                  (click)="deleteAnnouncement(announcement.id)"
+                >
+                  <mat-icon aria-hidden="true">delete_outline</mat-icon>
+                </button>
+              </div>
+            </li>
+          }
+        </ol>
+      } @else {
+        <div class="empty-list">
+          <h4>No announcements yet</h4>
+          <p>Create an announcement to share important updates with your users.</p>
+        </div>
+      }
+    </section>
+  </div>
+
+  @if (editorOpen && editorData; as data) {
+    <button
+      class="announcement-settings-drawer-backdrop"
+      type="button"
+      aria-label="Close announcement editor"
+      (click)="closeAnnouncementEditor()"
+    ></button>
+    <aside
+      class="announcement-settings-drawer"
+      role="dialog"
+      aria-modal="true"
+      [attr.aria-label]="data.mode === 'edit' ? 'Edit announcement' : 'Add announcement'"
+      (keydown.escape)="closeAnnouncementEditor()"
+    >
+      <app-create-announcement-dialog
+        class="announcement-editor-embedded"
+        [editorData]="data"
+        (saved)="saveAnnouncementFromEditor($event)"
+        (cancelled)="closeAnnouncementEditor()"
+      />
+    </aside>
+  }
+
+  <app-sticky-footer [fixed]="false">
+    <button
+      matButton
+      type="button"
+      [attr.aria-label]="hasOrderChanges ? 'Discard order' : 'Discard order (no order changes)'"
+      aria-describedby="discard-order-help"
+      [disabled]="!hasOrderChanges"
+      (click)="discardOrder()"
+    >
+      Discard Order
+    </button>
+    <button
+      matButton="filled"
+      type="button"
+      [attr.aria-label]="hasUnsavedChanges ? 'Save order' : 'Save order (no unsaved changes)'"
+      aria-describedby="save-order-help"
+      [disabled]="!hasUnsavedChanges"
+      (click)="save()"
+    >
+      Save Order
+    </button>
+    <span id="discard-order-help" class="visually-hidden">
+      Enabled after announcement order changes. Discarding order keeps other edits.
+    </span>
+    <span id="save-order-help" class="visually-hidden">
+      Enabled after announcement order or content changes.
+    </span>
+  </app-sticky-footer>
 </section>

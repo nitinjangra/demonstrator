@@ -14,6 +14,6 @@ export interface Announcement {
   endDate?: Date;
 }
 
-export type AnnouncementStatus = 'Published' | 'Scheduled' | 'Draft';
+export type AnnouncementStatus = 'Published' | 'Scheduled' | 'Draft' | 'Expired';
 
 export type Announcements = Announcement[];

@@ -123,11 +123,14 @@
   }
 
   &-link {
-    display: block;
+    display: flex;
+    align-items: center;
+    min-height: 2.75rem;
     margin-top: 0.5rem;
     color: var(--color-primary);
     font-weight: 600;
     text-underline-offset: 0.2em;
+    overflow-wrap: anywhere;
 
     &:focus-visible {
       border-radius: 0.15rem;
@@ -141,10 +144,17 @@
     align-items: center;
     gap: 0.35rem;
     max-width: 100%;
+    min-height: 2.75rem;
     margin-top: 0.5rem;
     color: var(--color-primary);
     font-size: 0.875rem;
     overflow-wrap: anywhere;
+
+    &:focus-visible {
+      border-radius: 0.15rem;
+      outline: 3px solid var(--color-primary);
+      outline-offset: 3px;
+    }
 
     .mat-icon {
       flex: 0 0 auto;
@@ -157,7 +167,8 @@
   &-expand {
     display: inline-block;
     margin-top: 0.5rem;
-    padding: 0;
+    min-height: 2.75rem;
+    padding: 0.5rem 0;
     border: 0;
     background: transparent;
     color: var(--color-primary);

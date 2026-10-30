@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
+import { DateAdapter } from '@angular/material/core';
 
 import { Landing } from './landing';
 import { WeatherIcon } from '../../shared/constants/icon.const';
@@ -21,6 +22,10 @@ describe('Landing', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should provide the native date adapter required by announcement date pickers', () => {
+    expect(fixture.debugElement.injector.get(DateAdapter)).toBeTruthy();
   });
 
   it('should show the morning greeting and sun icon', () => {

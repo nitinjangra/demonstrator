@@ -1,0 +1,10 @@
+.announcement-preview {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+
+  h3 {
+    margin: 0 0 1rem;
+    font-size: 1.05rem;
+  }
+}

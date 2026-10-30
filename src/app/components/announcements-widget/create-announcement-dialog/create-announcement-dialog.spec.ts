@@ -32,6 +32,25 @@ describe('CreateAnnouncementDialogComponent', () => {
     expect(host.querySelector('input[type="file"]')).not.toBeNull();
   });
 
+  it('uses the sticky footer with one rem action spacing for add and edit', () => {
+    const host = fixture.nativeElement as HTMLElement;
+    const footer = host.querySelector('app-sticky-footer footer') as HTMLElement;
+    const buttons = footer.querySelectorAll('button');
+
+    expect(footer.classList).not.toContain('sticky-footer--fixed');
+    expect(buttons.length).toBe(2);
+    expect(getComputedStyle(footer).gap).toBe('16px');
+    expect(buttons[1].textContent).toContain('Add announcement');
+
+    fixture.componentRef.setInput('editorData', {
+      mode: 'edit',
+      announcement: { id: 'edit-me', title: 'Existing', status: 'Published' },
+    });
+    fixture.detectChanges();
+
+    expect(footer.querySelectorAll('button')[1].textContent).toContain('Save announcement');
+  });
+
   it('keeps the dialog open when the form is invalid', () => {
     fixture.componentInstance.form.controls.title.setValue('   ');
 
