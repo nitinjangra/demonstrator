@@ -1,4 +1,38 @@
 <main class="dashboard" aria-labelledby="dashboard-title">
-  <h1 id="dashboard-title">Dashboard</h1>
-  <p>Your dashboard overview will appear here.</p>
+  <header class="dashboard__header">
+    <div>
+      <h1 id="dashboard-title">Actions dashboard</h1>
+      <p>Overview of priorities and upcoming due dates.</p>
+    </div>
+  </header>
+
+  <section class="dashboard__summary" aria-label="Action summary">
+    <article class="summary-card">
+      <span class="summary-card__label">Total actions</span>
+      <strong>{{ totalActions() }}</strong>
+    </article>
+    <article class="summary-card">
+      <span class="summary-card__label">High priority</span>
+      <strong>{{ priorityCounts()[0] }}</strong>
+    </article>
+    <article class="summary-card">
+      <span class="summary-card__label">Medium priority</span>
+      <strong>{{ priorityCounts()[1] }}</strong>
+    </article>
+    <article class="summary-card">
+      <span class="summary-card__label">Low priority</span>
+      <strong>{{ priorityCounts()[2] }}</strong>
+    </article>
+  </section>
+
+  <section class="dashboard__charts" aria-label="Action charts">
+    <article class="chart-card">
+      <h2>Actions by priority</h2>
+      <div id="priority-chart" class="chart-card__canvas" role="img" aria-label="Actions by priority chart"></div>
+    </article>
+    <article class="chart-card">
+      <h2>Actions by due date</h2>
+      <div id="due-date-chart" class="chart-card__canvas" role="img" aria-label="Actions by due date chart"></div>
+    </article>
+  </section>
 </main>
