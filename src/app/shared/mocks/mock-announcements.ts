@@ -29,4 +29,13 @@ export const mockAnnouncements: Announcements = [
     id: '3',
     status: 'Published',
   },
+  {
+    title: ' 🛠️ Scheduled Maintaince',
+    description:
+      'We will be performing scheduled maintenance on our servers this weekend. During this time, the application may be unavailable. We apologize for any inconvenience this may cause.',
+    startDate: new Date('2024-01-01'),
+    endDate: new Date('2024-01-02'),
+    id: '23',
+    status: 'Expired',
+  },
 ];

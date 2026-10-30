@@ -2,19 +2,27 @@
   <h2 id="theme-settings-title">Theme</h2>
   <p>Choose the appearance used throughout the application.</p>
 
-  <mat-button-toggle-group
-    class="theme-options"
-    aria-label="Color theme"
-    [value]="preference()"
-    (change)="setTheme($event.value)"
-  >
-    <mat-button-toggle value="light">Light</mat-button-toggle>
-    <mat-button-toggle value="dark">Dark</mat-button-toggle>
-    <mat-button-toggle value="system">Follow system</mat-button-toggle>
-  </mat-button-toggle-group>
+  <div class="theme-preference-row">
+    <div class="theme-preference-copy">
+      <h3>Theme preference</h3>
+      <p class="current-theme" aria-live="polite">Currently {{ theme() }}</p>
+    </div>
 
-  <p class="current-theme" aria-live="polite">
-    Theme preference: {{ preference() === 'system' ? 'Follow system' : preference() }}
-    (currently {{ theme() }})
-  </p>
+    <mat-button-toggle-group
+      class="theme-options"
+      aria-label="Color theme"
+      [value]="draftPreference()"
+      (change)="setTheme($event.value)"
+    >
+      <mat-button-toggle value="light">Light</mat-button-toggle>
+      <mat-button-toggle value="dark">Dark</mat-button-toggle>
+      <mat-button-toggle value="system">Follow system</mat-button-toggle>
+    </mat-button-toggle-group>
+  </div>
 </section>
+
+<app-sticky-footer [fixed]="false">
+  <button matButton="filled" type="button" [disabled]="!hasUnsavedChanges()" (click)="saveChanges()">
+    Save changes
+  </button>
+</app-sticky-footer>

@@ -1,56 +1,115 @@
 <mat-sidenav-container class="settings-layout">
-  <mat-sidenav class="settings-sidebar" mode="side" opened aria-label="Settings navigation">
-    <h1 class="settings-title">Settings</h1>
+  <mat-sidenav class="settings-sidebar" [class.settings-sidebar--minimized]="isSidebarMinimized" mode="side" opened aria-label="Settings navigation">
+    <div class="settings-sidebar-heading">
+      @if (!isSidebarMinimized) {
+        <h1 class="settings-title">Settings</h1>
+      }
+      @if (!isSidebarMinimized) {
+        <button
+          mat-icon-button
+          type="button"
+          class="sidebar-toggle"
+          (click)="toggleSidebar()"
+          aria-label="Minimize settings menu"
+          title="Minimize menu"
+        >
+          <mat-icon aria-hidden="true">chevron_left</mat-icon>
+        </button>
+      }
+    </div>
     <mat-nav-list>
-      <h2 matSubheader>General</h2>
+      @if (isSidebarMinimized) {
+        <button
+          mat-icon-button
+          type="button"
+          class="sidebar-toggle sidebar-toggle--collapsed sidebar-toggle--nav-item"
+          (click)="toggleSidebar()"
+          [attr.aria-label]="isSidebarMinimized ? 'Expand settings menu' : 'Minimize settings menu'"
+          title="Expand menu"
+        >
+          <mat-icon aria-hidden="true">chevron_right</mat-icon>
+        </button>
+      }
       <a
         mat-list-item
+        matTooltip="Overview"
+        [matTooltipDisabled]="!isSidebarMinimized"
+        routerLink="/settings/overview"
+        routerLinkActive="settings-nav-link--active"
+        ariaCurrentWhenActive="page"
+        [routerLinkActiveOptions]="{ exact: true }"
+      >
+        <mat-icon matListItemIcon aria-hidden="true">grid_view</mat-icon>
+        @if (!isSidebarMinimized) { <span matListItemTitle>Overview</span> }
+      </a>
+      @if (!isSidebarMinimized) { <h2 matSubheader>General</h2> }
+      <a
+        mat-list-item
+        matTooltip="Branding"
+        [matTooltipDisabled]="!isSidebarMinimized"
         routerLink="/settings/general/branding"
         routerLinkActive="settings-nav-link--active"
         [routerLinkActiveOptions]="{ exact: true }"
       >
-        <span matListItemTitle>Branding</span>
+        <mat-icon matListItemIcon aria-hidden="true">palette</mat-icon>
+        @if (!isSidebarMinimized) { <span matListItemTitle>Branding</span> }
       </a>
       <a
         mat-list-item
+        matTooltip="Feature toggles"
+        [matTooltipDisabled]="!isSidebarMinimized"
         routerLink="/settings/general/feature-toggles"
         routerLinkActive="settings-nav-link--active"
         [routerLinkActiveOptions]="{ exact: true }"
       >
-        <span matListItemTitle>Feature toggles</span>
+        <mat-icon matListItemIcon aria-hidden="true">toggle_on</mat-icon>
+        @if (!isSidebarMinimized) { <span matListItemTitle>Feature toggles</span> }
       </a>
       <a
         mat-list-item
+        matTooltip="Notifications"
+        [matTooltipDisabled]="!isSidebarMinimized"
         routerLink="/settings/general/notifications"
         routerLinkActive="settings-nav-link--active"
         [routerLinkActiveOptions]="{ exact: true }"
       >
-        <span matListItemTitle>Notifications</span>
+        <mat-icon matListItemIcon aria-hidden="true">notifications</mat-icon>
+        @if (!isSidebarMinimized) { <span matListItemTitle>Notifications</span> }
       </a>
       <a
         mat-list-item
+        matTooltip="Theme"
+        [matTooltipDisabled]="!isSidebarMinimized"
         routerLink="/settings/general/theme"
         routerLinkActive="settings-nav-link--active"
         [routerLinkActiveOptions]="{ exact: true }"
       >
-        <span matListItemTitle>Theme</span>
+        <mat-icon matListItemIcon aria-hidden="true">contrast</mat-icon>
+        @if (!isSidebarMinimized) { <span matListItemTitle>Theme</span> }
       </a>
       <a
         mat-list-item
+        matTooltip="Time setting"
+        [matTooltipDisabled]="!isSidebarMinimized"
         routerLink="/settings/general/time"
         routerLinkActive="settings-nav-link--active"
         [routerLinkActiveOptions]="{ exact: true }"
       >
-        <span matListItemTitle>Time setting</span>
+        <mat-icon matListItemIcon aria-hidden="true">schedule</mat-icon>
+        @if (!isSidebarMinimized) { <span matListItemTitle>Time setting</span> }
       </a>
-      <h2 matSubheader>Announcements</h2>
+      @if (!isSidebarMinimized) { <h2 matSubheader>Announcements</h2> }
       <a
         mat-list-item
+        matTooltip="Announcement settings"
+        [matTooltipDisabled]="!isSidebarMinimized"
         routerLink="/settings/announcements"
         routerLinkActive="settings-nav-link--active"
+        ariaCurrentWhenActive="page"
         [routerLinkActiveOptions]="{ exact: true }"
       >
-        <span matListItemTitle>Announcement settings</span>
+        <mat-icon matListItemIcon aria-hidden="true">campaign</mat-icon>
+        @if (!isSidebarMinimized) { <span matListItemTitle>Announcement settings</span> }
       </a>
     </mat-nav-list>
   </mat-sidenav>

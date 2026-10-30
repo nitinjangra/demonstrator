@@ -1,12 +1,52 @@
+:host {
+  display: flex;
+  min-height: 100%;
+  flex-direction: column;
+}
+
 .theme-settings {
-  max-width: 40rem;
+  flex: 1 0 auto;
+}
+
+.theme-preference-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  max-width: 56rem;
+  margin-top: 2rem;
+}
+
+.theme-preference-copy h3,
+.theme-preference-copy p {
+  margin: 0;
+}
+
+.theme-preference-copy p {
+  margin-top: 0.35rem;
+  color: var(--color-text-muted, #697386);
 }
 
 .theme-options {
-  max-width: 100%;
-  margin-block: 1.5rem 1rem;
+  flex: 0 0 auto;
+  margin-left: auto;
 }
 
 .current-theme {
   text-transform: capitalize;
+}
+
+app-sticky-footer {
+  margin-top: auto;
+}
+
+@media (max-width: 700px) {
+  .theme-preference-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .theme-options {
+    max-width: 100%;
+  }
 }
