@@ -3,6 +3,7 @@
 }
 
 .settings-layout {
+  height: calc(100vh - 64px);
   min-height: calc(100vh - 64px);
   background: transparent;
 }
@@ -13,24 +14,90 @@
   border-right: 1px solid var(--color-border, #d9dce1);
   border-radius: 0;
   background: var(--color-bg, #fff);
+
+  mat-nav-list {
+    padding-block: 0;
+    --mat-list-list-item-one-line-container-height: 2.5rem;
+    --mat-list-list-item-leading-icon-start-space: 0.5rem;
+    --mat-list-list-item-leading-icon-end-space: 0.5rem;
+  }
+
+  [matSubheader] {
+    box-sizing: border-box;
+    height: auto;
+    min-height: 2.5rem;
+    margin: 0;
+    padding-inline: 0.75rem;
+  }
+}
+
+.settings-sidebar--minimized {
+  width: 4.5rem;
+  padding-inline: 0.5rem;
+
+  .settings-sidebar-heading {
+    justify-content: center;
+  }
+
+  .sidebar-toggle--nav-item {
+    display: flex;
+    width: 100%;
+    height: 2.5rem;
+    margin: 0.25rem 0;
+    border-radius: 0.25rem;
+    color: inherit;
+  }
+
+  a[mat-list-item] {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-inline: 0;
+
+    [matListItemIcon] {
+      position: absolute;
+      left: 50%;
+      margin: 0;
+      transform: translateX(-50%);
+    }
+  }
+}
+
+.settings-sidebar-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 3rem;
+  margin: 0 0.5rem 0.75rem;
+}
+
+.sidebar-toggle {
+  flex: 0 0 auto;
 }
 
 .settings-title {
-  margin: 0.5rem 1rem 1.25rem;
+  margin: 0.5rem 0 0.75rem;
   font-size: 1.25rem;
   font-weight: 600;
 }
 
-.settings-nav-link--active {
-  background: color-mix(in srgb, var(--color-primary, #3f51b5) 12%, transparent);
+a.settings-nav-link--active,
+a[aria-current='page'] {
+  background-color: color-mix(in srgb, var(--color-primary, #3f51b5) 18%, transparent) !important;
 }
 
 .settings-content {
-  padding: clamp(1.25rem, 4vw, 2.5rem);
+  box-sizing: border-box;
+  height: 100%;
+  overflow: auto;
+  padding-left: clamp(1.25rem, 4vw, 1.5rem);
+  padding-right: clamp(1.25rem, 4vw, 1.5rem);
+  padding-top: clamp(1.25rem, 4vw, 1.5rem);
 }
 
 @media (max-width: 600px) {
-  .settings-sidebar {
+  .settings-sidebar:not(.settings-sidebar--minimized) {
     width: 13rem;
   }
 }

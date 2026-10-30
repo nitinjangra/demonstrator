@@ -32,4 +32,14 @@ describe('Globalheader', () => {
     expect(fixture.nativeElement.querySelector('[aria-label="Open navigation menu"]')).toBeNull();
     expect(component.canShowHamburgerMenu).toBeFalse();
   });
+
+  it('shows the dashboard icon as the dashboard link', () => {
+    fixture.detectChanges();
+
+    const dashboardLink = fixture.nativeElement.querySelector('.global-header-dashboard') as HTMLAnchorElement;
+    expect(dashboardLink.getAttribute('href')).toBe('/dashboard');
+    expect(dashboardLink.getAttribute('aria-label')).toBe('Dashboard');
+    expect(dashboardLink.querySelector('mat-icon')?.textContent?.trim()).toBe('dashboard');
+    expect(dashboardLink.textContent?.trim()).toBe('dashboard');
+  });
 });

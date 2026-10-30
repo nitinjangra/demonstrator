@@ -5,7 +5,7 @@
   <div class="notification-channel">
     <mat-slide-toggle
       class="notification-toggle"
-      [checked]="preferences().email"
+      [checked]="draftPreferences().email"
       (change)="setPreference('email', $event.checked)"
     >
       Email
@@ -18,16 +18,16 @@
     >
       <mat-slide-toggle
         class="notification-toggle"
-        [checked]="preferences().emailAsRespondent"
-        [disabled]="!preferences().email"
+        [checked]="draftPreferences().emailAsRespondent"
+        [disabled]="!draftPreferences().email"
         (change)="setPreference('emailAsRespondent', $event.checked)"
       >
         When added as a respondent
       </mat-slide-toggle>
       <mat-slide-toggle
         class="notification-toggle"
-        [checked]="preferences().emailAsApprover"
-        [disabled]="!preferences().email"
+        [checked]="draftPreferences().emailAsApprover"
+        [disabled]="!draftPreferences().email"
         (change)="setPreference('emailAsApprover', $event.checked)"
       >
         When added as an approver
@@ -37,7 +37,7 @@
 
   <mat-slide-toggle
     class="notification-toggle notification-channel"
-    [checked]="preferences().sms"
+    [checked]="draftPreferences().sms"
     (change)="setPreference('sms', $event.checked)"
   >
     SMS
@@ -45,9 +45,15 @@
 
   <mat-slide-toggle
     class="notification-toggle notification-channel"
-    [checked]="preferences().call"
+    [checked]="draftPreferences().call"
     (change)="setPreference('call', $event.checked)"
   >
     Phone call
   </mat-slide-toggle>
 </section>
+
+<app-sticky-footer [fixed]="false">
+  <button matButton="filled" type="button" [disabled]="!hasUnsavedChanges()" (click)="saveChanges()">
+    Save changes
+  </button>
+</app-sticky-footer>

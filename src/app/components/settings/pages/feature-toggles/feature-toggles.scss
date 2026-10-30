@@ -1,10 +1,26 @@
+:host {
+  display: flex;
+  min-height: 100%;
+  flex-direction: column;
+}
+
+.feature-toggles {
+  flex: 1 0 auto;
+}
+
+app-sticky-footer {
+  margin-top: auto;
+}
+
 .feature-toggles fieldset {
+  --mat-tree-container-background-color: var(--color-surface, #fff);
   display: grid;
   gap: 0.75rem;
-  max-width: 32rem;
   margin-block: 1.5rem;
   padding: 1rem;
   border: 1px solid var(--color-border, #d9dce1);
+  border-radius: 0.5rem;
+  background-color: var(--mat-tree-container-background-color);
 }
 
 .feature-toggle-row {

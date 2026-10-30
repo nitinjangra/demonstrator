@@ -1,6 +1,10 @@
+import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { provideRouter, Router } from '@angular/router';
 import { SettingsWrapper } from './settings-wrapper';
+
+@Component({ standalone: true, template: '' })
+class SettingsTestRoute {}
 
 describe('SettingsWrapper', () => {
   let fixture: ComponentFixture<SettingsWrapper>;
@@ -8,7 +12,7 @@ describe('SettingsWrapper', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [SettingsWrapper],
-      providers: [provideRouter([])],
+      providers: [provideRouter([{ path: 'settings/announcements', component: SettingsTestRoute }])],
     }).compileComponents();
 
     fixture = TestBed.createComponent(SettingsWrapper);
@@ -37,7 +41,7 @@ describe('SettingsWrapper', () => {
 
     const itemNames = Array.from(
       sidebar.querySelectorAll<HTMLAnchorElement>('a[mat-list-item]'),
-    ).map((link) => link.textContent.trim());
+    ).map((link) => link.querySelector('[matListItemTitle]')?.textContent?.trim());
     expect(itemNames).toEqual([
       'Branding',
       'Feature toggles',
@@ -46,5 +50,35 @@ describe('SettingsWrapper', () => {
       'Time setting',
       'Announcement settings',
     ]);
+  });
+
+  it('minimizes and expands the settings menu while keeping its links available', () => {
+    const toggle = fixture.nativeElement.querySelector('.sidebar-toggle') as HTMLButtonElement;
+    const sidebar = fixture.nativeElement.querySelector('.settings-sidebar') as HTMLElement;
+
+    expect(toggle.getAttribute('aria-label')).toBe('Minimize settings menu');
+    toggle.click();
+    fixture.detectChanges();
+
+    expect(sidebar.classList).toContain('settings-sidebar--minimized');
+    expect(fixture.nativeElement.querySelector('a[href="/settings/announcements"]')).not.toBeNull();
+    expect(toggle.getAttribute('aria-label')).toBe('Expand settings menu');
+
+    toggle.click();
+    fixture.detectChanges();
+
+    expect(sidebar.classList).not.toContain('settings-sidebar--minimized');
+    expect(toggle.getAttribute('aria-label')).toBe('Minimize settings menu');
+  });
+
+  it('highlights announcement settings when its route is active', async () => {
+    await TestBed.inject(Router).navigateByUrl('/settings/announcements');
+    fixture.detectChanges();
+
+    const link = fixture.nativeElement.querySelector(
+      'a[href="/settings/announcements"]',
+    ) as HTMLAnchorElement;
+    expect(link.classList).toContain('settings-nav-link--active');
+    expect(link.getAttribute('aria-current')).toBe('page');
   });
 });
