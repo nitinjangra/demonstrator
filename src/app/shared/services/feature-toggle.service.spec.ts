@@ -7,6 +7,7 @@ describe('FeatureToggleService', () => {
   beforeEach(() => {
     localStorage.removeItem('table-feature');
     localStorage.removeItem('dashboard-feature');
+    localStorage.removeItem('chart-library-feature');
     TestBed.configureTestingModule({ providers: [FeatureToggleService] });
     service = TestBed.inject(FeatureToggleService);
   });
@@ -14,6 +15,7 @@ describe('FeatureToggleService', () => {
   afterEach(() => {
     localStorage.removeItem('table-feature');
     localStorage.removeItem('dashboard-feature');
+    localStorage.removeItem('chart-library-feature');
   });
 
   it('defaults to AG Grid to preserve the existing table choice', () => {
@@ -84,5 +86,33 @@ describe('FeatureToggleService', () => {
     service = TestBed.inject(FeatureToggleService);
 
     expect(service.dashboardEnabled()).toBeFalse();
+  });
+
+  it('defaults to Chart.js and switches exclusively to Highcharts', () => {
+    expect(service.chartJsEnabled()).toBeTrue();
+    expect(service.highchartsEnabled()).toBeFalse();
+
+    service.setChartLibrary('highcharts', true);
+
+    expect(service.chartJsEnabled()).toBeFalse();
+    expect(service.highchartsEnabled()).toBeTrue();
+    expect(localStorage.getItem('chart-library-feature')).toBe('highcharts');
+  });
+
+  it('keeps one chart library selected when the active one is disabled', () => {
+    service.setChartLibrary('chartjs', false);
+
+    expect(service.chartJsEnabled()).toBeFalse();
+    expect(service.highchartsEnabled()).toBeTrue();
+  });
+
+  it('restores the chart library selection from storage', () => {
+    localStorage.setItem('chart-library-feature', 'highcharts');
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({ providers: [FeatureToggleService] });
+    service = TestBed.inject(FeatureToggleService);
+
+    expect(service.highchartsEnabled()).toBeTrue();
+    expect(service.chartJsEnabled()).toBeFalse();
   });
 });
