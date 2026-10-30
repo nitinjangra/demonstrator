@@ -2,25 +2,27 @@
   <h2 id="announcements-title" class="announcements-title">
     <mat-icon aria-hidden="true">campaign</mat-icon>
     Announcements
-    <button
-      class="announcement-menu-trigger"
-      appHoldFeedback
-      mat-icon-button
-      type="button"
-      [matMenuTriggerFor]="announcementMenu"
-      aria-label="Announcement options"
-    >
-      <mat-icon aria-hidden="true">more_vert</mat-icon>
-    </button>
+    @if (showContextMenu) {
+      <button
+        class="announcement-menu-trigger"
+        appHoldFeedback
+        mat-icon-button
+        type="button"
+        [matMenuTriggerFor]="announcementMenu"
+        aria-label="Announcement options"
+      >
+        <mat-icon aria-hidden="true">more_vert</mat-icon>
+      </button>
+    }
   </h2>
   <mat-menu #announcementMenu="matMenu" panelClass="announcement-context-menu">
     <button mat-menu-item routerLink="/settings/announcements">
       <mat-icon aria-hidden="true">settings</mat-icon>
       <span>Settings</span>
     </button>
-    <button mat-menu-item type="button" (click)="openCreateAnnouncementDialog()">
+    <button mat-menu-item type="button" [disabled]="!canAddAnnouncement" (click)="openCreateAnnouncementDialog()">
       <mat-icon aria-hidden="true">add</mat-icon>
-      <span>Add announcement</span>
+      <span>{{ canAddAnnouncement ? 'Add announcement' : 'Announcement limit reached (10)' }}</span>
     </button>
   </mat-menu>
   @let announcementsData = announcements | async;

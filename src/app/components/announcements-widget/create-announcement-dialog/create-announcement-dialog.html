@@ -1,6 +1,17 @@
-<h2 mat-dialog-title>Add announcement</h2>
-<form [formGroup]="form" (ngSubmit)="submit()">
-  <mat-dialog-content>
+<header
+  class="announcement-form-title"
+  [class.announcement-form-title--embedded]="isEmbedded"
+  mat-dialog-title
+>
+  <div class="announcement-form-heading">
+    <h2>{{ isEditing ? 'Edit announcement' : 'Add announcement' }}</h2>
+  </div>
+  <button mat-icon-button type="button" aria-label="Close editor" (click)="cancel()">
+    <mat-icon aria-hidden="true">close</mat-icon>
+  </button>
+</header>
+<form [class.announcement-form--embedded]="isEmbedded" [formGroup]="form" (ngSubmit)="submit()">
+  <mat-dialog-content [class.announcement-form-content--embedded]="isEmbedded">
     <mat-form-field appearance="outline">
       <mat-label>Title</mat-label>
       <input matInput formControlName="title" required maxlength="120" />
@@ -18,6 +29,7 @@
         <mat-option value="Draft">Draft</mat-option>
         <mat-option value="Scheduled">Scheduled</mat-option>
         <mat-option value="Published">Published</mat-option>
+        <mat-option value="Expired">Expired</mat-option>
       </mat-select>
     </mat-form-field>
 
@@ -35,12 +47,16 @@
     </mat-form-field>
 
     <mat-form-field appearance="outline">
-      <mat-label>Announcement date range </mat-label>
+      <mat-label>Date range</mat-label>
       <mat-date-range-input [rangePicker]="rangePicker">
         <input matStartDate formControlName="startDate" placeholder="Start date" />
         <input matEndDate formControlName="endDate" placeholder="End date" />
       </mat-date-range-input>
-      <mat-datepicker-toggle matIconSuffix [for]="rangePicker"></mat-datepicker-toggle>
+      <mat-datepicker-toggle
+        matIconSuffix
+        [for]="rangePicker"
+        aria-label="Open date range picker"
+      ></mat-datepicker-toggle>
       <mat-date-range-picker #rangePicker></mat-date-range-picker>
     </mat-form-field>
     @if (form.hasError('dateRange') && (form.controls.startDate.touched || form.controls.endDate.touched)) {
@@ -49,14 +65,33 @@
 
     <div class="attachment-field">
       <label for="announcement-attachment">Attachment</label>
-      <input id="announcement-attachment" type="file" (change)="onAttachmentSelected($event)" />
+      <p class="attachment-help">JPG and PNG images only, up to 2 MB.</p>
+      <input
+        id="announcement-attachment"
+        type="file"
+        [accept]="acceptedAttachmentTypes"
+        (change)="onAttachmentSelected($event)"
+      />
+      @if (attachmentError) {
+        <p class="form-error" role="alert">{{ attachmentError }}</p>
+      }
       @if (selectedAttachment) {
         <span class="attachment-name">{{ selectedAttachment.name }}</span>
       }
     </div>
   </mat-dialog-content>
-  <mat-dialog-actions align="end">
-    <button matButton type="button" mat-dialog-close>Cancel</button>
-    <button matButton="filled" type="submit" [disabled]="form.invalid">Add announcement</button>
-  </mat-dialog-actions>
+  <app-sticky-footer class="announcement-form-actions" [fixed]="false" [customStyles]="actionFooterStyles">
+    <button matButton type="button" (click)="cancel()">Cancel</button>
+    <span id="announcement-submit-help" class="visually-hidden">
+      Complete required fields and resolve attachment errors to enable this action.
+    </span>
+    <button
+      matButton="filled"
+      type="submit"
+      aria-describedby="announcement-submit-help"
+      [disabled]="form.invalid || !!attachmentError"
+    >
+      {{ isEditing ? 'Save announcement' : 'Add announcement' }}
+    </button>
+  </app-sticky-footer>
 </form>

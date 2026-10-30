@@ -5,6 +5,8 @@ import {
   DestroyRef,
   ElementRef,
   inject,
+  Input,
+  OnChanges,
   OnInit,
   signal,
   viewChildren,
@@ -20,7 +22,10 @@ import type { Announcement } from '../../shared/interfaces/announcement.interfac
 import { HoldFeedbackDirective } from '../../shared/directives/hold-feedback.directive';
 import { CreateAnnouncementDialogComponent } from './create-announcement-dialog/create-announcement-dialog';
 import type { CreateAnnouncementResult } from './types/create-announcement.types';
-import { AnnouncementsActionService } from './services/announcements-action.service';
+import {
+  AnnouncementsActionService,
+  filterAnnouncementsForDisplay,
+} from './services/announcements-action.service';
 
 @Component({
   selector: 'app-announcements',
@@ -38,7 +43,10 @@ import { AnnouncementsActionService } from './services/announcements-action.serv
   styleUrls: ['./announcements.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AnnouncementsWidgetComponent implements OnInit {
+export class AnnouncementsWidgetComponent implements OnInit, OnChanges {
+  @Input() showContextMenu = true;
+  @Input() announcementItems: Announcement[] | null = null;
+
   private readonly expandedAnnouncementIds = signal<ReadonlySet<string>>(new Set());
   private readonly truncatedAnnouncementIds = signal<ReadonlySet<string>>(new Set());
   private readonly descriptionElements =
@@ -49,6 +57,10 @@ export class AnnouncementsWidgetComponent implements OnInit {
   announcements: Observable<Announcement[]> = of([]);
   private readonly announcementsActionService = inject(AnnouncementsActionService);
   private readonly dialog = inject(MatDialog);
+
+  get canAddAnnouncement(): boolean {
+    return this.announcementsActionService.canAddAnnouncement;
+  }
 
   constructor() {
     afterEveryRender(() => {
@@ -79,7 +91,17 @@ export class AnnouncementsWidgetComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.announcements = this.announcementsActionService.getAnnouncements();
+    this.updateAnnouncementsFeed();
+  }
+
+  ngOnChanges(): void {
+    this.updateAnnouncementsFeed();
+  }
+
+  private updateAnnouncementsFeed(): void {
+    this.announcements = this.announcementItems
+      ? of(filterAnnouncementsForDisplay(this.announcementItems))
+      : this.announcementsActionService.getAnnouncements();
   }
 
   openCreateAnnouncementDialog(): void {

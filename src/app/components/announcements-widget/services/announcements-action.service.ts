@@ -3,10 +3,32 @@ import { BehaviorSubject, map, Observable, take } from 'rxjs';
 import { AnnouncementsApiService } from './announcements-api.service';
 import type { Announcement } from '../../../shared/interfaces/announcement.interface';
 
+export function filterAnnouncementsForDisplay(
+  announcements: Announcement[],
+  now = new Date(),
+): Announcement[] {
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+  return announcements.filter((announcement) => {
+    if (announcement.status !== 'Published') return false;
+
+    const endDate = toDate(announcement.endDate);
+    return !endDate || endDate >= today;
+  });
+}
+
+function toDate(value: Date | undefined): Date | undefined {
+  if (!value) return undefined;
+  const date = value instanceof Date ? value : new Date(value);
+  return Number.isNaN(date.getTime()) ? undefined : date;
+}
+
 @Injectable({
   providedIn: 'root',
 })
 export class AnnouncementsActionService {
+  static readonly maxAnnouncements = 10;
+  private static readonly storageKey = 'announcements';
   private readonly announcementsApiService = inject(AnnouncementsApiService);
   private readonly announcementsSubject = new BehaviorSubject<Announcement[]>([]);
 
@@ -14,24 +36,35 @@ export class AnnouncementsActionService {
     this.announcementsApiService
       .getAnnouncements()
       .pipe(take(1))
-      .subscribe((announcements) => this.announcementsSubject.next(announcements));
+      .subscribe((announcements) => this.announcementsSubject.next(this.readSavedAnnouncements() ?? announcements));
   }
 
   getAnnouncements(): Observable<Announcement[]> {
     return this.announcementsSubject.pipe(
-      map((announcements) =>
-        announcements.filter(
-          (announcement) => announcement.status !== 'Draft' && this.isActive(announcement),
-        ),
-      ),
+      map((announcements) => filterAnnouncementsForDisplay(announcements)),
     );
+  }
+
+  getAllAnnouncements(): Observable<Announcement[]> {
+    return this.announcementsSubject.asObservable();
+  }
+
+  get canAddAnnouncement(): boolean {
+    return this.announcementsSubject.value.length < AnnouncementsActionService.maxAnnouncements;
+  }
+
+  saveAnnouncements(announcements: Announcement[]): void {
+    this.announcementsSubject.next(announcements);
+    this.persistAnnouncements();
   }
 
   addAnnouncement(
     announcement: Omit<Announcement, 'id' | 'attachmentUrl' | 'attachmentName'> & {
       attachment?: File;
     },
-  ): void {
+  ): boolean {
+    if (!this.canAddAnnouncement) return false;
+
     const { attachment, ...fields } = announcement;
     const attachmentUrl = attachment ? URL.createObjectURL(attachment) : undefined;
 
@@ -45,6 +78,8 @@ export class AnnouncementsActionService {
         attachmentName: attachment?.name,
       },
     ]);
+    this.persistAnnouncements();
+    return true;
   }
 
   handleAnnouncementClick(this: void, linkUrl: string): void {
@@ -52,20 +87,29 @@ export class AnnouncementsActionService {
     window.open(linkUrl, '_blank', 'noopener,noreferrer');
   }
 
-  private isActive(announcement: Announcement): boolean {
-    const now = new Date();
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const startDate = this.toDate(announcement.startDate);
-    const endDate = this.toDate(announcement.endDate);
-
-    return (!startDate || startDate < tomorrow) && (!endDate || endDate >= today);
+  private toDate(value: Date | undefined): Date | undefined {
+    return toDate(value);
   }
 
-  private toDate(value: Date | undefined): Date | undefined {
-    if (!value) return undefined;
-    const date = value instanceof Date ? value : new Date(value);
-    return Number.isNaN(date.getTime()) ? undefined : date;
+  private readSavedAnnouncements(): Announcement[] | undefined {
+    const saved = localStorage.getItem(AnnouncementsActionService.storageKey);
+    if (!saved) return undefined;
+
+    try {
+      return (JSON.parse(saved) as Announcement[]).map((announcement) => ({
+        ...announcement,
+        startDate: this.toDate(announcement.startDate),
+        endDate: this.toDate(announcement.endDate),
+      }));
+    } catch {
+      return undefined;
+    }
+  }
+
+  private persistAnnouncements(): void {
+    localStorage.setItem(
+      AnnouncementsActionService.storageKey,
+      JSON.stringify(this.announcementsSubject.value),
+    );
   }
 }

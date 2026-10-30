@@ -4,3 +4,8 @@ export type CreateAnnouncementResult = Pick<
   Announcement,
   'title' | 'description' | 'linkUrl' | 'startDate' | 'endDate' | 'status'
 > & { attachment?: File };
+
+export interface AnnouncementEditorData {
+  mode: 'create' | 'edit';
+  announcement?: Announcement;
+}
