@@ -28,7 +28,14 @@ export const routes: Routes = [
       {
         path: '',
         pathMatch: 'full',
-        redirectTo: 'general/time',
+        redirectTo: 'overview',
+      },
+      {
+        path: 'overview',
+        loadComponent: () =>
+          import('./components/settings/pages/settings-overview/settings-overview').then(
+            (m) => m.SettingsOverview,
+          ),
       },
       {
         path: 'announcements',
