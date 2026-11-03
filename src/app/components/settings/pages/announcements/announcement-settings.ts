@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, DestroyRef, inject, Inject, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, DestroyRef, inject, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogModule } from '@angular/material/dialog';
@@ -43,7 +43,7 @@ interface DeleteAnnouncementDialogData {
   `,
 })
 class DeleteAnnouncementConfirmationDialog {
-  constructor(@Inject(MAT_DIALOG_DATA) readonly data: DeleteAnnouncementDialogData) {}
+  readonly data = inject<DeleteAnnouncementDialogData>(MAT_DIALOG_DATA);
 }
 
 @Component({
