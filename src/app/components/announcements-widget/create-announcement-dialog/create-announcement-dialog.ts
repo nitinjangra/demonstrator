@@ -66,6 +66,7 @@ export class CreateAnnouncementDialogComponent implements OnInit {
   );
 
   selectedAttachment: File | undefined;
+  removeExistingAttachment = false;
   attachmentError: string | null = null;
   readonly actionFooterStyles: FooterStyles = {
     height: 'auto',
@@ -84,7 +85,7 @@ export class CreateAnnouncementDialogComponent implements OnInit {
   }
 
   get existingAttachmentName(): string | undefined {
-    return this.modeData.announcement?.attachmentName;
+    return this.removeExistingAttachment ? undefined : this.modeData.announcement?.attachmentName;
   }
 
   ngOnInit(): void {
@@ -120,6 +121,13 @@ export class CreateAnnouncementDialogComponent implements OnInit {
     }
 
     this.selectedAttachment = file;
+    if (file) this.removeExistingAttachment = false;
+  }
+
+  removeAttachment(): void {
+    this.selectedAttachment = undefined;
+    this.removeExistingAttachment = true;
+    this.attachmentError = null;
   }
 
   submit(): void {
@@ -144,6 +152,7 @@ export class CreateAnnouncementDialogComponent implements OnInit {
       startDate: this.toDate(value.startDate),
       endDate: this.toDate(value.endDate),
       attachment: this.selectedAttachment,
+      removeAttachment: this.removeExistingAttachment,
     };
 
     if (this.dialogRef) this.dialogRef.close(result);

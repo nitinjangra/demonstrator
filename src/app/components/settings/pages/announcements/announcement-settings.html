@@ -1,4 +1,5 @@
 <section class="announcement-settings-page" aria-labelledby="announcement-settings-title">
+  <div class="announcement-settings-content" [attr.inert]="editorOpen ? '' : null">
   <header class="settings-header">
     <div>
       <h2 id="announcement-settings-title">Announcement settings</h2>
@@ -101,6 +102,7 @@
       }
     </section>
   </div>
+  </div>
 
   @if (editorOpen && editorData; as data) {
     <button
@@ -110,9 +112,12 @@
       (click)="closeAnnouncementEditor()"
     ></button>
     <aside
+      #editorDrawer
       class="announcement-settings-drawer"
       role="dialog"
       aria-modal="true"
+      cdkTrapFocus
+      cdkTrapFocusAutoCapture
       [attr.aria-label]="data.mode === 'edit' ? 'Edit announcement' : 'Add announcement'"
       (keydown.escape)="closeAnnouncementEditor()"
     >
@@ -125,6 +130,7 @@
     </aside>
   }
 
+  <div class="announcement-settings-footer" [attr.inert]="editorOpen ? '' : null">
   <app-sticky-footer [fixed]="false">
     <button
       matButton
@@ -153,4 +159,5 @@
       Enabled after announcement order or content changes.
     </span>
   </app-sticky-footer>
+  </div>
 </section>

@@ -188,6 +188,45 @@ describe('AnnouncementSettings', () => {
     expect(announcementsService.saveAnnouncements).toHaveBeenCalledWith(component.announcements);
   });
 
+  it('makes the editor modal, inerts the page, and restores focus to its opener', async () => {
+    fixture.detectChanges();
+    const editButton = fixture.nativeElement.querySelector('.announcement-edit') as HTMLButtonElement;
+    editButton.focus();
+    fixture.componentInstance.openEditAnnouncement('draft');
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const drawer = fixture.nativeElement.querySelector('.announcement-settings-drawer') as HTMLElement;
+    expect(drawer.getAttribute('aria-modal')).toBe('true');
+    expect(drawer.hasAttribute('cdktrapfocus')).toBeTrue();
+    expect(fixture.nativeElement.querySelector('.announcement-settings-page > div').hasAttribute('inert'))
+      .toBeTrue();
+    expect(fixture.nativeElement.querySelector('.announcement-settings-footer').hasAttribute('inert'))
+      .toBeTrue();
+    expect(drawer.contains(document.activeElement)).toBeTrue();
+
+    fixture.componentInstance.closeAnnouncementEditor();
+    fixture.detectChanges();
+    await Promise.resolve();
+
+    expect(document.activeElement).toBe(editButton);
+  });
+
+  it('removes an existing attachment when the editor requests removal', () => {
+    const component = fixture.componentInstance;
+    component.announcements[0].attachmentUrl = 'blob:existing';
+    component.announcements[0].attachmentName = 'existing.png';
+    component.openEditAnnouncement('draft');
+    component.saveAnnouncementFromEditor({
+      title: 'Draft announcement',
+      status: 'Draft',
+      removeAttachment: true,
+    });
+
+    expect(component.announcements[0].attachmentUrl).toBeUndefined();
+    expect(component.announcements[0].attachmentName).toBeUndefined();
+  });
+
   it('replaces the attachment when editing and preserves the old attachment when none is selected', () => {
     const component = fixture.componentInstance;
     component.announcements[0].attachmentUrl = 'blob:old';

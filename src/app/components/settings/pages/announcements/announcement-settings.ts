@@ -1,8 +1,17 @@
-import { ChangeDetectorRef, Component, DestroyRef, inject, OnInit } from '@angular/core';
+import {
+  ChangeDetectorRef,
+  Component,
+  DestroyRef,
+  ElementRef,
+  inject,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
+import { A11yModule } from '@angular/cdk/a11y';
 import { Observable } from 'rxjs';
 import type { Announcement } from '../../../../shared/interfaces/announcement.interface';
 import { AnnouncementsActionService } from '../../../announcements-widget/services/announcements-action.service';
@@ -53,6 +62,7 @@ class DeleteAnnouncementConfirmationDialog {
     MatButtonModule,
     MatDialogModule,
     MatIconModule,
+    A11yModule,
     CreateAnnouncementDialogComponent,
     AnnouncementPreviewComponent,
     StickyFooterComponent,
@@ -65,6 +75,15 @@ export class AnnouncementSettings implements OnInit {
   private readonly dialog = inject(MatDialog);
   private readonly destroyRef = inject(DestroyRef);
   private readonly changeDetector = inject(ChangeDetectorRef);
+  private returnFocusTo: HTMLElement | null = null;
+
+  @ViewChild('editorDrawer')
+  set editorDrawer(drawer: ElementRef<HTMLElement> | undefined) {
+    if (!drawer) return;
+    queueMicrotask(() => {
+      drawer.nativeElement.querySelector<HTMLElement>('button, input, textarea, select, [tabindex]')?.focus();
+    });
+  }
   announcements$: Observable<Announcement[]> = this.announcementsService.getAllAnnouncements();
   announcements: Announcement[] = [];
   private announcementOrder: string[] = [];
@@ -137,6 +156,7 @@ export class AnnouncementSettings implements OnInit {
     const announcement = this.announcements.find((item) => item.id === id);
     if (!announcement) return;
 
+    this.captureReturnFocus();
     this.editorData = { mode: 'edit', announcement };
     this.editorOpen = true;
     this.changeDetector.markForCheck();
@@ -145,6 +165,7 @@ export class AnnouncementSettings implements OnInit {
   openCreateAnnouncementDialog(): void {
     if (!this.canAddAnnouncement) return;
 
+    this.captureReturnFocus();
     this.editorData = { mode: 'create' };
     this.editorOpen = true;
     this.changeDetector.markForCheck();
@@ -154,6 +175,10 @@ export class AnnouncementSettings implements OnInit {
     this.editorOpen = false;
     this.editorData = null;
     this.changeDetector.markForCheck();
+    queueMicrotask(() => {
+      if (this.returnFocusTo?.isConnected) this.returnFocusTo.focus();
+      this.returnFocusTo = null;
+    });
   }
 
   saveAnnouncementFromEditor(result: CreateAnnouncementResult): void {
@@ -168,8 +193,16 @@ export class AnnouncementSettings implements OnInit {
           ? {
               ...item,
               ...fields,
-              attachmentUrl: attachment ? URL.createObjectURL(attachment) : item.attachmentUrl,
-              attachmentName: attachment?.name ?? item.attachmentName,
+              attachmentUrl: attachment
+                ? URL.createObjectURL(attachment)
+                : result.removeAttachment
+                  ? undefined
+                  : item.attachmentUrl,
+              attachmentName: attachment
+                ? attachment.name
+                : result.removeAttachment
+                  ? undefined
+                  : item.attachmentName,
             }
           : item,
       );
@@ -215,5 +248,9 @@ export class AnnouncementSettings implements OnInit {
         (orderIndex.get(second.id) ?? Number.MAX_SAFE_INTEGER),
     );
     this.changeDetector.markForCheck();
+  }
+
+  private captureReturnFocus(): void {
+    this.returnFocusTo = document.activeElement instanceof HTMLElement ? document.activeElement : null;
   }
 }
