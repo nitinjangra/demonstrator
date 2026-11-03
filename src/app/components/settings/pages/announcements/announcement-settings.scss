@@ -13,6 +13,18 @@
   overflow: hidden;
 }
 
+.announcement-settings-content {
+  display: flex;
+  min-height: 0;
+  flex: 1 1 auto;
+  flex-direction: column;
+}
+
+.announcement-settings-footer {
+  flex: 0 0 auto;
+  margin-top: auto;
+}
+
 .announcement-settings-page button {
   min-height: 2.75rem;
 }
@@ -34,12 +46,8 @@
 .settings-header {
   margin-bottom: 1.5rem;
 
-  h2 {
-    margin: 0;
-  }
   p {
     margin: 0.4rem 0 0;
-    color: var(--color-text-muted, #626b78);
   }
 }
 
@@ -51,6 +59,7 @@
   grid-template-rows: minmax(0, 1fr);
   gap: 1.25rem;
   overflow: hidden;
+  margin-bottom: 1rem;
 }
 
 .preview-pane,
@@ -107,10 +116,6 @@
   font-weight: 600;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-.row-title:focus-visible {
-  outline: 2px solid var(--color-primary, #3f51b5);
-  outline-offset: 2px;
 }
 .status-badge {
   justify-self: start;

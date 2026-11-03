@@ -42,7 +42,12 @@ import {
       </div>
     </section>
     <app-sticky-footer [fixed]="false">
-      <button matButton="filled" type="button" [disabled]="!hasUnsavedChanges()" (click)="saveChanges()">
+      <button
+        matButton="filled"
+        type="button"
+        [disabled]="!hasUnsavedChanges()"
+        (click)="saveChanges()"
+      >
         Save changes
       </button>
     </app-sticky-footer>
@@ -60,6 +65,13 @@ import {
       flex: 1;
       gap: 1.25rem;
       width: 100%;
+
+      p {
+        margin-top: 0;
+      }
+      h2 {
+        margin-bottom: 0;
+      }
     }
 
     .setting-group {
