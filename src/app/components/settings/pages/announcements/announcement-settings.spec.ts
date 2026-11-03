@@ -84,6 +84,7 @@ describe('AnnouncementSettings', () => {
       .toContain('Expired');
     expect(fixture.nativeElement.querySelector('.announcement-row .status-badge[data-status="Scheduled"]')?.textContent)
       .toContain('Scheduled');
+    expect(fixture.nativeElement.querySelector('.row-title')?.hasAttribute('tabindex')).toBeFalse();
     expect(fixture.nativeElement.querySelector('.announcement-state')).toBeNull();
     const editButton = fixture.nativeElement.querySelector('.announcement-edit') as HTMLButtonElement;
     expect(editButton.getAttribute('aria-label')).toBe('Edit Draft announcement');

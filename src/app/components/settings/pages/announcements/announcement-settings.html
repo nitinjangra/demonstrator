@@ -31,7 +31,7 @@
           @for (announcement of announcements; track announcement.id; let index = $index) {
             <li class="announcement-row">
               <div class="announcement-select">
-                <span class="row-title" tabindex="0" [attr.title]="announcement.title">
+                <span class="row-title" [attr.title]="announcement.title">
                   {{ announcement.title }}
                 </span>
                 <span

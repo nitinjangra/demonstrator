@@ -25,7 +25,12 @@ import { BrandingService } from '../../../../shared/services/branding.service';
       </mat-form-field>
     </section>
     <app-sticky-footer [fixed]="false">
-      <button matButton="filled" type="button" [disabled]="!hasUnsavedChanges()" (click)="saveChanges()">
+      <button
+        matButton="filled"
+        type="button"
+        [disabled]="!hasUnsavedChanges()"
+        (click)="saveChanges()"
+      >
         Save changes
       </button>
     </app-sticky-footer>
@@ -37,9 +42,16 @@ import { BrandingService } from '../../../../shared/services/branding.service';
       flex-direction: column;
     }
 
-    section { flex: 1 0 auto; }
-    mat-form-field { width: 100%; }
-    app-sticky-footer { margin-top: auto; }
+    section {
+      flex: 1 0 auto;
+    }
+    mat-form-field {
+      width: 100%;
+      margin-top: 1rem;
+    }
+    app-sticky-footer {
+      margin-top: auto;
+    }
   `,
 })
 export class Branding {
