@@ -41,9 +41,34 @@ describe('FeatureToggles', () => {
     fixture.componentInstance.setTableFeature('material-table', true);
     fixture.componentInstance.setDashboardEnabled(false);
     fixture.componentInstance.setChartLibrary('highcharts', true);
+    fixture.componentInstance.saveChanges();
 
     expect(featuresSpy.setTableFeature).toHaveBeenCalledWith('material-table', true);
     expect(featuresSpy.setDashboardEnabled).toHaveBeenCalledWith(false);
     expect(featuresSpy.setChartLibrary).toHaveBeenCalledWith('highcharts', true);
+  });
+
+  it('lets the dashboard use either chart library', () => {
+    const component = fixture.componentInstance;
+
+    component.setChartLibrary('highcharts', true);
+    component.saveChanges();
+    expect(featuresSpy.setChartLibrary).toHaveBeenCalledWith('highcharts', true);
+
+    featuresSpy.setChartLibrary.calls.reset();
+    component.setChartLibrary('chartjs', true);
+    component.saveChanges();
+    expect(featuresSpy.setChartLibrary).toHaveBeenCalledWith('chartjs', true);
+  });
+
+  it('does not allow the selected dashboard chart library to be switched off', () => {
+    const component = fixture.componentInstance;
+
+    component.setChartLibrary('chartjs', false);
+    component.setChartLibrary('highcharts', false);
+
+    expect(component.draftChartLibrary()).toBe('chartjs');
+    component.saveChanges();
+    expect(featuresSpy.setChartLibrary).toHaveBeenCalledWith('chartjs', true);
   });
 });

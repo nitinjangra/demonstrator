@@ -43,6 +43,7 @@ describe('SettingsWrapper', () => {
       sidebar.querySelectorAll<HTMLAnchorElement>('a[mat-list-item]'),
     ).map((link) => link.querySelector('[matListItemTitle]')?.textContent?.trim());
     expect(itemNames).toEqual([
+      'Overview',
       'Branding',
       'Feature toggles',
       'Notifications',
@@ -53,7 +54,7 @@ describe('SettingsWrapper', () => {
   });
 
   it('minimizes and expands the settings menu while keeping its links available', () => {
-    const toggle = fixture.nativeElement.querySelector('.sidebar-toggle') as HTMLButtonElement;
+    let toggle = fixture.nativeElement.querySelector('.sidebar-toggle') as HTMLButtonElement;
     const sidebar = fixture.nativeElement.querySelector('.settings-sidebar') as HTMLElement;
 
     expect(toggle.getAttribute('aria-label')).toBe('Minimize settings menu');
@@ -62,12 +63,14 @@ describe('SettingsWrapper', () => {
 
     expect(sidebar.classList).toContain('settings-sidebar--minimized');
     expect(fixture.nativeElement.querySelector('a[href="/settings/announcements"]')).not.toBeNull();
+    toggle = fixture.nativeElement.querySelector('.sidebar-toggle') as HTMLButtonElement;
     expect(toggle.getAttribute('aria-label')).toBe('Expand settings menu');
 
     toggle.click();
     fixture.detectChanges();
 
     expect(sidebar.classList).not.toContain('settings-sidebar--minimized');
+    toggle = fixture.nativeElement.querySelector('.sidebar-toggle') as HTMLButtonElement;
     expect(toggle.getAttribute('aria-label')).toBe('Minimize settings menu');
   });
 

@@ -33,6 +33,7 @@ describe('TimeSetting', () => {
   it('delegates the selected formats to the settings service', () => {
     fixture.componentInstance.setClockFormat('12h');
     fixture.componentInstance.setCalendarFormat('mm-dd-yyyy');
+    fixture.componentInstance.saveChanges();
 
     expect(settingsSpy.setClockFormat).toHaveBeenCalledWith('12h');
     expect(settingsSpy.setCalendarFormat).toHaveBeenCalledWith('mm-dd-yyyy');

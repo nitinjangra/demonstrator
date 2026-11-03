@@ -30,8 +30,9 @@ describe('Branding', () => {
     );
   });
 
-  it('delegates name updates to the branding service', () => {
-    fixture.componentInstance.setBrandName('New name');
+  it('saves the edited name through the branding service', () => {
+    fixture.componentInstance.setDraftBrandName('New name');
+    fixture.componentInstance.saveChanges();
 
     expect(brandingSpy.setBrandName).toHaveBeenCalledWith('New name');
   });
