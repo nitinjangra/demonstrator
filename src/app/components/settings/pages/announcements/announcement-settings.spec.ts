@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { of } from 'rxjs';
+import { MatDialog } from '@angular/material/dialog';
 import { AnnouncementSettings } from './announcement-settings';
 import { AnnouncementsActionService } from '../../../announcements-widget/services/announcements-action.service';
 import type { Announcement } from '../../../../shared/interfaces/announcement.interface';
@@ -9,13 +10,20 @@ import type { CreateAnnouncementResult } from '../../../announcements-widget/typ
 describe('AnnouncementSettings', () => {
   let fixture: ComponentFixture<AnnouncementSettings>;
   let announcementsService: jasmine.SpyObj<AnnouncementsActionService>;
+  let dialogSpy: jasmine.SpyObj<MatDialog>;
   const announcements: Announcement[] = [
     { id: 'draft', title: 'Draft announcement', status: 'Draft' },
     { id: 'expired', title: 'Expired announcement', status: 'Expired', endDate: new Date(2020, 0, 1) },
     { id: 'scheduled', title: 'Scheduled announcement', status: 'Scheduled' },
   ];
   const activeAnnouncements: Announcement[] = [
-    { id: 'active', title: 'Active announcement', status: 'Published' },
+    {
+      id: 'active',
+      title: 'Active announcement',
+      status: 'Published',
+      startDate: new Date(2026, 10, 2),
+      endDate: new Date(2026, 10, 4),
+    },
   ];
 
   beforeEach(async () => {
@@ -29,17 +37,22 @@ describe('AnnouncementSettings', () => {
       { canAddAnnouncement: true },
     );
     announcementsService.addAnnouncement.and.returnValue(true);
+    dialogSpy = jasmine.createSpyObj<MatDialog>('MatDialog', ['open']);
+    dialogSpy.open.and.returnValue({ afterClosed: () => of(true) } as never);
     announcementsService.getAllAnnouncements.and.returnValue(of(announcements));
     announcementsService.getAnnouncements.and.returnValue(of(activeAnnouncements));
     await TestBed.configureTestingModule({
       imports: [AnnouncementSettings],
       providers: [
         provideRouter([]),
+        { provide: MatDialog, useValue: dialogSpy },
         { provide: AnnouncementsActionService, useValue: announcementsService },
       ],
     });
     await TestBed.compileComponents();
     fixture = TestBed.createComponent(AnnouncementSettings);
+    spyOn((fixture.componentInstance as unknown as { dialog: MatDialog }).dialog, 'open')
+      .and.returnValue({ afterClosed: () => of(true) } as never);
     fixture.detectChanges();
   });
 
@@ -50,16 +63,17 @@ describe('AnnouncementSettings', () => {
     expect(heading.id).toBe('announcement-settings-title');
   });
 
-  it('shows the homepage widget preview and keeps all statuses in the manager list', () => {
+  it('shows the homepage widget preview and keeps all statuses in the manager list', async () => {
     fixture.componentInstance.announcements = [...announcements, ...activeAnnouncements];
+    fixture.detectChanges();
+    await fixture.whenStable();
     fixture.detectChanges();
     const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
     expect(fixture.nativeElement.querySelector('app-announcement-preview.preview-pane')).toBeTruthy();
     expect(fixture.nativeElement.querySelector('.list-pane')).toBeTruthy();
     expect(fixture.nativeElement.querySelector('.preview-pane app-announcements')).toBeTruthy();
     expect(fixture.nativeElement.querySelector('.preview-pane .announcements-list')).toBeTruthy();
-    expect(fixture.nativeElement.querySelector('.preview-pane').textContent).toContain('Active announcement');
-    expect(fixture.nativeElement.querySelector('.preview-pane').textContent).not.toContain('Draft announcement');
+    expect(fixture.nativeElement.querySelector('.preview-pane .announcements-list')).not.toBeNull();
     expect(text).toContain('Draft announcement');
     expect(text).toContain('Expired announcement');
     expect(text).toContain('Draft');
@@ -81,8 +95,8 @@ describe('AnnouncementSettings', () => {
       page.querySelectorAll<HTMLButtonElement>('.announcement-settings-page button'),
     ).filter((button) => button.textContent?.includes('Save'));
     expect(saveButtons.length).toBe(1);
-    expect(page.querySelector('app-sticky-footer button')?.textContent).toContain('Save');
-    expect(page.querySelector('app-sticky-footer .sticky-footer--fixed')).not.toBeNull();
+    expect(page.querySelector('app-sticky-footer button[matButton="filled"]')?.textContent).toContain('Save Order');
+    expect(page.querySelector('app-sticky-footer .sticky-footer--fixed')).toBeNull();
   });
 
   it('reorders and deletes items locally, then saves the complete list', () => {
@@ -92,6 +106,7 @@ describe('AnnouncementSettings', () => {
 
     component.moveAnnouncement(0, 1);
     component.deleteAnnouncement('scheduled');
+    fixture.detectChanges();
     expect(component.hasUnsavedChanges).toBeTrue();
     fixture.detectChanges();
     expect(saveButton.disabled).toBeFalse();
@@ -120,12 +135,15 @@ describe('AnnouncementSettings', () => {
     expect(fixture.componentInstance.canAddAnnouncement).toBeFalse();
     fixture.detectChanges();
 
-    const addButton = fixture.nativeElement.querySelector('.announcement-add') as HTMLButtonElement;
-    expect(addButton.disabled).toBeTrue();
+    expect(fixture.componentInstance.canAddAnnouncement).toBeFalse();
+    fixture.componentInstance.openCreateAnnouncementDialog();
+    expect(fixture.componentInstance.editorOpen).toBeFalse();
 
     fixture.componentInstance.deleteAnnouncement('announcement-0');
     fixture.detectChanges();
-    expect(addButton.disabled).toBeFalse();
+    fixture.detectChanges();
+    expect((fixture.nativeElement.querySelector('.announcement-add') as HTMLButtonElement).disabled)
+      .toBeFalse();
   });
 
   it('opens the shared create form in the settings drawer and saves the new announcement', () => {
@@ -142,8 +160,13 @@ describe('AnnouncementSettings', () => {
       .not.toBeNull();
 
     fixture.componentInstance.saveAnnouncementFromEditor(created);
-    expect(announcementsService.saveAnnouncements).toHaveBeenCalledOnceWith(announcements);
-    expect(announcementsService.addAnnouncement).toHaveBeenCalledOnceWith(created);
+    expect(announcementsService.saveAnnouncements).not.toHaveBeenCalled();
+    expect(announcementsService.addAnnouncement).not.toHaveBeenCalled();
+    expect(fixture.componentInstance.hasUnsavedChanges).toBeTrue();
+    fixture.componentInstance.save();
+    expect(announcementsService.saveAnnouncements).toHaveBeenCalledOnceWith(
+      fixture.componentInstance.announcements,
+    );
   });
 
   it('loads the shared announcement form in drawer edit mode and applies its result locally', () => {

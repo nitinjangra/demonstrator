@@ -61,7 +61,7 @@ describe('CreateAnnouncementDialogComponent', () => {
   });
 
   it('closes with trimmed values, optional dates, and the selected attachment', () => {
-    const attachment = new File(['attachment'], 'brief.pdf', { type: 'application/pdf' });
+    const attachment = new File(['attachment'], 'brief.png', { type: 'image/png' });
     fixture.componentInstance.form.setValue({
       title: '  Planned maintenance  ',
       status: 'Draft',
