@@ -187,4 +187,45 @@ describe('AnnouncementSettings', () => {
     component.save();
     expect(announcementsService.saveAnnouncements).toHaveBeenCalledWith(component.announcements);
   });
+
+  it('replaces the attachment when editing and preserves the old attachment when none is selected', () => {
+    const component = fixture.componentInstance;
+    component.announcements[0].attachmentUrl = 'blob:old';
+    component.announcements[0].attachmentName = 'old.png';
+    const attachment = new File(['new'], 'new.png', { type: 'image/png' });
+    spyOn(URL, 'createObjectURL').and.returnValue('blob:new');
+
+    component.openEditAnnouncement('draft');
+    component.saveAnnouncementFromEditor({ title: 'Updated', status: 'Published', attachment });
+    expect(component.announcements[0].attachmentUrl).toBe('blob:new');
+    expect(component.announcements[0].attachmentName).toBe('new.png');
+
+    component.openEditAnnouncement('draft');
+    component.saveAnnouncementFromEditor({ title: 'Updated again', status: 'Published' });
+    expect(component.announcements[0].attachmentUrl).toBe('blob:new');
+    expect(component.announcements[0].attachmentName).toBe('new.png');
+  });
+
+  it('ignores missing edit ids and skips saving when there are no changes', () => {
+    const component = fixture.componentInstance;
+    component.openEditAnnouncement('missing');
+    expect(component.editorOpen).toBeFalse();
+
+    component.saveAnnouncementFromEditor({ title: 'No editor', status: 'Draft' });
+    component.save();
+    expect(announcementsService.saveAnnouncements).not.toHaveBeenCalled();
+  });
+
+  it('restores original order when order changes are discarded', () => {
+    const component = fixture.componentInstance;
+    component.moveAnnouncement(0, 1);
+    expect(component.hasOrderChanges).toBeTrue();
+    component.discardOrder();
+    expect(component.announcements.map(({ id }) => id)).toEqual(announcements.map(({ id }) => id));
+    expect(component.hasOrderChanges).toBeFalse();
+    component.discardOrder();
+    component.moveAnnouncement(-1, 1);
+    component.moveAnnouncement(2, 1);
+    expect(component.announcements.map(({ id }) => id)).toEqual(announcements.map(({ id }) => id));
+  });
 });
