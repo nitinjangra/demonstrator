@@ -129,4 +129,75 @@ describe('CreateAnnouncementDialogComponent', () => {
     expect(fixture.componentInstance.form.hasError('dateRange')).toBeTrue();
     expect(dialogRefSpy.close).not.toHaveBeenCalled();
   });
+
+  it('initializes edit values with present dates and optional fields', () => {
+    fixture.componentRef.setInput('editorData', {
+      mode: 'edit',
+      announcement: {
+        id: 'existing',
+        title: 'Existing',
+        status: 'Published',
+        startDate: new Date(2026, 10, 2),
+        endDate: new Date(2026, 10, 4),
+      },
+    });
+    fixture.componentInstance.ngOnInit();
+
+    expect(fixture.componentInstance.form.getRawValue()).toEqual(jasmine.objectContaining({
+      title: 'Existing',
+      description: '',
+      linkUrl: '',
+      startDate: new Date(2026, 10, 2),
+      endDate: new Date(2026, 10, 4),
+    }));
+  });
+
+  it('clears optional text fields from the result when they contain only whitespace', () => {
+    fixture.componentInstance.form.setValue({
+      title: 'Maintenance',
+      status: 'Draft',
+      description: '   ',
+      linkUrl: '',
+      startDate: null,
+      endDate: null,
+    });
+
+    fixture.componentInstance.submit();
+
+    expect(dialogRefSpy.close).toHaveBeenCalledWith(jasmine.objectContaining({
+      description: undefined,
+      linkUrl: undefined,
+      startDate: undefined,
+      endDate: undefined,
+    }));
+  });
+
+  it('accepts image attachments and rejects unsupported or oversized files', () => {
+    const component = fixture.componentInstance;
+    const input = document.createElement('input');
+    input.type = 'file';
+    const event = (file: File | undefined) => ({
+      target: { files: file ? [file] : [], value: 'selected' },
+    } as unknown as Event);
+
+    component.onAttachmentSelected(event(new File(['image'], 'photo.jpg', { type: 'image/jpeg' })));
+    expect(component.selectedAttachment?.name).toBe('photo.jpg');
+
+    component.onAttachmentSelected(event(new File(['document'], 'notes.pdf', { type: 'application/pdf' })));
+    expect(component.selectedAttachment).toBeUndefined();
+    expect(component.attachmentError).toContain('JPG or PNG');
+
+    const oversized = new File([new Uint8Array(2 * 1024 * 1024 + 1)], 'large.png', { type: 'image/png' });
+    component.onAttachmentSelected(event(oversized));
+    expect(component.attachmentError).toContain('2 MB or smaller');
+
+    component.onAttachmentSelected(event(undefined));
+    expect(component.attachmentError).toBeNull();
+    expect(component.selectedAttachment).toBeUndefined();
+  });
+
+  it('cancels a modal through its dialog ref', () => {
+    fixture.componentInstance.cancel();
+    expect(dialogRefSpy.close).toHaveBeenCalledOnceWith();
+  });
 });
