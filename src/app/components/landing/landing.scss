@@ -91,6 +91,12 @@
       display: flex;
       align-items: center;
       gap: 0.5rem;
+
+      &:focus {
+        border-radius: 0.15rem;
+        outline: 3px solid var(--color-primary);
+        outline-offset: 3px;
+      }
     }
 
     &-announcements {

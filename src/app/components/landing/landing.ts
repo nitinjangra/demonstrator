@@ -1,12 +1,15 @@
-import { Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { Component, DestroyRef, ElementRef, inject, OnInit, signal, ViewChild } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatNativeDateModule } from '@angular/material/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
+import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { AnnouncementsWidgetComponent } from '../announcements-widget/announcements';
 import { Hours } from '../../shared/constants/time.const';
 import { WeatherIcon } from '../../shared/constants/icon.const';
 import { ActionsTableWrapper } from '../actions-table-wrapper/actions-table-wrapper';
+import { parsePriorityFilter } from '../actions-table-wrapper/shared/priority-filter';
+import type { PriorityFilter } from '../actions-table-wrapper/shared/priority-filter';
 
 @Component({
   selector: 'app-landing',
@@ -19,8 +22,12 @@ export class Landing implements OnInit {
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly liveAnnouncer = inject(LiveAnnouncer);
   private highlightTimeout?: ReturnType<typeof setTimeout>;
-  highlightActions = false;
+  private pendingHighlightCleanup: { priority: PriorityFilter } | null = null;
+  private pendingActionsFocus = false;
+  private actionsHeadingElement?: HTMLElement;
+  readonly highlightActions = signal(false);
   timeGreeting = '';
   greetingIcon = '';
   get greetingIconData(): string {
@@ -30,28 +37,70 @@ export class Landing implements OnInit {
     return this.timeGreeting;
   }
 
+  @ViewChild('actionsHeading', { read: ElementRef })
+  set actionsHeading(ref: ElementRef<HTMLHeadingElement> | undefined) {
+    this.actionsHeadingElement = ref?.nativeElement;
+    if (this.pendingActionsFocus && this.actionsHeadingElement) {
+      this.pendingActionsFocus = false;
+      this.focusActionsHeading();
+    }
+  }
+
   ngOnInit(): void {
     this.timeGreeting = this.getGreeting();
+    this.destroyRef.onDestroy(() => {
+      if (this.highlightTimeout) clearTimeout(this.highlightTimeout);
+    });
     this.route.queryParamMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
-      const highlightRequested =
-        params.get('highlightActions') === 'true' || params.has('priority');
+      const priority = parsePriorityFilter(params.get('priority'));
+      const isHighlightCleanup =
+        this.pendingHighlightCleanup !== null &&
+        !params.has('highlightActions') &&
+        priority === this.pendingHighlightCleanup.priority;
+      if (isHighlightCleanup) {
+        this.pendingHighlightCleanup = null;
+        return;
+      }
+
+      const highlightRequested = params.get('highlightActions') === 'true' || priority !== null;
       if (!highlightRequested) return;
 
-      this.highlightActions = true;
+      this.highlightActions.set(true);
+      this.focusActionsHeading();
+      void this.liveAnnouncer.announce(
+        priority === 'none'
+          ? 'Actions filtered to items with no priority.'
+          : priority
+            ? `Actions filtered by ${priority.toLowerCase()} priority.`
+            : 'Actions section opened. All priorities are shown.',
+        'polite',
+      );
       if (this.highlightTimeout) clearTimeout(this.highlightTimeout);
-      this.highlightTimeout = setTimeout(() => (this.highlightActions = false), 2000);
+      this.highlightTimeout = setTimeout(() => this.highlightActions.set(false), 2000);
       if (params.has('highlightActions')) {
+        const cleanupRequest = { priority };
+        this.pendingHighlightCleanup = cleanupRequest;
         void this.router.navigate([], {
           relativeTo: this.route,
           queryParams: { highlightActions: null },
           queryParamsHandling: 'merge',
           replaceUrl: true,
+        }).then((navigated) => {
+          if (!navigated && this.pendingHighlightCleanup === cleanupRequest) {
+            this.pendingHighlightCleanup = null;
+          }
         });
       }
-      this.destroyRef.onDestroy(() => {
-        if (this.highlightTimeout) clearTimeout(this.highlightTimeout);
-      });
     });
+  }
+
+  private focusActionsHeading(): void {
+    if (!this.actionsHeadingElement) {
+      this.pendingActionsFocus = true;
+      return;
+    }
+
+    this.actionsHeadingElement.focus({ preventScroll: true });
   }
 
   getGreeting(): string {

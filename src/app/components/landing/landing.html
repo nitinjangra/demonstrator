@@ -1,4 +1,4 @@
-<main class="landing" [class.landing--focus-actions]="highlightActions">
+<main class="landing" [class.landing--focus-actions]="highlightActions()">
   <div class="landing-focus-backdrop" aria-hidden="true"></div>
   <header class="landing-greeting">
     <h1 class="landing-greeting-heading">
@@ -11,10 +11,10 @@
     <section
       id="actions-section"
       class="landing-focus-content"
-      [class.landing-focus-content--highlight]="highlightActions"
+      [class.landing-focus-content--highlight]="highlightActions()"
       aria-labelledby="actions-heading"
     >
-      <h2 id="actions-heading" class="landing-section-heading">
+      <h2 #actionsHeading id="actions-heading" class="landing-section-heading" tabindex="-1">
         <mat-icon aria-hidden="true">task_alt</mat-icon>
         Actions
       </h2>
