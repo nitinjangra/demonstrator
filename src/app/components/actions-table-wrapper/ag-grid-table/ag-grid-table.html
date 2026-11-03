@@ -1,14 +1,19 @@
-<div class="actions-summary" aria-live="polite">
-  <span>{{ rowData().length }} actions</span>
-  <span class="priority-count priority-count--high">{{ highPriorityCount() }} high</span>
-  <span class="priority-count priority-count--medium">{{ mediumPriorityCount() }} medium</span>
-  <span class="priority-count priority-count--low">{{ lowPriorityCount() }} low</span>
-</div>
+<app-priority-summary
+  [rowData]="sourceRowData()"
+  [selectedPriority]="selectedPriority()"
+  [routeAppliedPriority]="routeAppliedPriority()"
+  (prioritySelected)="togglePriorityFilter($event)"
+  (filterCleared)="clearPriorityFilter()"
+/>
 
-<div class="ag-grid-frame">
+<div class="ag-grid-frame" [class.table-route-highlight]="routeAppliedPriority() !== null">
   <ag-grid-angular
     class="actions-grid"
     aria-label="Actions"
+    [domLayout]="'autoHeight'"
+    [pagination]="true"
+    [paginationPageSize]="10"
+    [paginationPageSizeSelector]="[10, 20, 50]"
     [rowData]="rowData()"
     [columnDefs]="columnDefs"
     [defaultColDef]="defaultColDef"

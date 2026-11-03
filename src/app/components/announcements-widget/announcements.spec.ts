@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 import { of } from 'rxjs';
 
 import { AnnouncementsWidgetComponent } from './announcements';
@@ -19,7 +20,10 @@ describe('AnnouncementsWidgetComponent', () => {
 
     await TestBed.configureTestingModule({
       imports: [AnnouncementsWidgetComponent, CoreTestingModule, AsyncPipe],
-      providers: [{ provide: AnnouncementsActionService, useValue: announcementsActionServiceSpy }],
+      providers: [
+        provideRouter([]),
+        { provide: AnnouncementsActionService, useValue: announcementsActionServiceSpy },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(AnnouncementsWidgetComponent);
@@ -38,7 +42,13 @@ describe('AnnouncementsWidgetComponent', () => {
   describe('ngOnInit', () => {
     it('should set announcements observable', () => {
       const mockAnnouncement = [
-        { id: '1', title: 'Test', description: 'Test message', linkUrl: '' },
+        {
+          id: '1',
+          title: 'Test',
+          status: 'Published' as const,
+          description: 'Test message',
+          linkUrl: '',
+        },
       ];
       announcementsActionServiceSpy.getAnnouncements.and.returnValue(of(mockAnnouncement));
 
@@ -167,6 +177,7 @@ describe('AnnouncementsWidgetComponent', () => {
         {
           id: 'short-description',
           title: 'Maintenance',
+          status: 'Published' as const,
           description: 'Maintenance is scheduled this weekend.',
           linkUrl: '',
         },
@@ -197,6 +208,6 @@ describe('AnnouncementsWidgetComponent', () => {
 
     expect(heading.tagName).toBe('H2');
     expect(heading.parentElement).toBe(panel.parentElement);
-    expect(heading.nextElementSibling).toBe(panel);
+    expect(heading.compareDocumentPosition(panel) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 });

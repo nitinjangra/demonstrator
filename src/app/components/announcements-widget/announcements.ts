@@ -5,25 +5,48 @@ import {
   DestroyRef,
   ElementRef,
   inject,
+  Input,
+  OnChanges,
   OnInit,
   signal,
   viewChildren,
 } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
-import { Announcement } from '../../shared/interfaces/announcement.interface';
-import { Observable, of } from 'rxjs';
+import { MatMenuModule } from '@angular/material/menu';
+import { RouterLink } from '@angular/router';
 import { AsyncPipe } from '@angular/common';
-import { AnnouncementsActionService } from './services/announcements-action.service';
+import { Observable, filter, of } from 'rxjs';
+import type { Announcement } from '../../shared/interfaces/announcement.interface';
+import { HoldFeedbackDirective } from '../../shared/directives/hold-feedback.directive';
+import { CreateAnnouncementDialogComponent } from './create-announcement-dialog/create-announcement-dialog';
+import type { CreateAnnouncementResult } from './types/create-announcement.types';
+import {
+  AnnouncementsActionService,
+  filterAnnouncementsForDisplay,
+} from './services/announcements-action.service';
 
 @Component({
   selector: 'app-announcements',
   standalone: true,
-  imports: [AsyncPipe, MatIconModule],
+  imports: [
+    AsyncPipe,
+    MatButtonModule,
+    MatDialogModule,
+    MatIconModule,
+    MatMenuModule,
+    RouterLink,
+    HoldFeedbackDirective,
+  ],
   templateUrl: './announcements.html',
   styleUrls: ['./announcements.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AnnouncementsWidgetComponent implements OnInit {
+export class AnnouncementsWidgetComponent implements OnInit, OnChanges {
+  @Input() showContextMenu = true;
+  @Input() announcementItems: Announcement[] | null = null;
+
   private readonly expandedAnnouncementIds = signal<ReadonlySet<string>>(new Set());
   private readonly truncatedAnnouncementIds = signal<ReadonlySet<string>>(new Set());
   private readonly descriptionElements =
@@ -33,6 +56,11 @@ export class AnnouncementsWidgetComponent implements OnInit {
 
   announcements: Observable<Announcement[]> = of([]);
   private readonly announcementsActionService = inject(AnnouncementsActionService);
+  private readonly dialog = inject(MatDialog);
+
+  get canAddAnnouncement(): boolean {
+    return this.announcementsActionService.canAddAnnouncement;
+  }
 
   constructor() {
     afterEveryRender(() => {
@@ -57,12 +85,38 @@ export class AnnouncementsWidgetComponent implements OnInit {
       this.updateTruncatedDescriptions();
     });
 
-    inject(DestroyRef).onDestroy(() => this.resizeObserver.disconnect());
+    inject(DestroyRef).onDestroy(() => {
+      this.resizeObserver.disconnect();
+    });
   }
 
   ngOnInit(): void {
-    this.announcements = this.announcementsActionService.getAnnouncements();
+    this.updateAnnouncementsFeed();
   }
+
+  ngOnChanges(): void {
+    this.updateAnnouncementsFeed();
+  }
+
+  private updateAnnouncementsFeed(): void {
+    this.announcements = this.announcementItems
+      ? of(filterAnnouncementsForDisplay(this.announcementItems))
+      : this.announcementsActionService.getAnnouncements();
+  }
+
+  openCreateAnnouncementDialog(): void {
+    this.dialog
+      .open(CreateAnnouncementDialogComponent, {
+        width: 'min(32rem, calc(100vw - 3rem))',
+        maxWidth: 'calc(100vw - 3rem)',
+      })
+      .afterClosed()
+      .pipe(
+        filter((announcement): announcement is CreateAnnouncementResult => !!announcement),
+      )
+      .subscribe((announcement) => this.announcementsActionService.addAnnouncement(announcement));
+  }
+
   handleAnnouncementClick(linkUrl: string): void {
     if (!linkUrl) return;
     this.announcementsActionService.handleAnnouncementClick(linkUrl);

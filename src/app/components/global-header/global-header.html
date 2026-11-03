@@ -14,10 +14,12 @@
   </a>
   <span class="example-spacer"></span>
   @if (dashboardEnabled()) {
-    <a class="global-header-dashboard" routerLink="/dashboard">Dashboard</a>
+    <a class="global-header-dashboard" routerLink="/dashboard" aria-label="Dashboard" title="Dashboard">
+      <mat-icon aria-hidden="true">dashboard</mat-icon>
+    </a>
   }
   <app-theme-toggle></app-theme-toggle>
-  <button class="settings-icon" type="button" routerLink="/settings" aria-label="Open settings">
+  <button class="settings-icon" type="button" routerLink="/settings/overview" aria-label="Open settings">
     <mat-icon aria-hidden="true">settings</mat-icon>
   </button>
 </mat-toolbar>

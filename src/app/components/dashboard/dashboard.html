@@ -1,4 +1,44 @@
 <main class="dashboard" aria-labelledby="dashboard-title">
-  <h1 id="dashboard-title">Dashboard</h1>
-  <p>Your dashboard overview will appear here.</p>
+  <header class="dashboard__header">
+    <div>
+      <h1 id="dashboard-title">Actions dashboard</h1>
+      <p>Overview of priorities and upcoming due dates.</p>
+    </div>
+  </header>
+
+  <section class="dashboard__summary" aria-label="Action summary">
+    <a class="summary-card summary-card--link" routerLink="/landing" [queryParams]="{ highlightActions: true }" aria-label="View all actions">
+      <span class="summary-card__label">Total actions</span>
+      <strong>{{ totalActions() }}</strong>
+    </a>
+    <a class="summary-card summary-card--link" [routerLink]="['/landing']" [queryParams]="{ priority: 'High' }" aria-label="View high priority actions">
+      <span class="summary-card__label">High priority</span>
+      <strong>{{ priorityCounts()[0] }}</strong>
+    </a>
+    <a class="summary-card summary-card--link" [routerLink]="['/landing']" [queryParams]="{ priority: 'Medium' }" aria-label="View medium priority actions">
+      <span class="summary-card__label">Medium priority</span>
+      <strong>{{ priorityCounts()[1] }}</strong>
+    </a>
+    <a class="summary-card summary-card--link" [routerLink]="['/landing']" [queryParams]="{ priority: 'Low' }" aria-label="View low priority actions">
+      <span class="summary-card__label">Low priority</span>
+      <strong>{{ priorityCounts()[2] }}</strong>
+    </a>
+    <a class="summary-card summary-card--link" [routerLink]="['/landing']" [queryParams]="{ priority: 'none' }" aria-label="View actions with no priority">
+      <span class="summary-card__label">No priority</span>
+      <strong>{{ priorityCounts()[3] }}</strong>
+    </a>
+  </section>
+
+  <section class="dashboard__charts" aria-label="Action charts">
+    <article class="chart-card">
+      <h2 id="priority-chart-title">Actions by priority</h2>
+      <p id="priority-chart-description" class="visually-hidden">{{ priorityChartSummary() }}</p>
+      <div id="priority-chart" class="chart-card__canvas" role="group" aria-labelledby="priority-chart-title" aria-describedby="priority-chart-description"></div>
+    </article>
+    <article class="chart-card">
+      <h2 id="due-date-chart-title">Actions by due date</h2>
+      <p id="due-date-chart-description" class="visually-hidden">{{ dueDateChartSummary() }}</p>
+      <div id="due-date-chart" class="chart-card__canvas" role="group" aria-labelledby="due-date-chart-title" aria-describedby="due-date-chart-description"></div>
+    </article>
+  </section>
 </main>

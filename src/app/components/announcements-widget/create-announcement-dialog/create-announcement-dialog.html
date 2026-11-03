@@ -1,0 +1,105 @@
+<header
+  class="announcement-form-title"
+  [class.announcement-form-title--embedded]="isEmbedded"
+  mat-dialog-title
+>
+  <div class="announcement-form-heading">
+    <h2>{{ isEditing ? 'Edit announcement' : 'Add announcement' }}</h2>
+  </div>
+  <button mat-icon-button type="button" aria-label="Close editor" (click)="cancel()">
+    <mat-icon aria-hidden="true">close</mat-icon>
+  </button>
+</header>
+<form [class.announcement-form--embedded]="isEmbedded" [formGroup]="form" (ngSubmit)="submit()">
+  <mat-dialog-content [class.announcement-form-content--embedded]="isEmbedded">
+    <mat-form-field appearance="outline">
+      <mat-label>Title</mat-label>
+      <input matInput formControlName="title" required maxlength="120" />
+      @if (form.controls.title.hasError('required') && form.controls.title.touched) {
+        <mat-error>Enter a title.</mat-error>
+      }
+      @if (form.controls.title.hasError('maxlength') && form.controls.title.touched) {
+        <mat-error>Use 120 characters or fewer.</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Status</mat-label>
+      <mat-select formControlName="status" aria-label="Announcement status">
+        <mat-option value="Draft">Draft</mat-option>
+        <mat-option value="Scheduled">Scheduled</mat-option>
+        <mat-option value="Published">Published</mat-option>
+        <mat-option value="Expired">Expired</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Description</mat-label>
+      <textarea matInput formControlName="description" rows="4"></textarea>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Link</mat-label>
+      <input matInput formControlName="linkUrl" type="url" />
+      @if (form.controls.linkUrl.hasError('url') && form.controls.linkUrl.touched) {
+        <mat-error>Enter a valid http or https URL.</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Date range</mat-label>
+      <mat-date-range-input [rangePicker]="rangePicker">
+        <input matStartDate formControlName="startDate" placeholder="Start date" />
+        <input matEndDate formControlName="endDate" placeholder="End date" />
+      </mat-date-range-input>
+      <mat-datepicker-toggle
+        matIconSuffix
+        [for]="rangePicker"
+        aria-label="Open date range picker"
+      ></mat-datepicker-toggle>
+      <mat-date-range-picker #rangePicker></mat-date-range-picker>
+    </mat-form-field>
+    @if (form.hasError('dateRange') && (form.controls.startDate.touched || form.controls.endDate.touched)) {
+      <p class="form-error" role="alert">End date must be on or after the start date.</p>
+    }
+
+    <div class="attachment-field">
+      <label for="announcement-attachment">Attachment</label>
+      <p class="attachment-help">JPG and PNG images only, up to 2 MB.</p>
+      <input
+        id="announcement-attachment"
+        type="file"
+        [accept]="acceptedAttachmentTypes"
+        (change)="onAttachmentSelected($event)"
+      />
+      @if (attachmentError) {
+        <p class="form-error" role="alert">{{ attachmentError }}</p>
+      }
+      @if (selectedAttachment) {
+        <span class="attachment-name">{{ selectedAttachment.name }}</span>
+      }
+      @if (existingAttachmentName) {
+        <div class="existing-attachment" aria-live="polite">
+          <span class="attachment-name">Current attachment: {{ existingAttachmentName }}</span>
+          <button matButton type="button" (click)="removeAttachment()">
+            Remove attachment
+          </button>
+        </div>
+      }
+    </div>
+  </mat-dialog-content>
+  <app-sticky-footer class="announcement-form-actions" [fixed]="false" [customStyles]="actionFooterStyles">
+    <button matButton type="button" (click)="cancel()">Cancel</button>
+    <span id="announcement-submit-help" class="visually-hidden">
+      Complete required fields and resolve attachment errors to enable this action.
+    </span>
+    <button
+      matButton="filled"
+      type="submit"
+      aria-describedby="announcement-submit-help"
+      [disabled]="form.invalid || !!attachmentError"
+    >
+      {{ isEditing ? 'Save announcement' : 'Add announcement' }}
+    </button>
+  </app-sticky-footer>
+</form>

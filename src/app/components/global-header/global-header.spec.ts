@@ -1,7 +1,11 @@
+import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { provideRouter, Router } from '@angular/router';
 
 import { GlobalHeaderComponent } from './global-header';
+
+@Component({ standalone: true, template: '' })
+class SettingsOverviewTestRoute {}
 
 describe('Globalheader', () => {
   let component: GlobalHeaderComponent;
@@ -10,7 +14,7 @@ describe('Globalheader', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [GlobalHeaderComponent],
-      providers: [provideRouter([])],
+      providers: [provideRouter([{ path: 'settings/overview', component: SettingsOverviewTestRoute }])],
     }).compileComponents();
 
     fixture = TestBed.createComponent(GlobalHeaderComponent);
@@ -31,5 +35,27 @@ describe('Globalheader', () => {
     expect(settingsButton.classList).toContain('settings-icon');
     expect(fixture.nativeElement.querySelector('[aria-label="Open navigation menu"]')).toBeNull();
     expect(component.canShowHamburgerMenu).toBeFalse();
+  });
+
+  it('shows the dashboard icon as the dashboard link', () => {
+    fixture.detectChanges();
+
+    const dashboardLink = fixture.nativeElement.querySelector('.global-header-dashboard') as HTMLAnchorElement;
+    expect(dashboardLink.getAttribute('href')).toBe('/dashboard');
+    expect(dashboardLink.getAttribute('aria-label')).toBe('Dashboard');
+    expect(dashboardLink.querySelector('mat-icon')?.textContent?.trim()).toBe('dashboard');
+    expect(dashboardLink.textContent?.trim()).toBe('dashboard');
+  });
+
+  it('navigates to the settings overview when the settings button is clicked', async () => {
+    fixture.detectChanges();
+
+    const settingsButton = fixture.nativeElement.querySelector(
+      'button[aria-label="Open settings"]',
+    ) as HTMLButtonElement;
+    settingsButton.click();
+    await fixture.whenStable();
+
+    expect(TestBed.inject(Router).url).toBe('/settings/overview');
   });
 });

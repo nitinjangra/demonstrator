@@ -6,14 +6,14 @@
     <legend>Actions table (one selection required)</legend>
     <mat-slide-toggle
       class="feature-toggle-row"
-      [checked]="agGridEnabled()"
+      [checked]="draftTableFeature() === 'ag-grid'"
       (change)="setTableFeature('ag-grid', $event.checked)"
     >
       AG Grid
     </mat-slide-toggle>
     <mat-slide-toggle
       class="feature-toggle-row"
-      [checked]="materialTableEnabled()"
+      [checked]="draftTableFeature() === 'material-table'"
       (change)="setTableFeature('material-table', $event.checked)"
     >
       Material table
@@ -24,11 +24,30 @@
     <legend>Dashboard</legend>
     <mat-slide-toggle
       class="feature-toggle-row"
-      [checked]="dashboardEnabled()"
+      [checked]="draftDashboardEnabled()"
       (change)="setDashboardEnabled($event.checked)"
     >
       Enable dashboard
     </mat-slide-toggle>
-
+    <mat-slide-toggle
+      class="feature-toggle-row"
+      [checked]="draftChartLibrary() === 'chartjs'"
+      (change)="setChartLibrary('chartjs', $event.checked)"
+    >
+      Chart.js
+    </mat-slide-toggle>
+    <mat-slide-toggle
+      class="feature-toggle-row"
+      [checked]="draftChartLibrary() === 'highcharts'"
+      (change)="setChartLibrary('highcharts', $event.checked)"
+    >
+      Highcharts
+    </mat-slide-toggle>
   </fieldset>
 </section>
+
+<app-sticky-footer [fixed]="false">
+  <button matButton="filled" type="button" [disabled]="!hasUnsavedChanges()" (click)="saveChanges()">
+    Save changes
+  </button>
+</app-sticky-footer>

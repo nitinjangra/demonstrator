@@ -1,20 +1,24 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { AgGridAngular } from 'ag-grid-angular';
-import type { ColDef } from 'ag-grid-community';
+import type { ColDef, ICellRendererParams } from 'ag-grid-community';
 import { AllCommunityModule, ModuleRegistry, themeQuartz } from 'ag-grid-community';
 import { Priority } from '../../../shared/enums/priority.enum';
 import { ActionTableRow } from '../../../shared/interfaces/actions-table.interface';
 import { DateTimeSettingsService } from '../../../shared/services/date-time-settings.service';
+import { PrioritySummaryComponent } from '../priority-summary/priority-summary';
 import { AgTableActionService } from '../shared/services/ag-table-action.service';
 import { AgTableStateService } from '../shared/services/ag-table-state.service';
+import { ActivatedRoute } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { parsePriorityFilter } from '../shared/priority-filter';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 @Component({
   selector: 'app-ag-grid-table',
   standalone: true,
-  imports: [AgGridAngular],
+  imports: [AgGridAngular, PrioritySummaryComponent],
   templateUrl: './ag-grid-table.html',
   styleUrl: './ag-grid-table.scss',
 })
@@ -22,17 +26,21 @@ export class AgGridTable {
   private readonly actionService = inject(AgTableActionService);
   private readonly state = inject(AgTableStateService);
   private readonly dateTimeSettings = inject(DateTimeSettingsService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly destroyRef = inject(DestroyRef);
+  private highlightTimeout?: ReturnType<typeof setTimeout>;
 
-  readonly rowData = toSignal(this.state.getRowData(), { initialValue: [] });
-  readonly highPriorityCount = computed(
-    () => this.rowData().filter((row) => row.priority === Priority.High).length,
-  );
-  readonly mediumPriorityCount = computed(
-    () => this.rowData().filter((row) => row.priority === Priority.Medium).length,
-  );
-  readonly lowPriorityCount = computed(
-    () => this.rowData().filter((row) => row.priority === Priority.Low).length,
-  );
+  readonly Priority = Priority;
+  readonly sourceRowData = toSignal(this.state.getRowData(), { initialValue: [] });
+  readonly selectedPriority = signal<Priority | 'none' | null>(null);
+  readonly routeAppliedPriority = signal<Priority | 'none' | null>(null);
+  readonly rowData = computed(() => {
+    const priority = this.selectedPriority();
+    if (priority === 'none') {
+      return this.sourceRowData().filter((row) => !row.priority);
+    }
+    return priority ? this.sourceRowData().filter((row) => row.priority === priority) : this.sourceRowData();
+  });
   readonly gridTheme = themeQuartz.withParams({
     accentColor: 'var(--color-primary)',
     backgroundColor: 'var(--color-surface)',
@@ -61,6 +69,8 @@ export class AgGridTable {
     {
       field: 'priority',
       headerName: 'Priority',
+      cellRenderer: ({ value }: ICellRendererParams<ActionTableRow, Priority | null>) =>
+        this.renderPriorityBadge(value),
       valueFormatter: ({ value }) =>
         value === Priority.High
           ? '↑ High'
@@ -74,6 +84,26 @@ export class AgGridTable {
 
   constructor() {
     this.actionService.loadGridData();
+    this.route.queryParamMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
+      const priority = parsePriorityFilter(params.get('priority'));
+      this.selectedPriority.set(priority);
+      this.routeAppliedPriority.set(priority);
+      if (this.highlightTimeout) clearTimeout(this.highlightTimeout);
+      if (priority) {
+        this.highlightTimeout = setTimeout(() => this.routeAppliedPriority.set(null), 2000);
+      }
+    });
+    this.destroyRef.onDestroy(() => {
+      if (this.highlightTimeout) clearTimeout(this.highlightTimeout);
+    });
+  }
+
+  togglePriorityFilter(priority: Priority | 'none'): void {
+    this.selectedPriority.update((selected) => (selected === priority ? null : priority));
+  }
+
+  clearPriorityFilter(): void {
+    this.selectedPriority.set(null);
   }
 
   private compareDates(
@@ -86,6 +116,30 @@ export class AgGridTable {
       return leftTime === rightTime ? 0 : leftTime === null ? 1 : -1;
     }
     return leftTime - rightTime;
+  }
+
+  private renderPriorityBadge(value: unknown): HTMLElement {
+    const badge = document.createElement('span');
+    const label = document.createElement('span');
+    const icon = document.createElement('span');
+    const priority = value as Priority;
+
+    if (priority !== Priority.High && priority !== Priority.Medium && priority !== Priority.Low) {
+      badge.className = 'no-priority';
+      badge.textContent = '—';
+      badge.setAttribute('aria-label', 'No priority');
+      return badge;
+    }
+
+    const modifier = priority.toLowerCase();
+    badge.className = `priority-badge priority-badge--${modifier}`;
+    icon.className = 'priority-badge__icon';
+    icon.setAttribute('aria-hidden', 'true');
+    icon.textContent = priority === Priority.High ? '↑' : priority === Priority.Low ? '↓' : '−';
+    label.textContent = priority;
+    badge.append(icon, label);
+
+    return badge;
   }
 
   private toTimestamp(value: Date | string | null | undefined): number | null {
