@@ -40,6 +40,27 @@ body {
   color: var(--color-muted-text);
 }
 
+.table-route-highlight {
+  animation: table-route-highlight 2s ease-out;
+}
+
+@keyframes table-route-highlight {
+  0%,
+  75% {
+    box-shadow: inset 0 0 0 3px var(--color-primary);
+  }
+  100% {
+    box-shadow: inset 0 0 0 0 transparent;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .table-route-highlight {
+    animation: none;
+    box-shadow: inset 0 0 0 3px var(--color-primary);
+  }
+}
+
 body {
   margin: 0;
   font-family: Roboto, 'Helvetica Neue', sans-serif;
@@ -48,6 +69,16 @@ body {
   transition:
     background-color 0.3s ease,
     color 0.3s ease;
+}
+
+body:has(app-landing) {
+  overflow: hidden;
+}
+
+app-root:has(app-landing) {
+  height: 100vh;
+  min-height: 0;
+  overflow: hidden;
 }
 
 :focus-visible {

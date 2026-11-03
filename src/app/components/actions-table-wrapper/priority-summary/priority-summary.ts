@@ -13,6 +13,7 @@ type PriorityFilter = Priority | 'none';
 export class PrioritySummaryComponent {
   readonly rowData = input.required<ActionTableRow[]>();
   readonly selectedPriority = input<PriorityFilter | null>(null);
+  readonly routeAppliedPriority = input<PriorityFilter | null>(null);
   readonly prioritySelected = output<PriorityFilter>();
   readonly filterCleared = output<void>();
 
