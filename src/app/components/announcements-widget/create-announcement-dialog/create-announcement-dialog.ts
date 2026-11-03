@@ -70,6 +70,7 @@ export class CreateAnnouncementDialogComponent implements OnInit {
   attachmentError: string | null = null;
   readonly actionFooterStyles: FooterStyles = {
     height: 'auto',
+    backgroundColor: 'transparent',
   };
 
   get modeData(): AnnouncementEditorData {

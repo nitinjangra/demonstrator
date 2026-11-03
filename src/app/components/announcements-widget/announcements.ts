@@ -107,7 +107,8 @@ export class AnnouncementsWidgetComponent implements OnInit, OnChanges {
   openCreateAnnouncementDialog(): void {
     this.dialog
       .open(CreateAnnouncementDialogComponent, {
-        width: 'min(32rem, calc(100vw - 2rem))',
+        width: 'min(32rem, calc(100vw - 3rem))',
+        maxWidth: 'calc(100vw - 3rem)',
       })
       .afterClosed()
       .pipe(
