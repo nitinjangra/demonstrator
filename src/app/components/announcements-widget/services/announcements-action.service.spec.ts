@@ -2,7 +2,10 @@ import { TestBed } from '@angular/core/testing';
 import { firstValueFrom, of } from 'rxjs';
 import { CoreTestingModule } from '../../../shared/core/core-testing.module';
 import { Announcement } from '../../../shared/interfaces/announcement.interface';
-import { AnnouncementsActionService } from './announcements-action.service';
+import {
+  AnnouncementsActionService,
+  filterAnnouncementsForDisplay,
+} from './announcements-action.service';
 import { AnnouncementsApiService } from './announcements-api.service';
 
 describe('AnnouncementsActionService', () => {
@@ -124,9 +127,52 @@ describe('AnnouncementsActionService', () => {
 
     expect(announcements.map(({ title }) => title)).toEqual([
       ...mockAnnouncements.map(({ title }) => title),
-      'Future',
       'Active',
     ]);
+  });
+
+  it('keeps published announcements hidden until their start date', async () => {
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const tomorrow = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
+    const yesterday = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 1);
+    service.saveAnnouncements([
+      { id: 'future-start', title: 'Starts tomorrow', status: 'Published', startDate: tomorrow },
+      { id: 'starts-today', title: 'Starts today', status: 'Published', startDate: today },
+      { id: 'already-started', title: 'Already started', status: 'Published', startDate: yesterday },
+    ]);
+
+    const announcements = await firstValueFrom(service.getAnnouncements());
+
+    expect(announcements.map(({ id }) => id)).toEqual(['starts-today', 'already-started']);
+  });
+
+  it('applies inclusive start and end date boundaries to the active feed', () => {
+    const now = new Date(2026, 10, 3, 14, 30);
+    const announcements: Announcement[] = [
+      { id: 'starts-today', title: 'Starts today', status: 'Published', startDate: new Date(2026, 10, 3) },
+      { id: 'ends-today', title: 'Ends today', status: 'Published', endDate: new Date(2026, 10, 3) },
+      { id: 'starts-tomorrow', title: 'Starts tomorrow', status: 'Published', startDate: new Date(2026, 10, 4) },
+      { id: 'ended-yesterday', title: 'Ended yesterday', status: 'Published', endDate: new Date(2026, 10, 2) },
+    ];
+
+    expect(filterAnnouncementsForDisplay(announcements, now).map(({ id }) => id)).toEqual([
+      'starts-today',
+      'ends-today',
+    ]);
+  });
+
+  it('does not persist temporary object URLs for uploaded attachments', async () => {
+    spyOn(URL, 'createObjectURL').and.returnValue('blob:temporary-attachment');
+    const attachment = new File(['image'], 'brief.png', { type: 'image/png' });
+
+    service.addAnnouncement({ title: 'With attachment', status: 'Published', attachment });
+
+    const saved = JSON.parse(localStorage.getItem('announcements') ?? '[]') as Announcement[];
+    expect(saved[1].attachmentUrl).toBeUndefined();
+    expect(saved[1].attachmentName).toBeUndefined();
+    expect((await firstValueFrom(service.getAllAnnouncements()))[1].attachmentUrl)
+      .toBe('blob:temporary-attachment');
   });
 
   describe('handleAnnouncementClick', () => {

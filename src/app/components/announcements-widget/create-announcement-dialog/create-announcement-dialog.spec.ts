@@ -196,6 +196,35 @@ describe('CreateAnnouncementDialogComponent', () => {
     expect(component.selectedAttachment).toBeUndefined();
   });
 
+  it('shows the current attachment in edit mode and emits an explicit removal request', () => {
+    fixture.componentRef.setInput('editorData', {
+      mode: 'edit',
+      announcement: {
+        id: 'with-attachment',
+        title: 'Existing announcement',
+        status: 'Published',
+        attachmentName: 'current-image.png',
+        attachmentUrl: 'blob:current-image',
+      },
+    });
+    fixture.detectChanges();
+
+    const host = fixture.nativeElement as HTMLElement;
+    expect(host.querySelector('.existing-attachment')?.textContent).toContain('current-image.png');
+    const removeButton = Array.from(host.querySelectorAll('button')).find((button) =>
+      button.textContent?.includes('Remove attachment'),
+    ) as HTMLButtonElement;
+    removeButton.click();
+    fixture.detectChanges();
+
+    expect(host.querySelector('.existing-attachment')).toBeNull();
+    fixture.componentInstance.form.controls.title.setValue('Updated announcement');
+    fixture.componentInstance.submit();
+    expect(dialogRefSpy.close).toHaveBeenCalledWith(
+      jasmine.objectContaining({ removeAttachment: true, attachment: undefined }),
+    );
+  });
+
   it('cancels a modal through its dialog ref', () => {
     fixture.componentInstance.cancel();
     expect(dialogRefSpy.close).toHaveBeenCalledOnceWith();

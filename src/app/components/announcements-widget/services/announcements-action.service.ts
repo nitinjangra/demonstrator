@@ -12,8 +12,9 @@ export function filterAnnouncementsForDisplay(
   return announcements.filter((announcement) => {
     if (announcement.status !== 'Published') return false;
 
+    const startDate = toDate(announcement.startDate);
     const endDate = toDate(announcement.endDate);
-    return !endDate || endDate >= today;
+    return (!startDate || startDate <= today) && (!endDate || endDate >= today);
   });
 }
 
@@ -109,7 +110,13 @@ export class AnnouncementsActionService {
   private persistAnnouncements(): void {
     localStorage.setItem(
       AnnouncementsActionService.storageKey,
-      JSON.stringify(this.announcementsSubject.value),
+      JSON.stringify(
+        this.announcementsSubject.value.map(({ attachmentUrl, attachmentName, ...announcement }) =>
+          attachmentUrl?.startsWith('blob:')
+            ? announcement
+            : { ...announcement, attachmentUrl, attachmentName },
+        ),
+      ),
     );
   }
 }

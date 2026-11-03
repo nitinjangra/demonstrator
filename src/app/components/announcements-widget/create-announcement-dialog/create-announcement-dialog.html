@@ -78,6 +78,14 @@
       @if (selectedAttachment) {
         <span class="attachment-name">{{ selectedAttachment.name }}</span>
       }
+      @if (existingAttachmentName) {
+        <div class="existing-attachment" aria-live="polite">
+          <span class="attachment-name">Current attachment: {{ existingAttachmentName }}</span>
+          <button matButton type="button" (click)="removeAttachment()">
+            Remove attachment
+          </button>
+        </div>
+      }
     </div>
   </mat-dialog-content>
   <app-sticky-footer class="announcement-form-actions" [fixed]="false" [customStyles]="actionFooterStyles">

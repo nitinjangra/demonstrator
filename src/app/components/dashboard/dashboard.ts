@@ -37,15 +37,20 @@ export class Dashboard implements AfterViewInit {
     this.rows().filter((row) => !row.priority).length,
   ]);
   readonly dueDateData = computed(() => {
-    const counts = new Map<string, number>();
+    const counts = new Map<number, number>();
     for (const row of this.rows()) {
       const date = this.asDate(row.dueDate);
       if (date) {
-        const month = date.toLocaleString('en', { month: 'short', year: 'numeric' });
-        counts.set(month, (counts.get(month) ?? 0) + 1);
+        const monthKey = date.getFullYear() * 12 + date.getMonth();
+        counts.set(monthKey, (counts.get(monthKey) ?? 0) + 1);
       }
     }
-    return [...counts.entries()].sort(([left], [right]) => left.localeCompare(right));
+    return [...counts.entries()]
+      .sort(([left], [right]) => left - right)
+      .map(([monthKey, count]) => {
+        const date = new Date(Math.floor(monthKey / 12), monthKey % 12, 1);
+        return [date.toLocaleString('en', { month: 'short', year: 'numeric' }), count] as const;
+      });
   });
 
   constructor() {
