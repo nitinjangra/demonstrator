@@ -16,7 +16,9 @@ describe('MaterialTable', () => {
       providers: [{ provide: ActivatedRoute, useValue: { queryParamMap: queryParams.asObservable() } }],
     }).compileComponents();
     fixture = TestBed.createComponent(MaterialTable);
+    fixture.detectChanges();
     await fixture.whenStable();
+    fixture.detectChanges();
   });
 
   it('should render sortable action columns and rows', () => {
@@ -38,7 +40,7 @@ describe('MaterialTable', () => {
 
     expect(entityNameHeader.getAttribute('aria-sort')).toBe('ascending');
     expect(table.querySelector('tbody tr td.mat-column-entityName')?.textContent?.trim()).toBe(
-      'Berkshire investments insights',
+      'Agricultural commodities update',
     );
   });
 
@@ -121,7 +123,7 @@ describe('MaterialTable', () => {
   });
 
   it('applies the priority supplied by the route query parameter', async () => {
-    queryParams.next(convertToParamMap({ priority: 'High' }));
+    queryParams.next(convertToParamMap({ priority: 'High', highlightActions: 'true', tab: 'actions' }));
 
     expect(fixture.componentInstance.selectedPriority()).toBe(Priority.High);
     expect(fixture.componentInstance.routeAppliedPriority()).toBe(Priority.High);
