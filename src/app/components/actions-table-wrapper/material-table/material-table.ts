@@ -11,6 +11,7 @@ import { AgTableActionService } from '../shared/services/ag-table-action.service
 import { AgTableStateService } from '../shared/services/ag-table-state.service';
 import { PrioritySummaryComponent } from '../priority-summary/priority-summary';
 import { ActivatedRoute } from '@angular/router';
+import { parsePriorityFilter } from '../shared/priority-filter';
 
 @Component({
   selector: 'app-material-table',
@@ -64,10 +65,7 @@ export class MaterialTable {
 
     this.actionService.loadGridData();
     this.route.queryParamMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
-      const value = params.get('priority');
-      const priority = value === 'none'
-        ? 'none'
-        : Object.values(Priority).find((item) => item === value) ?? null;
+      const priority = parsePriorityFilter(params.get('priority'));
       this.selectedPriority.set(priority);
       this.routeAppliedPriority.set(priority);
       if (this.highlightTimeout) clearTimeout(this.highlightTimeout);

@@ -48,7 +48,7 @@ describe('AgGridTable', () => {
   });
 
   it('applies the priority supplied by the route query parameter', () => {
-    queryParams.next(convertToParamMap({ priority: 'High' }));
+    queryParams.next(convertToParamMap({ priority: 'High', highlightActions: 'true', tab: 'actions' }));
 
     expect(component.selectedPriority()).toBe(Priority.High);
     expect(component.routeAppliedPriority()).toBe(Priority.High);
