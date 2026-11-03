@@ -40,6 +40,7 @@ describe('Notifications', () => {
 
   it('delegates preference changes to the settings service', () => {
     fixture.componentInstance.setPreference('sms', true);
+    fixture.componentInstance.saveChanges();
 
     expect(settingsSpy.setPreference).toHaveBeenCalledWith('sms', true);
   });

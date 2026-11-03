@@ -25,11 +25,8 @@ describe('ThemeSetting', () => {
   afterEach(() => localStorage.clear());
 
   it('should update and persist the selected theme', () => {
-    const darkButton = fixture.nativeElement.querySelector(
-      'mat-button-toggle[value="dark"] button',
-    ) as HTMLButtonElement;
-
-    darkButton.click();
+    fixture.componentInstance.setTheme('dark');
+    fixture.componentInstance.saveChanges();
     fixture.detectChanges();
 
     expect(fixture.componentInstance.theme()).toBe('dark');
@@ -41,11 +38,8 @@ describe('ThemeSetting', () => {
     fixture.componentInstance.setTheme('dark');
     fixture.detectChanges();
 
-    const systemButton = fixture.nativeElement.querySelector(
-      'mat-button-toggle[value="system"] button',
-    ) as HTMLButtonElement;
-
-    systemButton.click();
+    fixture.componentInstance.setTheme('system');
+    fixture.componentInstance.saveChanges();
     fixture.detectChanges();
 
     expect(fixture.componentInstance.preference()).toBe('system');
