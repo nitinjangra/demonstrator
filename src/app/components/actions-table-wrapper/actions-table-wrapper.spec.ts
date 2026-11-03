@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 import { FeatureToggleService } from '../../shared/services/feature-toggle.service';
 
 import { ActionsTableWrapper } from './actions-table-wrapper';
@@ -12,6 +13,7 @@ describe('ActionsTableWrapper', () => {
     localStorage.removeItem('table-feature');
     await TestBed.configureTestingModule({
       imports: [ActionsTableWrapper],
+      providers: [provideRouter([])],
     }).compileComponents();
 
     fixture = TestBed.createComponent(ActionsTableWrapper);

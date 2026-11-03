@@ -40,9 +40,9 @@ describe('Dashboard', () => {
     expect(fixture.nativeElement.querySelector('#priority-chart-description')?.textContent)
       .toContain('Actions by priority:');
     expect(fixture.nativeElement.querySelector('#due-date-chart-description')?.textContent)
-      .toContain('due date data');
+      .toContain('Actions due by month:');
     expect(fixture.nativeElement.querySelector('[aria-label="View all actions"]')?.getAttribute('href'))
-      .toBe('/landing');
+      .toBe('/landing?highlightActions=true');
   });
 
   it('renders both charts with Chart.js when that library is selected', async () => {
