@@ -40,6 +40,7 @@ describe('CreateAnnouncementDialogComponent', () => {
     expect(footer.classList).not.toContain('sticky-footer--fixed');
     expect(buttons.length).toBe(2);
     expect(getComputedStyle(footer).gap).toBe('16px');
+    expect(footer.style.backgroundColor).toBe('transparent');
     expect(buttons[1].textContent).toContain('Add announcement');
 
     fixture.componentRef.setInput('editorData', {
