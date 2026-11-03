@@ -11,7 +11,7 @@ describe('Dashboard', () => {
 
   beforeEach(async () => {
     localStorage.removeItem('chart-library-feature');
-    await TestBed.configureTestingModule({ imports: [Dashboard] }).compileComponents();
+    await TestBed.configureTestingModule({ imports: [Dashboard], providers: [provideRouter([])] }).compileComponents();
     fixture = TestBed.createComponent(Dashboard);
     fixture.detectChanges();
   });
@@ -29,6 +29,20 @@ describe('Dashboard', () => {
     );
     expect(fixture.nativeElement.querySelector('#priority-chart')).not.toBeNull();
     expect(fixture.nativeElement.querySelector('#due-date-chart')).not.toBeNull();
+    expect(fixture.nativeElement.querySelector('[aria-label="View high priority actions"]')?.getAttribute('href'))
+      .toContain('/landing?priority=High');
+    expect(fixture.nativeElement.querySelector('[aria-label="View medium priority actions"]')?.getAttribute('href'))
+      .toContain('/landing?priority=Medium');
+    expect(fixture.nativeElement.querySelector('[aria-label="View low priority actions"]')?.getAttribute('href'))
+      .toContain('/landing?priority=Low');
+    expect(fixture.nativeElement.querySelector('[aria-label="View actions with no priority"]')?.getAttribute('href'))
+      .toContain('/landing?priority=none');
+    expect(fixture.nativeElement.querySelector('#priority-chart-description')?.textContent)
+      .toContain('Actions by priority:');
+    expect(fixture.nativeElement.querySelector('#due-date-chart-description')?.textContent)
+      .toContain('due date data');
+    expect(fixture.nativeElement.querySelector('[aria-label="View all actions"]')?.getAttribute('href'))
+      .toBe('/landing');
   });
 
   it('renders both charts with Chart.js when that library is selected', async () => {
@@ -42,6 +56,18 @@ describe('Dashboard', () => {
     expect(dueDateChart.querySelector('svg')).toBeNull();
   });
 
+  it('navigates to the matching priority filter when a Chart.js pie slice is clicked', async () => {
+    await waitForChartRender();
+    const navigate = spyOn(TestBed.inject(Router), 'navigate').and.resolveTo(true);
+    const chart = (fixture.componentInstance as unknown as {
+      charts: { options: { onClick?: (event: never, elements: { index: number }[]) => void } }[];
+    }).charts[0];
+
+    chart.options.onClick?.(undefined as never, [{ index: 3 }]);
+
+    expect(navigate).toHaveBeenCalledOnceWith(['/landing'], { queryParams: { priority: 'none' } });
+  });
+
   it('renders both charts with Highcharts when that library is selected', async () => {
     TestBed.inject(FeatureToggleService).setChartLibrary('highcharts', true);
     fixture.detectChanges();
@@ -53,6 +79,20 @@ describe('Dashboard', () => {
     expect(dueDateChart.querySelector('svg')).not.toBeNull();
     expect(priorityChart.querySelector('canvas')).toBeNull();
     expect(dueDateChart.querySelector('canvas')).toBeNull();
+  });
+
+  it('navigates to the matching priority filter when a Highcharts pie slice is clicked', async () => {
+    TestBed.inject(FeatureToggleService).setChartLibrary('highcharts', true);
+    fixture.detectChanges();
+    await waitForChartRender();
+    const navigate = spyOn(TestBed.inject(Router), 'navigate').and.resolveTo(true);
+    const charts = (fixture.componentInstance as unknown as {
+      highchartsInstances: { series: { data: { firePointEvent: (event: string) => void }[] }[] }[];
+    }).highchartsInstances;
+
+    charts[0].series[0].data[0].firePointEvent('click');
+
+    expect(navigate).toHaveBeenCalledOnceWith(['/landing'], { queryParams: { priority: 'High' } });
   });
 
   it('orders due-date chart buckets chronologically across year boundaries', () => {

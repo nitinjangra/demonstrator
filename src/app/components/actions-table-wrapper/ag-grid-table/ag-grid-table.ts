@@ -1,4 +1,4 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { AgGridAngular } from 'ag-grid-angular';
 import type { ColDef, ICellRendererParams } from 'ag-grid-community';
@@ -9,6 +9,8 @@ import { DateTimeSettingsService } from '../../../shared/services/date-time-sett
 import { PrioritySummaryComponent } from '../priority-summary/priority-summary';
 import { AgTableActionService } from '../shared/services/ag-table-action.service';
 import { AgTableStateService } from '../shared/services/ag-table-state.service';
+import { ActivatedRoute } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
@@ -23,10 +25,14 @@ export class AgGridTable {
   private readonly actionService = inject(AgTableActionService);
   private readonly state = inject(AgTableStateService);
   private readonly dateTimeSettings = inject(DateTimeSettingsService);
+  private readonly route = inject(ActivatedRoute);
+  private readonly destroyRef = inject(DestroyRef);
+  private highlightTimeout?: ReturnType<typeof setTimeout>;
 
   readonly Priority = Priority;
   readonly sourceRowData = toSignal(this.state.getRowData(), { initialValue: [] });
   readonly selectedPriority = signal<Priority | 'none' | null>(null);
+  readonly routeAppliedPriority = signal<Priority | 'none' | null>(null);
   readonly rowData = computed(() => {
     const priority = this.selectedPriority();
     if (priority === 'none') {
@@ -77,6 +83,21 @@ export class AgGridTable {
 
   constructor() {
     this.actionService.loadGridData();
+    this.route.queryParamMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
+      const value = params.get('priority');
+      const priority = value === 'none'
+        ? 'none'
+        : Object.values(Priority).find((item) => item === value) ?? null;
+      this.selectedPriority.set(priority);
+      this.routeAppliedPriority.set(priority);
+      if (this.highlightTimeout) clearTimeout(this.highlightTimeout);
+      if (priority) {
+        this.highlightTimeout = setTimeout(() => this.routeAppliedPriority.set(null), 2000);
+      }
+    });
+    this.destroyRef.onDestroy(() => {
+      if (this.highlightTimeout) clearTimeout(this.highlightTimeout);
+    });
   }
 
   togglePriorityFilter(priority: Priority | 'none'): void {

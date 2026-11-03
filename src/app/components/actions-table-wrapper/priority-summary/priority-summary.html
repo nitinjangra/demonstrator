@@ -4,6 +4,7 @@
     <span
       [class]="'priority-filter priority-filter--' + filter.className"
       [class.is-active]="selectedPriority() === filter.value"
+      [class.is-route-highlight]="routeAppliedPriority() === filter.value"
     >
       <button
         class="priority-count"

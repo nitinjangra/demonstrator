@@ -1,4 +1,5 @@
-<main class="landing">
+<main class="landing" [class.landing--focus-actions]="highlightActions">
+  <div class="landing-focus-backdrop" aria-hidden="true"></div>
   <header class="landing-greeting">
     <h1 class="landing-greeting-heading">
       {{ timeGreeting }}
@@ -7,7 +8,12 @@
     <p class="landing-greeting-description">Here’s what needs your attention today.</p>
   </header>
   <div class="landing-focus">
-    <section class="landing-focus-content" aria-labelledby="actions-heading">
+    <section
+      id="actions-section"
+      class="landing-focus-content"
+      [class.landing-focus-content--highlight]="highlightActions"
+      aria-labelledby="actions-heading"
+    >
       <h2 id="actions-heading" class="landing-section-heading">
         <mat-icon aria-hidden="true">task_alt</mat-icon>
         Actions

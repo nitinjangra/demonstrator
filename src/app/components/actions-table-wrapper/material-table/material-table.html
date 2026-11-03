@@ -1,11 +1,18 @@
 <app-priority-summary
   [rowData]="rowData()"
   [selectedPriority]="selectedPriority()"
+  [routeAppliedPriority]="routeAppliedPriority()"
   (prioritySelected)="togglePriorityFilter($event)"
   (filterCleared)="clearPriorityFilter()"
 />
 
-<table mat-table [dataSource]="dataSource" matSort aria-label="Actions">
+<table
+  mat-table
+  [dataSource]="dataSource"
+  matSort
+  aria-label="Actions"
+  [class.table-route-highlight]="routeAppliedPriority() !== null"
+>
   <ng-container matColumnDef="id">
     <th mat-header-cell *matHeaderCellDef mat-sort-header>ID</th>
     <td mat-cell *matCellDef="let row">{{ row.id }}</td>
@@ -60,3 +67,9 @@
     <td class="empty-state" [attr.colspan]="displayedColumns.length">No actions to show.</td>
   </tr>
 </table>
+<mat-paginator
+  aria-label="Actions table pages"
+  [pageSize]="10"
+  [pageSizeOptions]="pageSizeOptions"
+  showFirstLastButtons
+></mat-paginator>

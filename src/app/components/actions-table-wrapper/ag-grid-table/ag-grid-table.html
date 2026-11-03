@@ -1,15 +1,19 @@
 <app-priority-summary
   [rowData]="sourceRowData()"
   [selectedPriority]="selectedPriority()"
+  [routeAppliedPriority]="routeAppliedPriority()"
   (prioritySelected)="togglePriorityFilter($event)"
   (filterCleared)="clearPriorityFilter()"
 />
 
-<div class="ag-grid-frame">
+<div class="ag-grid-frame" [class.table-route-highlight]="routeAppliedPriority() !== null">
   <ag-grid-angular
     class="actions-grid"
     aria-label="Actions"
     [domLayout]="'autoHeight'"
+    [pagination]="true"
+    [paginationPageSize]="10"
+    [paginationPageSizeSelector]="[10, 20, 50]"
     [rowData]="rowData()"
     [columnDefs]="columnDefs"
     [defaultColDef]="defaultColDef"

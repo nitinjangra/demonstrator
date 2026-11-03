@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { ActivatedRoute, convertToParamMap, provideRouter, Router } from '@angular/router';
 import { DateAdapter } from '@angular/material/core';
+import { BehaviorSubject } from 'rxjs';
 
 import { Landing } from './landing';
 import { WeatherIcon } from '../../shared/constants/icon.const';
@@ -8,11 +9,16 @@ import { WeatherIcon } from '../../shared/constants/icon.const';
 describe('Landing', () => {
   let component: Landing;
   let fixture: ComponentFixture<Landing>;
+  let queryParams: BehaviorSubject<ReturnType<typeof convertToParamMap>>;
 
   beforeEach(async () => {
+    queryParams = new BehaviorSubject(convertToParamMap({}));
     await TestBed.configureTestingModule({
       imports: [Landing],
-      providers: [provideRouter([])],
+      providers: [
+        provideRouter([]),
+        { provide: ActivatedRoute, useValue: { queryParamMap: queryParams.asObservable() } },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(Landing);
@@ -26,6 +32,50 @@ describe('Landing', () => {
 
   it('should provide the native date adapter required by announcement date pickers', () => {
     expect(fixture.debugElement.injector.get(DateAdapter)).toBeTruthy();
+  });
+
+  it('briefly highlights the actions section when navigation requests it', () => {
+    spyOn(TestBed.inject(Router), 'navigate').and.resolveTo(true);
+    jasmine.clock().install();
+
+    fixture.detectChanges();
+    queryParams.next(convertToParamMap({ highlightActions: 'true' }));
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('#actions-section')?.classList)
+      .toContain('landing-focus-content--highlight');
+    expect(fixture.nativeElement.querySelector('main.landing')?.classList)
+      .toContain('landing--focus-actions');
+    expect(fixture.nativeElement.querySelector('.landing-focus-backdrop')?.getAttribute('aria-hidden'))
+      .toBe('true');
+    jasmine.clock().tick(2000);
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('#actions-section')?.classList)
+      .not.toContain('landing-focus-content--highlight');
+    expect(fixture.nativeElement.querySelector('main.landing')?.classList)
+      .not.toContain('landing--focus-actions');
+    jasmine.clock().uninstall();
+  });
+
+  it('also highlights the actions section when a priority filter is in the route', () => {
+    spyOn(TestBed.inject(Router), 'navigate').and.resolveTo(true);
+    jasmine.clock().install();
+
+    fixture.detectChanges();
+    queryParams.next(convertToParamMap({ priority: 'High' }));
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('#actions-section')?.classList)
+      .toContain('landing-focus-content--highlight');
+    expect(fixture.nativeElement.querySelector('main.landing')?.classList)
+      .toContain('landing--focus-actions');
+    jasmine.clock().tick(2000);
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelector('#actions-section')?.classList)
+      .not.toContain('landing-focus-content--highlight');
+    expect(fixture.nativeElement.querySelector('main.landing')?.classList)
+      .not.toContain('landing--focus-actions');
+    jasmine.clock().uninstall();
   });
 
   it('should show the morning greeting and sun icon', () => {
