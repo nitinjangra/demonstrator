@@ -2,14 +2,17 @@
   <h2 id="announcements-title" class="announcements-title">
     <mat-icon aria-hidden="true">campaign</mat-icon>
     Announcements
-    @if (showContextMenu) {
+    @if (showContextMenu && isAdmin()) {
       <button
         class="announcement-menu-trigger"
         appHoldFeedback
         mat-icon-button
         type="button"
         [matMenuTriggerFor]="announcementMenu"
-        aria-label="Announcement options"
+        #menuTrigger="matMenuTrigger"
+        aria-haspopup="menu"
+        [attr.aria-expanded]="menuTrigger.menuOpen"
+        aria-label="Announcements options"
       >
         <mat-icon aria-hidden="true">more_vert</mat-icon>
       </button>
@@ -34,6 +37,11 @@
             <mat-icon aria-hidden="true">campaign</mat-icon>
             <p class="announcements-empty-state-title">No announcements yet</p>
             <p class="announcements-empty-state-description">New announcements will appear here.</p>
+            @if (showContextMenu && isAdmin()) {
+              <button matButton="filled" type="button" [disabled]="!canAddAnnouncement" (click)="openCreateAnnouncementDialog()">
+                Add announcement
+              </button>
+            }
           </li>
         }
         @for (announcement of announcementsData; track announcement.id) {

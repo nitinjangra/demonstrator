@@ -35,7 +35,7 @@
 .summary-card {
   display: grid;
   gap: 0.5rem;
-  padding: 1rem 1.25rem;
+  padding: 1rem;
 
   strong { font-size: 1.75rem; }
 }
@@ -65,9 +65,9 @@
 
 .chart-card {
   min-width: 0;
-  padding: 1rem 1.25rem;
+  padding: 1rem;
 
-  h2 { margin: 0 0 0.75rem; font-size: 1.05rem; }
+  h2 { display: flex; min-height: 2.75rem; align-items: center; margin: 0 0 0.75rem; font-size: 1.05rem; }
 }
 
 .chart-card__canvas { position: relative; height: 18rem; }

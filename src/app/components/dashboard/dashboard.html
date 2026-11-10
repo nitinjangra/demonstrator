@@ -2,10 +2,11 @@
   <header class="dashboard__header">
     <div>
       <h1 id="dashboard-title">Actions dashboard</h1>
-      <p>Overview of priorities and upcoming due dates.</p>
+      <p>{{ totalActions() === 0 ? 'No actions to summarize yet' : 'Overview of priorities and upcoming due dates' }}, {{ userName() }}.</p>
     </div>
   </header>
 
+  @if (totalActions() > 0) {
   <section class="dashboard__summary" aria-label="Action summary">
     <a class="summary-card summary-card--link" routerLink="/landing" [queryParams]="{ highlightActions: true }" aria-label="View all actions">
       <span class="summary-card__label">Total actions</span>
@@ -28,6 +29,7 @@
       <strong>{{ priorityCounts()[3] }}</strong>
     </a>
   </section>
+  }
 
   <section class="dashboard__charts" aria-label="Action charts">
     <article class="chart-card">
