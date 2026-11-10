@@ -15,6 +15,15 @@
       </span>
       <mat-icon aria-hidden="true">arrow_forward</mat-icon>
     </a>
+    @if (mockDriverEnabled()) {
+      <a class="settings-overview-row" routerLink="/settings/general/mock-driver">
+        <span>
+          <strong>Mock Data Driver</strong>
+          <small>Provide action rows to preview empty, filtered, and paginated table states.</small>
+        </span>
+        <mat-icon aria-hidden="true">arrow_forward</mat-icon>
+      </a>
+    }
     <a class="settings-overview-row" routerLink="/settings/general/notifications">
       <span>
         <strong>Notifications</strong>

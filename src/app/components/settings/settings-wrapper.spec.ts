@@ -36,6 +36,7 @@ describe('SettingsWrapper', () => {
     expect(sidebar.querySelector('a[href="/settings/general/time"]')).not.toBeNull();
     expect(sidebar.querySelector('a[href="/settings/general/theme"]')).not.toBeNull();
     expect(sidebar.querySelector('a[href="/settings/general/feature-toggles"]')).not.toBeNull();
+    expect(sidebar.querySelector('a[href="/settings/general/mock-driver"]')).toBeNull();
     expect(sidebar.querySelector('a[href="/settings/general/notifications"]')).not.toBeNull();
     expect(sidebar.querySelector('a[href="/settings/announcements"]')).not.toBeNull();
 

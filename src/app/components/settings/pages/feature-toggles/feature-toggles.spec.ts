@@ -10,11 +10,12 @@ describe('FeatureToggles', () => {
   beforeEach(async () => {
     featuresSpy = jasmine.createSpyObj<FeatureToggleService>(
       'FeatureToggleService',
-      ['setTableFeature', 'setDashboardEnabled', 'setChartLibrary'],
+      ['setTableFeature', 'setDashboardEnabled', 'setMockDriverEnabled', 'setChartLibrary'],
       {
         agGridEnabled: signal(true),
         materialTableEnabled: signal(false),
         dashboardEnabled: signal(true),
+        mockDriverEnabled: signal(false),
         chartJsEnabled: signal(true),
         highchartsEnabled: signal(false),
       },
@@ -40,11 +41,13 @@ describe('FeatureToggles', () => {
   it('delegates table and dashboard updates to the feature service', () => {
     fixture.componentInstance.setTableFeature('material-table', true);
     fixture.componentInstance.setDashboardEnabled(false);
+    fixture.componentInstance.setMockDriverEnabled(true);
     fixture.componentInstance.setChartLibrary('highcharts', true);
     fixture.componentInstance.saveChanges();
 
     expect(featuresSpy.setTableFeature).toHaveBeenCalledWith('material-table', true);
     expect(featuresSpy.setDashboardEnabled).toHaveBeenCalledWith(false);
+    expect(featuresSpy.setMockDriverEnabled).toHaveBeenCalledWith(true);
     expect(featuresSpy.setChartLibrary).toHaveBeenCalledWith('highcharts', true);
   });
 

@@ -8,6 +8,7 @@ describe('FeatureToggleService', () => {
     localStorage.removeItem('table-feature');
     localStorage.removeItem('dashboard-feature');
     localStorage.removeItem('chart-library-feature');
+    localStorage.removeItem('mock-driver-feature');
     TestBed.configureTestingModule({ providers: [FeatureToggleService] });
     service = TestBed.inject(FeatureToggleService);
   });
@@ -16,6 +17,7 @@ describe('FeatureToggleService', () => {
     localStorage.removeItem('table-feature');
     localStorage.removeItem('dashboard-feature');
     localStorage.removeItem('chart-library-feature');
+    localStorage.removeItem('mock-driver-feature');
   });
 
   it('defaults to AG Grid to preserve the existing table choice', () => {
