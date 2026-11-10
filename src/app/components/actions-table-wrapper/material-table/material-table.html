@@ -6,6 +6,7 @@
   (filterCleared)="clearPriorityFilter()"
 />
 
+@if (visibleRowData().length > 0) {
 <table
   mat-table
   [dataSource]="dataSource"
@@ -67,9 +68,17 @@
     <td class="empty-state" [attr.colspan]="displayedColumns.length">No actions to show.</td>
   </tr>
 </table>
-<mat-paginator
-  aria-label="Actions table pages"
-  [pageSize]="10"
-  [pageSizeOptions]="pageSizeOptions"
-  showFirstLastButtons
-></mat-paginator>
+@if (visibleRowData().length > 10) {
+  <mat-paginator
+    aria-label="Actions table pages"
+    [pageSize]="10"
+    [pageSizeOptions]="pageSizeOptions"
+    showFirstLastButtons
+  ></mat-paginator>
+  }
+} @else {
+  <div class="actions-empty-state" role="status">
+    <mat-icon aria-hidden="true">checklist</mat-icon>
+    <span>No actions to show.</span>
+  </div>
+}

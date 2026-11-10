@@ -39,6 +39,35 @@ describe('AnnouncementsWidgetComponent', () => {
     expect(component).toBeTruthy();
   });
 
+  it('shows an accessible empty state when no announcements are available', async () => {
+    fixture.componentRef.setInput('announcementItems', []);
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const emptyState = fixture.nativeElement.querySelector(
+      '.announcements-empty-state[role="status"]',
+    ) as HTMLElement;
+
+    expect(emptyState).not.toBeNull();
+    expect(emptyState.textContent).toContain('No announcements yet');
+    expect(fixture.nativeElement.querySelector('.announcements-list-item')).toBeNull();
+  });
+
+  it('does not show the empty state when announcements are available', async () => {
+    const activeAnnouncement = {
+      ...mockAnnouncements[0],
+      startDate: new Date('2020-01-01'),
+      endDate: new Date('2099-01-01'),
+    };
+    fixture.componentRef.setInput('announcementItems', [activeAnnouncement]);
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    expect(fixture.nativeElement.querySelector('.announcements-empty-state')).toBeNull();
+    expect(fixture.nativeElement.querySelectorAll('.announcements-list-item').length)
+      .toBe(1);
+  });
+
   describe('ngOnInit', () => {
     it('should set announcements observable', () => {
       const mockAnnouncement = [

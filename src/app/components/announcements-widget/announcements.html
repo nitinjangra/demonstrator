@@ -29,6 +29,13 @@
   <div class="announcements-panel">
     <ul class="announcements-list">
       @if (announcementsData) {
+        @if (announcementsData.length === 0) {
+          <li class="announcements-empty-state" role="status">
+            <mat-icon aria-hidden="true">campaign</mat-icon>
+            <p class="announcements-empty-state-title">No announcements yet</p>
+            <p class="announcements-empty-state-description">New announcements will appear here.</p>
+          </li>
+        }
         @for (announcement of announcementsData; track announcement.id) {
           <li class="announcements-list-item">
             <article>

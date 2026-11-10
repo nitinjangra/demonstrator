@@ -1,4 +1,5 @@
 import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
+import { MatIconModule } from '@angular/material/icon';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { AgGridAngular } from 'ag-grid-angular';
 import type { ColDef, ICellRendererParams } from 'ag-grid-community';
@@ -18,7 +19,7 @@ ModuleRegistry.registerModules([AllCommunityModule]);
 @Component({
   selector: 'app-ag-grid-table',
   standalone: true,
-  imports: [AgGridAngular, PrioritySummaryComponent],
+  imports: [AgGridAngular, MatIconModule, PrioritySummaryComponent],
   templateUrl: './ag-grid-table.html',
   styleUrl: './ag-grid-table.scss',
 })

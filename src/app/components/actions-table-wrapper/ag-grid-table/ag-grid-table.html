@@ -7,16 +7,23 @@
 />
 
 <div class="ag-grid-frame" [class.table-route-highlight]="routeAppliedPriority() !== null">
-  <ag-grid-angular
-    class="actions-grid"
-    aria-label="Actions"
-    [domLayout]="'autoHeight'"
-    [pagination]="true"
-    [paginationPageSize]="10"
-    [paginationPageSizeSelector]="[10, 20, 50]"
-    [rowData]="rowData()"
-    [columnDefs]="columnDefs"
-    [defaultColDef]="defaultColDef"
-    [theme]="gridTheme"
-  />
+  @if (rowData().length > 0) {
+    <ag-grid-angular
+      class="actions-grid"
+      aria-label="Actions"
+      [domLayout]="'autoHeight'"
+      [pagination]="rowData().length > 10"
+      [paginationPageSize]="10"
+      [paginationPageSizeSelector]="[10, 20, 50]"
+      [rowData]="rowData()"
+      [columnDefs]="columnDefs"
+      [defaultColDef]="defaultColDef"
+      [theme]="gridTheme"
+    />
+  } @else {
+    <div class="actions-empty-state" role="status">
+      <mat-icon aria-hidden="true">checklist</mat-icon>
+      <span>No actions to show.</span>
+    </div>
+  }
 </div>
