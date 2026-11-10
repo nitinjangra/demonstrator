@@ -18,6 +18,7 @@ import { AgTableActionService } from '../actions-table-wrapper/shared/services/a
 import { AgTableStateService } from '../actions-table-wrapper/shared/services/ag-table-state.service';
 import { FeatureToggleService } from '../../shared/services/feature-toggle.service';
 import { Router, RouterLink } from '@angular/router';
+import { UserSettingsService } from '../../shared/services/user-settings.service';
 
 Chart.register(...registerables);
 
@@ -35,6 +36,7 @@ export class Dashboard implements AfterViewInit {
   private readonly platformId = inject(PLATFORM_ID);
   private readonly features = inject(FeatureToggleService);
   private readonly router = inject(Router);
+  readonly userName = inject(UserSettingsService).userName;
   private charts: Chart[] = [];
   private highchartsInstances: Highcharts.Chart[] = [];
 

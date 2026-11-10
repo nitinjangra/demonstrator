@@ -1,3 +1,4 @@
+@if (rowData().length > 0) {
 <div class="actions-summary" aria-live="polite">
   <span>{{ rowData().length }} actions</span>
   @for (filter of filters; track filter.value) {
@@ -11,7 +12,12 @@
         type="button"
         [attr.aria-pressed]="selectedPriority() === filter.value"
         (click)="prioritySelected.emit(filter.value)"
-      >{{ counts()[filter.countKey] }} {{ filter.label }}</button>
+      >
+        @if (filter.countKey === 'high') { <span class="priority-symbol" aria-hidden="true">↑</span> }
+        @else if (filter.countKey === 'medium') { <span class="priority-symbol" aria-hidden="true">●</span> }
+        @else if (filter.countKey === 'low') { <span class="priority-symbol" aria-hidden="true">↓</span> }
+        {{ counts()[filter.countKey] }} {{ filter.label }}
+      </button>
       @if (selectedPriority() === filter.value) {
         <button
           class="priority-filter-clear"
@@ -23,3 +29,4 @@
     </span>
   }
 </div>
+}

@@ -79,6 +79,6 @@
 } @else {
   <div class="actions-empty-state" role="status">
     <mat-icon aria-hidden="true">checklist</mat-icon>
-    <span>No actions to show.</span>
+    <span>{{ rowData().length === 0 ? 'You’re all caught up. No actions need your attention.' : 'No actions match this priority filter.' }}</span>
   </div>
 }

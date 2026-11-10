@@ -21,6 +21,7 @@ import { Observable, filter, of } from 'rxjs';
 import type { Announcement } from '../../shared/interfaces/announcement.interface';
 import { HoldFeedbackDirective } from '../../shared/directives/hold-feedback.directive';
 import { CreateAnnouncementDialogComponent } from './create-announcement-dialog/create-announcement-dialog';
+import { UserSettingsService } from '../../shared/services/user-settings.service';
 import type { CreateAnnouncementResult } from './types/create-announcement.types';
 import {
   AnnouncementsActionService,
@@ -46,6 +47,7 @@ import {
 export class AnnouncementsWidgetComponent implements OnInit, OnChanges {
   @Input() showContextMenu = true;
   @Input() announcementItems: Announcement[] | null = null;
+  readonly isAdmin = inject(UserSettingsService).isAdmin;
 
   private readonly expandedAnnouncementIds = signal<ReadonlySet<string>>(new Set());
   private readonly truncatedAnnouncementIds = signal<ReadonlySet<string>>(new Set());

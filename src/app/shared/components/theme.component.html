@@ -11,7 +11,9 @@
   (keydown)="onKeyDown($event)"
   (keyup)="onKeyUp($event)"
   (blur)="cancelHold()"
-  [attr.aria-label]="label()"
+  aria-label="Dark theme"
+  [attr.aria-pressed]="isDarkMode()"
+  [attr.title]="label()"
   aria-description="Press and hold for 2 seconds to switch themes"
   matTooltip="press and hold to switch theme"
 >

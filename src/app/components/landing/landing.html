@@ -2,10 +2,12 @@
   <div class="landing-focus-backdrop" aria-hidden="true"></div>
   <header class="landing-greeting">
     <h1 class="landing-greeting-heading">
-      {{ timeGreeting }}
+      {{ timeGreeting }}, {{ userName() }}
       <span class="landing-greeting-heading-icon" aria-hidden="true">{{ greetingIcon }}</span>
     </h1>
-    <p class="landing-greeting-description">Here’s what needs your attention today.</p>
+    <p class="landing-greeting-description">
+      {{ actionCount().length === 0 ? 'You’re all caught up. No actions need your attention' : 'Here’s what needs your attention today' }}.
+    </p>
   </header>
   <div class="landing-focus">
     <section

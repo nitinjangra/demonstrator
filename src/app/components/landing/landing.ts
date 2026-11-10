@@ -1,4 +1,5 @@
 import { Component, DestroyRef, ElementRef, inject, OnInit, signal, ViewChild } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { MatIconModule } from '@angular/material/icon';
 import { MatNativeDateModule } from '@angular/material/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -10,6 +11,9 @@ import { WeatherIcon } from '../../shared/constants/icon.const';
 import { ActionsTableWrapper } from '../actions-table-wrapper/actions-table-wrapper';
 import { parsePriorityFilter } from '../actions-table-wrapper/shared/priority-filter';
 import type { PriorityFilter } from '../actions-table-wrapper/shared/priority-filter';
+import { AgTableStateService } from '../actions-table-wrapper/shared/services/ag-table-state.service';
+import { UserSettingsService } from '../../shared/services/user-settings.service';
+import type { ActionTableRow } from '../../shared/interfaces/actions-table.interface';
 
 @Component({
   selector: 'app-landing',
@@ -23,6 +27,9 @@ export class Landing implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
   private readonly liveAnnouncer = inject(LiveAnnouncer);
+  private readonly tableState = inject(AgTableStateService);
+  readonly userName = inject(UserSettingsService).firstName;
+  readonly actionCount = toSignal(this.tableState.getRowData(), { initialValue: [] as ActionTableRow[] });
   private highlightTimeout?: ReturnType<typeof setTimeout>;
   private pendingHighlightCleanup: { priority: PriorityFilter } | null = null;
   private pendingActionsFocus = false;
@@ -107,13 +114,13 @@ export class Landing implements OnInit {
     const hour = new Date().getHours();
     if (hour < Hours.Twelve) {
       this.greetingIcon = WeatherIcon.Sun;
-      return 'Good Morning!!';
+      return 'Good morning';
     }
     if (hour < Hours.Seventeen) {
       this.greetingIcon = WeatherIcon.Cloud;
-      return 'Good Afternoon!!';
+      return 'Good afternoon';
     }
     this.greetingIcon = WeatherIcon.Moon;
-    return 'Good Evening!!';
+    return 'Good evening';
   }
 }

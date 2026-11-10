@@ -94,6 +94,13 @@
   }
 }
 
+.priority-symbol {
+  display: inline-block;
+  min-width: 1em;
+  margin-inline-end: 0.2rem;
+  text-align: center;
+}
+
 .priority-filter-clear {
   display: inline-grid;
   width: 1.75rem;
