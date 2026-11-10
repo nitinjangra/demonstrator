@@ -102,6 +102,7 @@
     &-announcements {
       box-sizing: border-box;
       display: block;
+      --announcements-empty-state-min-height: 30rem;
       min-width: 0;
       min-height: 36rem;
       padding: 1rem;
@@ -119,6 +120,10 @@
     &-focus-content,
     &-focus-announcements {
       min-height: 28rem;
+    }
+
+    &-focus-announcements {
+      --announcements-empty-state-min-height: 22rem;
     }
   }
 

@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, signal, ViewChild } from '@angular/core';
+import { Component, computed, DestroyRef, inject, signal, ViewChild } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatSort, MatSortModule } from '@angular/material/sort';
@@ -32,19 +32,26 @@ export class MaterialTable {
   readonly routeAppliedPriority = signal<Priority | 'none' | null>(null);
 
   @ViewChild(MatSort)
-  set matSort(sort: MatSort) {
-    this.dataSource.sort = sort;
+  set matSort(sort: MatSort | undefined) {
+    this.dataSource.sort = sort ?? null;
   }
 
   @ViewChild(MatPaginator)
-  set paginator(paginator: MatPaginator) {
-    this.dataSource.paginator = paginator;
+  set paginator(paginator: MatPaginator | undefined) {
+    this.dataSource.paginator = paginator ?? null;
   }
 
   readonly displayedColumns = ['id', 'entityName', 'dueDate', 'priority'];
   readonly dataSource = new MatTableDataSource<ActionTableRow>();
   readonly pageSizeOptions = [10, 20, 50];
   private readonly rowData = signal<ActionTableRow[]>([]);
+  readonly visibleRowData = computed(() => {
+    const rows = this.rowData();
+    const priority = this.selectedPriority();
+    if (priority === 'none') return rows.filter((row) => !row.priority);
+    return priority ? rows.filter((row) => row.priority === priority) : rows;
+  });
+
   constructor() {
     this.dataSource.filterPredicate = (row, filter) =>
       filter === 'none' ? !row.priority : !filter || row.priority === filter;

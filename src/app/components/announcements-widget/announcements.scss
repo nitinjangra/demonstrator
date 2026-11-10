@@ -25,6 +25,41 @@
       background: var(--color-bg);
     }
   }
+
+  &-empty-state {
+    display: grid;
+    box-sizing: border-box;
+    min-height: var(--announcements-empty-state-min-height, 12rem);
+    align-content: center;
+    justify-items: center;
+    gap: 0.5rem;
+    padding: 1.5rem;
+    border: 1px dashed var(--color-border);
+    border-radius: 0.625rem;
+    color: var(--color-muted-text);
+    text-align: center;
+
+    .mat-icon {
+      width: 2rem;
+      height: 2rem;
+      color: var(--color-primary);
+      font-size: 2rem;
+    }
+
+    &-title,
+    &-description {
+      margin: 0;
+    }
+
+    &-title {
+      color: var(--color-text);
+      font-weight: 600;
+    }
+
+    &-description {
+      font-size: 0.875rem;
+    }
+  }
 }
 
 .announcement-menu-trigger {
