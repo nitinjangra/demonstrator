@@ -1,35 +1,21 @@
 <mat-sidenav-container class="settings-layout">
   <mat-sidenav class="settings-sidebar" [class.settings-sidebar--minimized]="isSidebarMinimized" mode="side" opened aria-label="Settings navigation">
     <div class="settings-sidebar-heading">
+      <button
+        mat-icon-button
+        type="button"
+        class="sidebar-toggle"
+        (click)="toggleSidebar()"
+        [attr.aria-label]="isSidebarMinimized ? 'Expand settings menu' : 'Minimize settings menu'"
+        [title]="isSidebarMinimized ? 'Expand menu' : 'Minimize menu'"
+      >
+        <mat-icon aria-hidden="true">dock_to_right</mat-icon>
+      </button>
       @if (!isSidebarMinimized) {
         <h1 class="settings-title">Settings</h1>
       }
-      @if (!isSidebarMinimized) {
-        <button
-          mat-icon-button
-          type="button"
-          class="sidebar-toggle"
-          (click)="toggleSidebar()"
-          aria-label="Minimize settings menu"
-          title="Minimize menu"
-        >
-          <mat-icon aria-hidden="true">chevron_left</mat-icon>
-        </button>
-      }
     </div>
     <mat-nav-list>
-      @if (isSidebarMinimized) {
-        <button
-          mat-icon-button
-          type="button"
-          class="sidebar-toggle sidebar-toggle--nav-item"
-          (click)="toggleSidebar()"
-          [attr.aria-label]="isSidebarMinimized ? 'Expand settings menu' : 'Minimize settings menu'"
-          title="Expand menu"
-        >
-          <mat-icon aria-hidden="true">chevron_right</mat-icon>
-        </button>
-      }
       <a
         mat-list-item
         matTooltip="Overview"
@@ -65,6 +51,19 @@
         <mat-icon matListItemIcon aria-hidden="true">toggle_on</mat-icon>
         @if (!isSidebarMinimized) { <span matListItemTitle>Feature toggles</span> }
       </a>
+      @if (mockDriverEnabled()) {
+        <a
+          mat-list-item
+          matTooltip="Mock data driver"
+          [matTooltipDisabled]="!isSidebarMinimized"
+          routerLink="/settings/general/mock-driver"
+          routerLinkActive="settings-nav-link--active"
+          [routerLinkActiveOptions]="{ exact: true }"
+        >
+          <mat-icon matListItemIcon aria-hidden="true">data_object</mat-icon>
+          @if (!isSidebarMinimized) { <span matListItemTitle>Mock data driver</span> }
+        </a>
+      }
       <a
         mat-list-item
         matTooltip="Notifications"

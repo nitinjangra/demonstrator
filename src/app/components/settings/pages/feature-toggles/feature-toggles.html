@@ -44,6 +44,17 @@
       Highcharts
     </mat-slide-toggle>
   </fieldset>
+
+  <fieldset>
+    <legend>Developer tools</legend>
+    <mat-slide-toggle
+      class="feature-toggle-row"
+      [checked]="draftMockDriverEnabled()"
+      (change)="setMockDriverEnabled($event.checked)"
+    >
+      Enable mock data driver
+    </mat-slide-toggle>
+  </fieldset>
 </section>
 
 <app-sticky-footer [fixed]="false">

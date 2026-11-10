@@ -73,6 +73,16 @@ export const routes: Routes = [
               import('./components/settings/pages/feature-toggles/feature-toggles').then((m) => m.FeatureToggles),
           },
           {
+            path: 'mock-driver',
+            canMatch: [
+              () =>
+                inject(FeatureToggleService).mockDriverEnabled() ||
+                inject(Router).createUrlTree(['/settings/general/feature-toggles']),
+            ],
+            loadComponent: () =>
+              import('./components/settings/pages/mock-driver/mock-driver').then((m) => m.MockDriver),
+          },
+          {
             path: 'notifications',
             loadComponent: () =>
               import('./components/settings/pages/notifications/notifications').then((m) => m.Notifications),
