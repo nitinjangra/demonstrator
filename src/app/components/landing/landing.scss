@@ -4,8 +4,7 @@
   height: calc(100dvh - 4rem);
   min-height: 0;
   overflow-x: hidden;
-  overflow-y: auto;
-  overscroll-behavior-y: contain;
+  overflow-y: hidden;
 }
 
 .landing {
@@ -14,8 +13,18 @@
   width: min(100% - 2rem, 90rem);
   margin-inline: auto;
   box-sizing: border-box;
+  display: flex;
+  height: 100%;
+  min-height: 0;
+  flex-direction: column;
   padding-block: 0 2rem;
   padding-inline: clamp(0rem, 2vw, 1.5rem);
+
+  &-loading {
+    display: grid;
+    min-height: min(70vh, 36rem);
+    place-items: center;
+  }
 
   &-focus-backdrop {
     position: fixed;
@@ -61,16 +70,21 @@
 
   &-focus {
     display: grid;
+    min-height: 0;
+    flex: 1 1 auto;
     grid-template-columns: minmax(0, 62fr) minmax(18rem, 38fr);
-    align-items: start;
+    align-items: stretch;
     gap: 1rem;
 
     &-content {
       position: relative;
       z-index: 2;
       box-sizing: border-box;
+      display: flex;
       min-width: 0;
-      min-height: 36rem;
+      min-height: 0;
+      flex-direction: column;
+      overflow: hidden;
       padding: 1rem;
       border: 1px solid var(--color-border);
       border-radius: 0.75rem;
@@ -81,6 +95,10 @@
       }
 
       h2 {
+        position: sticky;
+        z-index: 1;
+        top: 0;
+        flex: 0 0 auto;
         min-height: 2.75rem;
         margin: 0 0 0.5rem;
         font-size: 1.25rem;
@@ -100,12 +118,23 @@
       }
     }
 
+    &-actions-scroll {
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      min-height: 0;
+      flex: 1 1 auto;
+      overflow: hidden;
+    }
+
     &-announcements {
       box-sizing: border-box;
       display: block;
       --announcements-empty-state-min-height: 30rem;
       min-width: 0;
-      min-height: 36rem;
+      min-height: 0;
+      overflow-x: hidden;
+      overflow-y: hidden;
       padding: 1rem;
       border: 1px solid var(--color-border);
       border-radius: 0.75rem;
@@ -113,14 +142,29 @@
     }
   }
 
-  @media (max-width: 760px) {
+  @media (max-width: 960px) {
     &-focus {
+      min-height: auto;
+      flex: initial;
       grid-template-columns: minmax(0, 1fr);
+      align-items: start;
     }
 
     &-focus-content,
     &-focus-announcements {
       min-height: 28rem;
+      overflow-y: visible;
+    }
+
+    &-focus-content {
+      display: block;
+      overflow: visible;
+    }
+
+    &-actions-scroll {
+      display: block;
+      min-height: auto;
+      overflow: visible;
     }
 
     &-focus-announcements {
@@ -130,6 +174,20 @@
 
   @media (max-width: 600px) {
     width: min(100% - 1.5rem, 90rem);
+  }
+}
+
+@media (max-width: 960px) {
+  :host {
+    height: auto;
+    min-height: calc(100vh - 4rem);
+    min-height: calc(100dvh - 4rem);
+    overflow-y: auto;
+  }
+
+  .landing {
+    display: block;
+    height: auto;
   }
 }
 
