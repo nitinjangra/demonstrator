@@ -11,7 +11,6 @@
     <ag-grid-angular
       class="actions-grid"
       aria-label="Actions"
-      [domLayout]="'autoHeight'"
       [pagination]="rowData().length > 10"
       [paginationPageSize]="10"
       [paginationPageSizeSelector]="[10, 20, 50]"
@@ -23,7 +22,12 @@
   } @else {
     <div class="actions-empty-state" role="status">
       <mat-icon aria-hidden="true">checklist</mat-icon>
-      <span>{{ sourceRowData().length === 0 ? 'You’re all caught up. No actions need your attention.' : 'No actions match this priority filter.' }}</span>
+      @if (sourceRowData().length === 0) {
+        <p class="actions-empty-state-title">You’re all caught up</p>
+        <p class="actions-empty-state-description">No actions need your attention.</p>
+      } @else {
+        <p class="actions-empty-state-description">No actions match this priority filter.</p>
+      }
     </div>
   }
 </div>

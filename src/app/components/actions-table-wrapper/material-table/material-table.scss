@@ -1,14 +1,32 @@
 :host {
-  display: block;
-  overflow-x: auto;
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+
+.actions-table-viewport {
+  box-sizing: border-box;
+  height: 27rem;
+  max-height: 27rem;
+  min-height: 8rem;
+  flex: 1 1 27rem;
+  max-width: 100%;
+  overflow: auto;
+  border: 1px solid var(--color-border);
+  border-radius: 0.625rem;
+  overscroll-behavior: contain;
+}
+
+:host ::ng-deep mat-paginator {
+  flex: 0 0 auto;
 }
 
 .mat-mdc-table {
   width: 100%;
-  height: 26rem;
+  height: auto;
   min-width: 36rem;
-  border: 1px solid var(--color-border);
-  border-radius: 0.625rem;
   border-collapse: separate;
   border-spacing: 0;
   background-color: var(--color-surface);
@@ -35,6 +53,13 @@
   border-right: 1px solid var(--color-border);
   border-bottom: 1px solid var(--color-border);
   color: inherit;
+}
+
+.mat-mdc-header-cell {
+  position: sticky;
+  z-index: 1;
+  top: 0;
+  background: var(--color-table-header);
 }
 
 .mat-mdc-header-cell:last-child,
@@ -99,8 +124,9 @@
   width: 10rem;
 }
 
-.entity-name {
-  max-width: 0;
+.mat-column-entityName {
+  width: 20rem;
+  max-width: 20rem;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -113,7 +139,7 @@
 
 .actions-empty-state {
   display: grid;
-  min-height: 26rem;
+  min-height: 8rem;
   box-sizing: border-box;
   place-items: center;
   align-content: center;
@@ -124,6 +150,19 @@
   background: var(--color-surface);
   color: var(--color-muted-text);
   text-align: center;
+
+  p {
+    margin: 0;
+  }
+
+  &-title {
+    color: var(--color-text);
+    font-weight: 600;
+  }
+
+  &-description {
+    font-size: 0.875rem;
+  }
 
   mat-icon {
     width: 2.5rem;
