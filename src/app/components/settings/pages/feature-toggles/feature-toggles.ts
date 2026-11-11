@@ -1,7 +1,8 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, HostListener, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { StickyFooterComponent } from '../../../../shared/components/sticky-footer/sticky-footer.component';
+import { UnsavedChangesDialogService } from '../../../../shared/components/unsaved-changes-dialog/unsaved-changes-dialog.component';
 import {
   ChartLibrary,
   FeatureToggleService,
@@ -17,6 +18,7 @@ import {
 })
 export class FeatureToggles {
   private readonly features = inject(FeatureToggleService);
+  private readonly unsavedChangesDialog = inject(UnsavedChangesDialogService);
   readonly agGridEnabled = this.features.agGridEnabled;
   readonly dashboardEnabled = this.features.dashboardEnabled;
   readonly mockDriverEnabled = this.features.mockDriverEnabled;
@@ -58,5 +60,14 @@ export class FeatureToggles {
     this.features.setDashboardEnabled(this.draftDashboardEnabled());
     this.features.setMockDriverEnabled(this.draftMockDriverEnabled());
     this.features.setChartLibrary(this.draftChartLibrary(), true);
+  }
+
+  @HostListener('window:beforeunload', ['$event'])
+  warnBeforeLeaving(event: BeforeUnloadEvent): void {
+    this.unsavedChangesDialog.warnBeforeUnload(event, this.hasUnsavedChanges());
+  }
+
+  canDeactivate(): boolean | import('rxjs').Observable<boolean> {
+    return this.unsavedChangesDialog.confirmIfNeeded(this.hasUnsavedChanges());
   }
 }
