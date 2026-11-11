@@ -72,6 +72,19 @@
 
 .chart-card__canvas { position: relative; height: 18rem; }
 
+.dashboard__empty-state {
+  grid-column: 1 / -1;
+  padding: 2rem;
+  border: 1px dashed var(--color-border);
+  border-radius: 0.75rem;
+  background: var(--color-surface);
+  text-align: center;
+
+  h2 { margin: 0 0 0.5rem; font-size: 1.1rem; }
+  p { margin: 0 0 1rem; color: var(--color-muted-text); }
+  a { color: var(--color-primary); text-underline-offset: 0.15em; }
+}
+
 .visually-hidden {
   position: absolute;
   width: 1px;
