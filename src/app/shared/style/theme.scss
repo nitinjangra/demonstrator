@@ -33,7 +33,7 @@ $dark-theme: mat.m2-define-dark-theme((
 // Keep Angular Material controls on the same runtime color tokens as the rest of the app.
 :root {
   @include mat.button-overrides((
-    filled-container-color: var(--color-primary),
+    filled-container-color: var(--color-primary-action, var(--color-primary)),
     filled-label-text-color: #fff,
     outlined-outline-color: var(--color-border),
     outlined-label-text-color: var(--color-text),
@@ -73,7 +73,7 @@ $dark-theme: mat.m2-define-dark-theme((
 
   @include mat.button-toggle-overrides((
     divider-color: var(--color-border),
-    selected-state-background-color: var(--color-primary),
+    selected-state-background-color: var(--color-primary-action, var(--color-primary)),
     selected-state-text-color: #fff,
     text-color: var(--color-text),
   ));

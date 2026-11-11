@@ -2,20 +2,11 @@
   type="button"
   class="theme-toggle"
   [class.theme-toggle--dark]="isDarkMode()"
-  [class.theme-toggle--holding]="isHolding()"
-  (click)="onClick($event)"
-  (pointerdown)="onPointerDown($event)"
-  (pointerup)="cancelHold()"
-  (pointerleave)="cancelHold()"
-  (pointercancel)="cancelHold()"
-  (keydown)="onKeyDown($event)"
-  (keyup)="onKeyUp($event)"
-  (blur)="cancelHold()"
-  aria-label="Dark theme"
+  (click)="toggleTheme()"
+  [attr.aria-label]="label()"
   [attr.aria-pressed]="isDarkMode()"
   [attr.title]="label()"
-  aria-description="Press and hold for 2 seconds to switch themes"
-  matTooltip="press and hold to switch theme"
+  [matTooltip]="label()"
 >
   <span class="theme-toggle__icon" aria-hidden="true"></span>
 </button>
