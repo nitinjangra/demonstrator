@@ -59,7 +59,13 @@ export class AgGridTable {
   };
   readonly columnDefs: ColDef<ActionTableRow>[] = [
     { field: 'id', headerName: 'ID', maxWidth: 90 },
-    { field: 'entityName', headerName: 'Entity name', minWidth: 190 },
+    {
+      field: 'entityName',
+      headerName: 'Entity name',
+      minWidth: 190,
+      maxWidth: 320,
+      tooltipField: 'entityName',
+    },
     {
       field: 'dueDate',
       headerName: 'Due date',
