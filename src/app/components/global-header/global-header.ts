@@ -33,7 +33,11 @@ import {
 })
 export class GlobalHeaderComponent {
   canShowHamburgerMenu = false;
-  readonly brandName = inject(BrandingService).displayName;
+  private readonly branding = inject(BrandingService);
+  readonly brandName = this.branding.displayName;
+  readonly brandMode = this.branding.brandMode;
+  readonly brandLogo = this.branding.brandLogo;
+  readonly brandAltText = this.branding.brandAltText;
   readonly dashboardEnabled = inject(FeatureToggleService).dashboardEnabled;
   private readonly userSettings = inject(UserSettingsService);
   readonly userName = this.userSettings.firstName;

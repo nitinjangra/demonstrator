@@ -27,11 +27,19 @@
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
+  min-width: 0;
   color: inherit;
   font-size: 1.125rem;
   font-weight: 700;
   letter-spacing: 0.01em;
-  text-decoration: none;
+}
+
+.global-header-brand-label {
+  display: block;
+  max-width: clamp(15ch, 20vw, 25ch);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .global-header-home-icon {
@@ -40,8 +48,25 @@
   font-size: 1.2em;
 }
 
-.global-header-brand:hover {
-  text-decoration: underline;
+.global-header-home-link {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.2rem;
+  color: inherit;
+
+  &:focus-visible {
+    outline: 2px solid var(--color-primary);
+    outline-offset: 3px;
+  }
+}
+
+.global-header-brand-image {
+  display: block;
+  width: 2rem;
+  height: 2rem;
+  object-fit: contain;
 }
 
 .global-header-dashboard {
