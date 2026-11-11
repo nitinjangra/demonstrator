@@ -53,6 +53,7 @@ export const routes: Routes = [
       },
       {
         path: 'announcements',
+        canDeactivate: [confirmUnsavedChanges],
         loadComponent: () =>
           import('./components/settings/pages/announcements/announcement-settings').then(
             (m) => m.AnnouncementSettings,
@@ -64,11 +65,13 @@ export const routes: Routes = [
           { path: '', pathMatch: 'full', redirectTo: 'time' },
           {
             path: 'branding',
+            canDeactivate: [confirmUnsavedChanges],
             loadComponent: () =>
               import('./components/settings/pages/branding/branding').then((m) => m.Branding),
           },
           {
             path: 'time',
+            canDeactivate: [confirmUnsavedChanges],
             loadComponent: () =>
               import('./components/settings/pages/time-setting/time-setting').then(
                 (m) => m.TimeSetting,
@@ -76,6 +79,7 @@ export const routes: Routes = [
           },
           {
             path: 'theme',
+            canDeactivate: [confirmUnsavedChanges],
             loadComponent: () =>
               import('./components/settings/pages/theme-setting/theme-setting').then(
                 (m) => m.ThemeSetting,
@@ -83,6 +87,7 @@ export const routes: Routes = [
           },
           {
             path: 'feature-toggles',
+            canDeactivate: [confirmUnsavedChanges],
             loadComponent: () =>
               import('./components/settings/pages/feature-toggles/feature-toggles').then((m) => m.FeatureToggles),
           },
@@ -98,6 +103,7 @@ export const routes: Routes = [
           },
           {
             path: 'notifications',
+            canDeactivate: [confirmUnsavedChanges],
             loadComponent: () =>
               import('./components/settings/pages/notifications/notifications').then((m) => m.Notifications),
           },
