@@ -1,4 +1,8 @@
-<section class="mock-driver" aria-labelledby="mock-driver-title">
+<section
+  class="mock-driver"
+  [class.mock-driver--footer-visible]="selectedComponent() !== null"
+  aria-labelledby="mock-driver-title"
+>
   <header class="mock-driver-header">
     <h2 id="mock-driver-title">Mock data driver</h2>
     <p>Select a component to inspect its data shape, preview mock data, and edit the payload.</p>
@@ -18,12 +22,9 @@
       <section class="mock-driver-pane preview-pane" aria-labelledby="mock-preview-title">
         <div class="pane-heading">
           <div>
-            <h3 id="mock-preview-title">Preview</h3>
-            <p>Updates as you edit valid JSON.</p>
+            <h3 id="mock-preview-title">{{ isDirty ? 'Draft preview (not applied)' : 'Applied preview' }}</h3>
+            <p>The preview follows the editor draft. Apply it to update app data.</p>
           </div>
-          <span class="data-type">
-            {{ component === 'actions-table' ? 'ActionTableRow[]' : 'Announcement[]' }}
-          </span>
         </div>
 
         <div class="data-shape" aria-label="Expected data fields">
@@ -36,7 +37,12 @@
           }
         </div>
 
-        @if (validationError()) {
+        @if (isLoadingPreview()) {
+          <div class="preview-placeholder" role="status" aria-live="polite">
+            <mat-icon aria-hidden="true">hourglass_top</mat-icon>
+            <span>Loading preview…</span>
+          </div>
+        } @else if (validationError()) {
           <div class="preview-placeholder" role="status">Fix the JSON to see a preview.</div>
         } @else if (component === 'actions-table') {
           @if (actionRows().length) {
@@ -61,12 +67,16 @@
               }
             </div>
           } @else {
-            <div class="preview-placeholder">No actions to show.</div>
+            <div class="preview-placeholder actions-empty-state" role="status">
+              <mat-icon aria-hidden="true">checklist</mat-icon>
+              <span>No actions to show.</span>
+            </div>
           }
         } @else {
           <app-announcements
             [announcementItems]="announcementItems()"
             [showContextMenu]="false"
+            [showAllProvidedAnnouncements]="true"
           />
         }
       </section>
@@ -75,11 +85,38 @@
         <div class="editor-toolbar">
           <div>
             <h3 id="mock-editor-title">Mock data</h3>
+            <p class="applied-state">
+              @if (isDirty) {
+                <mat-icon aria-hidden="true">edit</mat-icon> Edited, not applied
+              } @else {
+                <mat-icon aria-hidden="true">check_circle</mat-icon>
+                {{ appliedState() }}
+                @if (appliedAt(); as applied) { · {{ applied | date:'shortTime' }} }
+              }
+            </p>
             @if (itemCount() !== null) {
-              <p>{{ itemCount() }} valid {{ component === 'actions-table' ? 'action' : 'announcement' }}{{ itemCount() === 1 ? '' : 's' }}</p>
+              <p role="status" aria-live="polite">{{ itemCount() }} valid · {{ validationError() ? 1 : 0 }} errors</p>
+              @if (component === 'announcement-widget') {
+                <p class="status-counts">
+                  Published {{ announcementStatusCounts().Published }} · Scheduled {{ announcementStatusCounts().Scheduled }} ·
+                  Draft {{ announcementStatusCounts().Draft }} · Expired {{ announcementStatusCounts().Expired }}
+                </p>
+              }
             }
           </div>
-          <button matButton="outlined" type="button" (click)="loadMockData()">Load mock data</button>
+          <label class="scenario-picker" for="mock-driver-scenario">
+            Scenario
+            <select id="mock-driver-scenario" (change)="selectScenario($event)">
+              <option value="">Choose</option>
+              <option value="default">Default</option>
+              <option value="empty">Empty</option>
+              <option value="many">Many (50)</option>
+              <option value="long-text">Long text</option>
+              @if (component === 'announcement-widget') { <option value="mixed-statuses">Mixed statuses</option> }
+              <option value="error">Error</option>
+              <option value="loading">Loading</option>
+            </select>
+          </label>
         </div>
 
         <label class="visually-hidden" for="mock-data-payload">{{ component === 'actions-table' ? 'Action rows' : 'Announcements' }} JSON</label>
@@ -87,29 +124,44 @@
           id="mock-data-payload"
           spellcheck="false"
           rows="20"
+          aria-label="Mock data JSON"
           [value]="payload()"
           [attr.aria-invalid]="validationError() ? 'true' : null"
           [attr.aria-describedby]="validationError() ? 'mock-driver-help mock-driver-error' : 'mock-driver-help'"
           (input)="onPayloadInput($event)"
         ></textarea>
-        <p id="mock-driver-help" class="mock-driver-help">
-          Edit the JSON payload, then apply it to update this component's mock data.
-        </p>
+        <p id="mock-driver-help" class="mock-driver-help">Edit the JSON draft, then apply it to update app data.</p>
 
         @if (validationError(); as error) {
           <p id="mock-driver-error" class="mock-driver-error" role="alert">{{ error }}</p>
         }
 
-        <div class="mock-driver-actions">
-          <button matButton="filled" type="button" [disabled]="validationError() !== null" (click)="applyPayload()">
-            Apply mock data
-          </button>
-          <button matButton="outlined" type="button" (click)="loadEmptyState()">Load empty state</button>
-          <button matButton="text" type="button" (click)="resetToDefault()">Reset to project default</button>
-          <a matButton="text" routerLink="/landing">Open home page</a>
-        </div>
-        <p class="mock-driver-status" role="status" aria-live="polite">{{ statusMessage() }}</p>
       </section>
     </div>
+    <app-sticky-footer [fixed]="true">
+      <div class="mock-driver-status-row">
+        <p class="mock-driver-status" role="status" aria-live="polite">{{ statusMessage() }}</p>
+        @if (statusMessage().startsWith('Applied to')) {
+          <a class="open-home-link" matButton="text" routerLink="/landing">Open home page <mat-icon aria-hidden="true">arrow_forward</mat-icon></a>
+        }
+      </div>
+      <button
+        matButton="filled"
+        type="button"
+        [disabled]="validationError() !== null || !isDirty"
+        (click)="applyPayload()"
+      >
+        Apply
+      </button>
+      <button matButton="outlined" type="button" (click)="resetToDefault()">
+        Load project default into draft
+      </button>
+    </app-sticky-footer>
+  } @else {
+    <section class="mock-driver-empty-state" aria-labelledby="mock-driver-empty-title">
+      <mat-icon aria-hidden="true">data_object</mat-icon>
+      <h3 id="mock-driver-empty-title">Choose a component to begin</h3>
+      <p>Select an available component above to inspect its mock data, preview it, and edit a draft.</p>
+    </section>
   }
 </section>

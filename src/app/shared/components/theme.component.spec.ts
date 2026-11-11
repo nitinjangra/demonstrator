@@ -52,14 +52,14 @@ describe('ThemeToggleComponent', () => {
     expect(getComputedStyle(button).height).toBe('44px');
   });
 
-  it('shows the press-and-hold tooltip on hover', fakeAsync(() => {
+  it('shows the current action in its tooltip on hover', fakeAsync(() => {
     const button = fixture.debugElement.query(By.css('button')).nativeElement as HTMLButtonElement;
     button.dispatchEvent(new MouseEvent('mouseenter'));
     tick();
     fixture.detectChanges();
 
     expect(document.querySelector('.mat-mdc-tooltip')?.textContent).toContain(
-      'press and hold to switch theme',
+      'Switch to dark mode',
     );
     fixture.debugElement.query(By.css('button')).injector.get(MatTooltip).hide();
     tick();
@@ -73,76 +73,9 @@ describe('ThemeToggleComponent', () => {
     expect(themeServiceSpy.toggleTheme).toHaveBeenCalled();
   });
 
-  it('should switch themes after the button is held for two seconds', fakeAsync(() => {
+  it('switches theme on standard keyboard activation', fakeAsync(() => {
     const button = fixture.debugElement.query(By.css('button')).nativeElement as HTMLButtonElement;
-
-    button.dispatchEvent(new PointerEvent('pointerdown', { button: 0, isPrimary: true }));
-    fixture.detectChanges();
-    expect(component.isHolding()).toBeTrue();
-    expect(button.classList).toContain('theme-toggle--holding');
-
-    tick(1999);
-    expect(themeServiceSpy.toggleTheme).not.toHaveBeenCalled();
-
-    tick(1);
-    expect(themeServiceSpy.toggleTheme).toHaveBeenCalledTimes(1);
-    expect(component.isHolding()).toBeFalse();
-  }));
-
-  it('should cancel the switch when the button is released early', fakeAsync(() => {
-    const button = fixture.debugElement.query(By.css('button')).nativeElement as HTMLButtonElement;
-
-    button.dispatchEvent(new PointerEvent('pointerdown', { button: 0, isPrimary: true }));
-    tick(1000);
-    button.dispatchEvent(new PointerEvent('pointerup'));
-    tick(1000);
-
-    expect(themeServiceSpy.toggleTheme).not.toHaveBeenCalled();
-    expect(component.isHolding()).toBeFalse();
-  }));
-
-  it('ignores non-primary and non-left pointer presses', fakeAsync(() => {
-    const button = fixture.debugElement.query(By.css('button')).nativeElement as HTMLButtonElement;
-    button.dispatchEvent(new PointerEvent('pointerdown', { button: 0, isPrimary: false }));
-    button.dispatchEvent(new PointerEvent('pointerdown', { button: 2, isPrimary: true }));
-
-    expect(component.isHolding()).toBeFalse();
-    tick(2000);
-    expect(themeServiceSpy.toggleTheme).not.toHaveBeenCalled();
-  }));
-
-  it('ignores unrelated keys and repeated keydown events', fakeAsync(() => {
-    const button = fixture.debugElement.query(By.css('button')).nativeElement as HTMLButtonElement;
-    button.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', cancelable: true }));
-    button.dispatchEvent(new KeyboardEvent('keyup', { key: 'Escape', cancelable: true }));
-
-    expect(component.isHolding()).toBeFalse();
-    button.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', cancelable: true }));
-    button.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', repeat: true, cancelable: true }));
-    expect(component.isHolding()).toBeTrue();
-    tick(2000);
-    expect(themeServiceSpy.toggleTheme).toHaveBeenCalledTimes(1);
-  }));
-
-  it('ignores the synthetic click after a keyboard hold', fakeAsync(() => {
-    const button = fixture.debugElement.query(By.css('button')).nativeElement as HTMLButtonElement;
-    button.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', cancelable: true }));
-    button.dispatchEvent(new KeyboardEvent('keyup', { key: 'Enter', cancelable: true }));
-    button.click();
-
-    expect(themeServiceSpy.toggleTheme).not.toHaveBeenCalled();
-    tick();
-    button.click();
-    expect(themeServiceSpy.toggleTheme).toHaveBeenCalledTimes(1);
-  }));
-
-  it('should switch themes after the button is held with the keyboard for two seconds', fakeAsync(() => {
-    const button = fixture.debugElement.query(By.css('button')).nativeElement as HTMLButtonElement;
-
-    button.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', cancelable: true }));
-    tick(2000);
-    button.dispatchEvent(new KeyboardEvent('keyup', { key: ' ', cancelable: true }));
-
+    button.dispatchEvent(new MouseEvent('click', { detail: 0 }));
     expect(themeServiceSpy.toggleTheme).toHaveBeenCalledTimes(1);
     tick();
   }));

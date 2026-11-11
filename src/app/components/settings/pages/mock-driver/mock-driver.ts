@@ -1,16 +1,23 @@
+import { DatePipe } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 import { RouterLink } from '@angular/router';
 import { Priority } from '../../../../shared/enums/priority.enum';
 import type { ActionTableRow } from '../../../../shared/interfaces/actions-table.interface';
 import type { Announcement, AnnouncementStatus } from '../../../../shared/interfaces/announcement.interface';
+import { take } from 'rxjs';
+import { StickyFooterComponent } from '../../../../shared/components/sticky-footer/sticky-footer.component';
 import { mockAnnouncements } from '../../../../shared/mocks/mock-announcements';
+import { mockDriverAnnouncements } from '../../../../shared/mocks/mock-driver-announcements';
 import { AnnouncementsWidgetComponent } from '../../../announcements-widget/announcements';
 import { AgTableStateService } from '../../../actions-table-wrapper/shared/services/ag-table-state.service';
 import { MockActionDataService } from '../../../actions-table-wrapper/shared/services/mock-action-data.service';
+import { mockTableData } from '../../../actions-table-wrapper/shared/mock/actions-table.mock';
 import { AnnouncementsActionService } from '../../../announcements-widget/services/announcements-action.service';
 
 type MockComponent = 'actions-table' | 'announcement-widget';
+type Scenario = 'default' | 'empty' | 'many' | 'long-text' | 'mixed-statuses' | 'error' | 'loading';
 type PayloadResult =
   | { component: 'actions-table'; data: ActionTableRow[] }
   | { component: 'announcement-widget'; data: Announcement[] }
@@ -21,7 +28,14 @@ const ANNOUNCEMENT_STATUSES: AnnouncementStatus[] = ['Published', 'Scheduled', '
 @Component({
   selector: 'app-mock-driver',
   standalone: true,
-  imports: [AnnouncementsWidgetComponent, MatButtonModule, RouterLink],
+  imports: [
+    AnnouncementsWidgetComponent,
+    DatePipe,
+    MatButtonModule,
+    MatIconModule,
+    RouterLink,
+    StickyFooterComponent,
+  ],
   templateUrl: './mock-driver.html',
   styleUrl: './mock-driver.scss',
 })
@@ -32,7 +46,12 @@ export class MockDriver {
 
   readonly selectedComponent = signal<MockComponent | null>(null);
   readonly payload = signal('[]');
+  readonly appliedPayload = signal('');
+  readonly appliedState = signal('Choose a component');
+  readonly appliedAt = signal<Date | null>(null);
+  readonly isLoadingPreview = signal(false);
   readonly statusMessage = signal('');
+  private loadingTimer?: ReturnType<typeof setTimeout>;
   readonly payloadResult = computed(() => this.parsePayload(this.payload()));
   readonly validationError = computed(() => {
     const result = this.payloadResult();
@@ -50,12 +69,52 @@ export class MockDriver {
     const result = this.payloadResult();
     return 'component' in result ? result.data.length : null;
   });
+  readonly announcementStatusCounts = computed(() => {
+    const counts: Record<AnnouncementStatus, number> = {
+      Published: 0,
+      Scheduled: 0,
+      Draft: 0,
+      Expired: 0,
+    };
+    for (const item of this.announcementItems()) counts[item.status] += 1;
+    return counts;
+  });
 
   selectComponent(event: Event): void {
     const value = (event.target as HTMLSelectElement).value;
-    this.selectedComponent.set(value === 'actions-table' || value === 'announcement-widget' ? value : null);
-    this.payload.set('[]');
+    const component = value === 'actions-table' || value === 'announcement-widget' ? value : null;
+    const currentComponent = this.selectedComponent();
+    if (
+      currentComponent && currentComponent !== component && this.isDirty &&
+      !window.confirm('Discard your unapplied edits and switch components?')
+    ) {
+      (event.target as HTMLSelectElement).value = currentComponent;
+      return;
+    }
+    if (this.loadingTimer) clearTimeout(this.loadingTimer);
+    this.isLoadingPreview.set(false);
+    this.selectedComponent.set(component);
     this.statusMessage.set('');
+
+    if (component === 'actions-table') {
+      const rows = this.mockData.getRows();
+      const serialized = JSON.stringify(rows, null, 2);
+      this.payload.set(serialized);
+      this.appliedPayload.set(serialized);
+      this.appliedState.set(this.getAppliedState(component, rows));
+    } else if (component === 'announcement-widget') {
+      this.announcements
+        .getAllAnnouncements()
+        .pipe(take(1))
+        .subscribe((items) => {
+          const serialized = JSON.stringify(items, null, 2);
+          this.payload.set(serialized);
+          this.appliedPayload.set(serialized);
+          this.appliedState.set(this.getAppliedState(component, items));
+        });
+    } else {
+      this.payload.set('[]');
+    }
   }
 
   onPayloadInput(event: Event): void {
@@ -63,22 +122,46 @@ export class MockDriver {
     this.statusMessage.set('');
   }
 
-  loadMockData(): void {
-    const component = this.selectedComponent();
-    if (component === 'actions-table') {
-      const rows = this.createSampleActions();
-      this.payload.set(JSON.stringify(rows, null, 2));
-      this.statusMessage.set('Sample action data loaded. Apply it to update the table.');
-    } else if (component === 'announcement-widget') {
-      this.payload.set(JSON.stringify(mockAnnouncements, null, 2));
-      this.statusMessage.set('Sample announcement data loaded. Apply it to update the widget.');
-    }
+  get isDirty(): boolean {
+    return this.payload() !== this.appliedPayload();
   }
 
-  loadEmptyState(): void {
-    if (!this.selectedComponent()) return;
-    this.payload.set('[]');
-    this.statusMessage.set('Empty data loaded. Apply it to preview the empty state.');
+  selectScenario(event: Event): void {
+    const scenario = (event.target as HTMLSelectElement).value as Scenario;
+    if (!scenario) return;
+    if (this.isDirty && !window.confirm('Replace your unapplied edits with this scenario?')) return;
+    if (this.loadingTimer) clearTimeout(this.loadingTimer);
+    this.isLoadingPreview.set(false);
+    const component = this.selectedComponent();
+    if (!component) return;
+    if (scenario === 'error') {
+      this.payload.set('[{ "id": ]');
+      this.statusMessage.set('Error scenario loaded into the draft. The invalid JSON message is announced below.');
+      return;
+    }
+    if (scenario === 'loading') {
+      this.payload.set(this.appliedPayload());
+      this.isLoadingPreview.set(true);
+      this.statusMessage.set('Showing the loading preview for a moment.');
+      this.loadingTimer = setTimeout(() => this.isLoadingPreview.set(false), 1500);
+      return;
+    }
+    const defaultData = component === 'actions-table' ? mockTableData : mockAnnouncements;
+    let data: ActionTableRow[] | Announcement[] = defaultData;
+    if (scenario === 'empty') data = [];
+    if (scenario === 'many') {
+      data = component === 'actions-table' ? this.createSampleActions(50) : this.createManyAnnouncements(50);
+    }
+    if (scenario === 'long-text') {
+      data = component === 'announcement-widget'
+        ? this.createLongTextAnnouncements()
+        : this.createSampleActions(1, true);
+    }
+    if (scenario === 'mixed-statuses' && component === 'announcement-widget') {
+      data = mockDriverAnnouncements;
+    }
+    this.payload.set(JSON.stringify(data, null, 2));
+    this.statusMessage.set(`${this.scenarioLabel(scenario)} scenario loaded into the draft. Apply to use it in the app.`);
   }
 
   applyPayload(): void {
@@ -91,33 +174,86 @@ export class MockDriver {
     } else {
       this.announcements.saveAnnouncements(result.data);
     }
-    const name = result.component === 'actions-table' ? 'action' : 'announcement';
-    this.statusMessage.set(`Applied ${result.data.length} mock ${name}${result.data.length === 1 ? '' : 's'}.`);
+    this.appliedPayload.set(this.payload());
+    this.appliedAt.set(new Date());
+    this.appliedState.set(this.getAppliedState(result.component, result.data));
+    const target = result.component === 'actions-table' ? 'Actions table' : 'Announcement widget';
+    this.statusMessage.set(`Applied to ${target}.`);
   }
 
   resetToDefault(): void {
     const component = this.selectedComponent();
-    if (component === 'actions-table') {
-      this.mockData.reset();
-      const rows = this.mockData.getRows();
-      this.tableState.setRowData(rows);
-      this.payload.set(JSON.stringify(rows, null, 2));
-      this.statusMessage.set('Reset to the project default action data.');
-    } else if (component === 'announcement-widget') {
-      this.announcements.saveAnnouncements(mockAnnouncements);
-      this.payload.set(JSON.stringify(mockAnnouncements, null, 2));
-      this.statusMessage.set('Reset to the project default announcement data.');
+    if (!component) return;
+    if (
+      this.isDirty &&
+      !window.confirm('Replace your unapplied draft with the project default?')
+    ) {
+      return;
     }
+
+    let defaultData: ActionTableRow[] | Announcement[];
+    if (component === 'actions-table') {
+      defaultData = mockTableData;
+    } else if (component === 'announcement-widget') {
+      defaultData = mockAnnouncements;
+    } else {
+      return;
+    }
+
+    this.payload.set(JSON.stringify(defaultData, null, 2));
+    this.statusMessage.set(
+      this.isDirty
+        ? 'Project default loaded into the draft. Apply to use it in the app.'
+        : 'Project default is already applied.',
+    );
   }
 
-  private createSampleActions(): ActionTableRow[] {
-    return Array.from({ length: 12 }, (_, index) => ({
+  private scenarioLabel(scenario: Scenario): string {
+    return {
+      default: 'Default',
+      empty: 'Empty',
+      many: 'Many items',
+      'long-text': 'Long text',
+      'mixed-statuses': 'Mixed statuses',
+      error: 'Error',
+      loading: 'Loading',
+    }[scenario];
+  }
+
+  private getAppliedState(component: MockComponent, data: ActionTableRow[] | Announcement[]): string {
+    const projectDefault = component === 'actions-table' ? mockTableData : mockAnnouncements;
+    return JSON.stringify(data) === JSON.stringify(projectDefault)
+      ? 'Project default'
+      : 'Custom data applied';
+  }
+
+  private createSampleActions(count = 12, longText = false): ActionTableRow[] {
+    return Array.from({ length: count }, (_, index) => ({
       id: index + 1,
-      entityName: `Sample action ${index + 1}`,
+      entityName: longText
+        ? `Sample action ${index + 1}: ${'Review supporting documentation and coordinate the next operational milestone. '.repeat(4)}`
+        : `Sample action ${index + 1}`,
       entityId: `sample-action-${index + 1}`,
       dueDate: new Date(Date.UTC(2026, 10, index + 1, 12)).toISOString(),
       priority: [Priority.High, Priority.Medium, Priority.Low][index % 3],
     }));
+  }
+
+  private createManyAnnouncements(count: number): Announcement[] {
+    return Array.from({ length: count }, (_, index) => ({
+      id: `scenario-announcement-${index + 1}`,
+      title: `Scenario announcement ${index + 1}`,
+      status: 'Published' as const,
+    }));
+  }
+
+  private createLongTextAnnouncements(): Announcement[] {
+    return [{
+      id: 'long-title-announcement',
+      title: `A long announcement title for checking wrapping and layout ${'across narrow screens '.repeat(5)}`,
+      status: 'Published',
+      description: `This announcement has no fixed limit on its description. ${'Review the full message and make sure the preview remains readable. '.repeat(10)}`,
+    }];
   }
 
   private parsePayload(value: string): PayloadResult {
