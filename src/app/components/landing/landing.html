@@ -1,4 +1,9 @@
 <main class="landing" [class.landing--focus-actions]="highlightActions()">
+  @if (isPreparing()) {
+    <div class="landing-loading">
+      <app-loading text="Getting things ready..." />
+    </div>
+  } @else {
   <div class="landing-focus-backdrop" aria-hidden="true"></div>
   <header class="landing-greeting">
     <h1 class="landing-greeting-heading">
@@ -20,8 +25,14 @@
         <mat-icon aria-hidden="true">task_alt</mat-icon>
         Actions
       </h2>
-      <app-actions-table-wrapper></app-actions-table-wrapper>
+      <div class="landing-actions-scroll" role="region" aria-label="Actions table" tabindex="0">
+        <app-actions-table-wrapper></app-actions-table-wrapper>
+      </div>
     </section>
-    <app-announcements class="landing-focus-announcements"></app-announcements>
+    <app-announcements
+      class="landing-focus-announcements"
+      [enableKeyboardScrolling]="true"
+    ></app-announcements>
   </div>
+  }
 </main>
