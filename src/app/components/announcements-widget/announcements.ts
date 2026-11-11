@@ -47,6 +47,8 @@ import {
 export class AnnouncementsWidgetComponent implements OnInit, OnChanges {
   @Input() showContextMenu = true;
   @Input() announcementItems: Announcement[] | null = null;
+  @Input() showAllProvidedAnnouncements = false;
+  @Input() enableKeyboardScrolling = false;
   readonly isAdmin = inject(UserSettingsService).isAdmin;
 
   private readonly expandedAnnouncementIds = signal<ReadonlySet<string>>(new Set());
@@ -102,7 +104,11 @@ export class AnnouncementsWidgetComponent implements OnInit, OnChanges {
 
   private updateAnnouncementsFeed(): void {
     this.announcements = this.announcementItems
-      ? of(filterAnnouncementsForDisplay(this.announcementItems))
+      ? of(
+          this.showAllProvidedAnnouncements
+            ? this.announcementItems
+            : filterAnnouncementsForDisplay(this.announcementItems),
+        )
       : this.announcementsActionService.getAnnouncements();
   }
 
@@ -111,6 +117,7 @@ export class AnnouncementsWidgetComponent implements OnInit, OnChanges {
       .open(CreateAnnouncementDialogComponent, {
         width: 'min(32rem, calc(100vw - 3rem))',
         maxWidth: 'calc(100vw - 3rem)',
+        disableClose: true,
       })
       .afterClosed()
       .pipe(

@@ -96,8 +96,8 @@ describe('AnnouncementSettings', () => {
       page.querySelectorAll<HTMLButtonElement>('.announcement-settings-page button'),
     ).filter((button) => button.textContent?.includes('Save'));
     expect(saveButtons.length).toBe(1);
-    expect(page.querySelector('app-sticky-footer button[matButton="filled"]')?.textContent).toContain('Save Order');
-    expect(page.querySelector('app-sticky-footer .sticky-footer--fixed')).toBeNull();
+    expect(page.querySelector('app-sticky-footer button[matButton="filled"]')?.textContent).toContain('Save changes');
+    expect(page.querySelector('app-sticky-footer .sticky-footer--fixed')).not.toBeNull();
   });
 
   it('reorders and deletes items locally, then saves the complete list', () => {
@@ -206,7 +206,7 @@ describe('AnnouncementSettings', () => {
       .toBeTrue();
     expect(drawer.contains(document.activeElement)).toBeTrue();
 
-    fixture.componentInstance.closeAnnouncementEditor();
+    fixture.componentInstance.dismissAnnouncementEditor();
     fixture.detectChanges();
     await Promise.resolve();
 
