@@ -32,6 +32,13 @@
   }
 
   <section class="dashboard__charts" aria-label="Action charts">
+    @if (totalActions() === 0) {
+      <div class="dashboard__empty-state" aria-labelledby="dashboard-empty-title">
+        <h2 id="dashboard-empty-title">No action data to chart yet</h2>
+        <p>Priority and due date charts will appear when actions are available.</p>
+        <a routerLink="/landing">View actions</a>
+      </div>
+    } @else {
     <article class="chart-card">
       <h2 id="priority-chart-title">Actions by priority</h2>
       <p id="priority-chart-description" class="visually-hidden">{{ priorityChartSummary() }}</p>
@@ -42,5 +49,6 @@
       <p id="due-date-chart-description" class="visually-hidden">{{ dueDateChartSummary() }}</p>
       <div id="due-date-chart" class="chart-card__canvas" role="group" aria-labelledby="due-date-chart-title" aria-describedby="due-date-chart-description"></div>
     </article>
+    }
   </section>
 </main>
