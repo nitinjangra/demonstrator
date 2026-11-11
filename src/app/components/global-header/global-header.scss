@@ -69,6 +69,7 @@
   }
 }
 
+.user-icon,
 .settings-icon {
   display: inline-flex;
   box-sizing: border-box;
@@ -89,17 +90,23 @@
     color 180ms ease,
     transform 180ms ease;
 
+  &:hover {
+    background: color-mix(in srgb, var(--color-text) 8%, transparent);
+  }
+
   &:active {
     transform: scale(0.94);
   }
 
   &:focus-visible {
-    outline: 2px solid var(--color-primary);
-    outline-offset: 2px;
+    outline: 2px solid var(--color-text);
+    outline-offset: 3px;
+    box-shadow: 0 0 0 2px var(--color-surface);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .user-icon,
   .settings-icon {
     transition: none;
   }

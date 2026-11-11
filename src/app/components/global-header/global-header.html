@@ -13,13 +13,45 @@
     {{ brandName() }}
   </a>
   <span class="example-spacer"></span>
-  @if (dashboardEnabled()) {
+  @if (dashboardEnabled() && isAdmin()) {
     <a class="global-header-dashboard" routerLink="/dashboard" aria-label="Dashboard" title="Dashboard">
       <mat-icon aria-hidden="true">dashboard</mat-icon>
     </a>
   }
   <app-theme-toggle></app-theme-toggle>
-  <button class="settings-icon" type="button" routerLink="/settings/overview" aria-label="Open settings">
-    <mat-icon aria-hidden="true">settings</mat-icon>
+  <button
+    class="user-icon"
+    type="button"
+    [matMenuTriggerFor]="userProfileMenu"
+    [matTooltip]="userName()"
+    aria-haspopup="menu"
+    [attr.aria-label]="'Switch user profile. Current user: ' + userName()"
+    title="Switch user profile"
+  >
+    <mat-icon aria-hidden="true">person</mat-icon>
   </button>
+  <mat-menu #userProfileMenu="matMenu" aria-label="Predefined user profiles">
+    @for (profile of userProfiles; track profile.id) {
+      @if (userName() === profile.name) {
+        <button mat-menu-item type="button" disabled>
+          <mat-icon aria-hidden="true">{{ profile.id === 'invited' ? 'mail' : 'person' }}</mat-icon>
+          <span>Current profile: {{ profile.name }}</span>
+        </button>
+      }
+    }
+    <mat-divider />
+    @for (profile of userProfiles; track profile.id) {
+      @if (userName() !== profile.name) {
+        <button mat-menu-item type="button" (click)="selectProfile(profile.id)">
+          <mat-icon aria-hidden="true">{{ profile.id === 'invited' ? 'mail' : 'person' }}</mat-icon>
+          <span>Switch to {{ profile.name }}</span>
+        </button>
+      }
+    }
+  </mat-menu>
+  @if (isAdmin()) {
+    <button class="settings-icon" type="button" routerLink="/settings/overview" aria-label="Open settings">
+      <mat-icon aria-hidden="true">settings</mat-icon>
+    </button>
+  }
 </mat-toolbar>
