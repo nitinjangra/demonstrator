@@ -1,6 +1,12 @@
 import { inject } from '@angular/core';
 import { Router, Routes } from '@angular/router';
 import { FeatureToggleService } from './shared/services/feature-toggle.service';
+import { UserSettingsService } from './shared/services/user-settings.service';
+import type { Observable } from 'rxjs';
+
+const confirmUnsavedChanges = (component: {
+  canDeactivate: () => boolean | Observable<boolean>;
+}) => component.canDeactivate();
 
 export const routes: Routes = [
   {
@@ -14,6 +20,9 @@ export const routes: Routes = [
       () =>
         inject(FeatureToggleService).dashboardEnabled() ||
         inject(Router).createUrlTree(['/landing']),
+      () =>
+        inject(UserSettingsService).isAdmin() ||
+        inject(Router).createUrlTree(['/landing']),
     ],
     loadComponent: () => import('./components/dashboard/dashboard').then((m) => m.Dashboard),
   },
@@ -23,6 +32,11 @@ export const routes: Routes = [
   },
   {
     path: 'settings',
+    canMatch: [
+      () =>
+        inject(UserSettingsService).isAdmin() ||
+        inject(Router).createUrlTree(['/landing']),
+    ],
     loadComponent: () => import('./components/settings/settings-wrapper').then((m) => m.SettingsWrapper),
     children: [
       {
