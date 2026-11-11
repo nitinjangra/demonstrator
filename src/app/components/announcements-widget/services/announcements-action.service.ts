@@ -1,7 +1,54 @@
 import { inject, Injectable } from '@angular/core';
 import { BehaviorSubject, map, Observable, take } from 'rxjs';
 import { AnnouncementsApiService } from './announcements-api.service';
-import type { Announcement } from '../../../shared/interfaces/announcement.interface';
+import type {
+  Announcement,
+  AnnouncementStatus,
+} from '../../../shared/interfaces/announcement.interface';
+
+export type AnnouncementSaveIntent = 'draft' | 'publish';
+
+function asDate(value: Date | string | undefined): Date | undefined {
+  if (!value) return undefined;
+  const date = value instanceof Date ? value : new Date(value);
+  return Number.isNaN(date.getTime()) ? undefined : date;
+}
+
+function startOfDay(date: Date): Date {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+}
+
+export function deriveAnnouncementStatus(
+  startDate: Date | string | undefined,
+  endDate: Date | string | undefined,
+  fallbackStatus: AnnouncementStatus = 'Draft',
+  now = new Date(),
+): AnnouncementStatus {
+  const start = asDate(startDate);
+  const end = asDate(endDate);
+  if (!start && !end) return fallbackStatus;
+
+  const today = startOfDay(now).getTime();
+  if (end && startOfDay(end).getTime() < today) return 'Expired';
+  if (start && startOfDay(start).getTime() > today) return 'Scheduled';
+  return 'Published';
+}
+
+export function resolveAnnouncementStatus(
+  startDate: Date | string | undefined,
+  endDate: Date | string | undefined,
+  intent: AnnouncementSaveIntent | undefined,
+  fallbackStatus: AnnouncementStatus = 'Draft',
+  now = new Date(),
+): AnnouncementStatus {
+  if (intent === 'draft') return 'Draft';
+  return deriveAnnouncementStatus(
+    startDate,
+    endDate,
+    intent === 'publish' ? 'Published' : fallbackStatus,
+    now,
+  );
+}
 
 export function filterAnnouncementsForDisplay(
   announcements: Announcement[],
@@ -14,7 +61,10 @@ export function filterAnnouncementsForDisplay(
 
     const startDate = toDate(announcement.startDate);
     const endDate = toDate(announcement.endDate);
-    return (!startDate || startDate <= today) && (!endDate || endDate >= today);
+    return (
+      (!startDate || startOfDay(startDate).getTime() <= today.getTime()) &&
+      (!endDate || startOfDay(endDate).getTime() >= today.getTime())
+    );
   });
 }
 
@@ -55,18 +105,41 @@ export class AnnouncementsActionService {
   }
 
   saveAnnouncements(announcements: Announcement[]): void {
-    this.announcementsSubject.next(announcements);
+    this.announcementsSubject.next(announcements.map((announcement) => ({
+      ...announcement,
+      status: announcement.status === 'Draft'
+        ? 'Draft'
+        : this.getStatusForDates(
+            announcement.startDate,
+            announcement.endDate,
+            announcement.status,
+          ),
+    })));
     this.persistAnnouncements();
+  }
+
+  getStatusForDates(
+    startDate: Date | undefined,
+    endDate: Date | undefined,
+    fallbackStatus: AnnouncementStatus = 'Draft',
+  ): AnnouncementStatus {
+    return deriveAnnouncementStatus(startDate, endDate, fallbackStatus);
   }
 
   addAnnouncement(
     announcement: Omit<Announcement, 'id' | 'attachmentUrl' | 'attachmentName'> & {
       attachment?: File;
+      intent?: AnnouncementSaveIntent;
+      removeAttachment?: boolean;
     },
   ): boolean {
     if (!this.canAddAnnouncement) return false;
 
-    const { attachment, ...fields } = announcement;
+    const { attachment, intent } = announcement;
+    const fields = { ...announcement };
+    delete fields.attachment;
+    delete fields.intent;
+    delete fields.removeAttachment;
     const attachmentUrl = attachment ? URL.createObjectURL(attachment) : undefined;
 
     this.announcementsSubject.next([
@@ -74,7 +147,7 @@ export class AnnouncementsActionService {
       {
         ...fields,
         id: crypto.randomUUID(),
-        status: fields.status,
+        status: resolveAnnouncementStatus(fields.startDate, fields.endDate, intent, fields.status),
         attachmentUrl,
         attachmentName: attachment?.name,
       },
@@ -97,11 +170,18 @@ export class AnnouncementsActionService {
     if (!saved) return undefined;
 
     try {
-      return (JSON.parse(saved) as Announcement[]).map((announcement) => ({
-        ...announcement,
-        startDate: this.toDate(announcement.startDate),
-        endDate: this.toDate(announcement.endDate),
-      }));
+      return (JSON.parse(saved) as Announcement[]).map((announcement) => {
+        const startDate = this.toDate(announcement.startDate);
+        const endDate = this.toDate(announcement.endDate);
+        return {
+          ...announcement,
+          startDate,
+          endDate,
+          status: announcement.status === 'Draft'
+            ? 'Draft'
+            : this.getStatusForDates(startDate, endDate, announcement.status ?? 'Draft'),
+        };
+      });
     } catch {
       return undefined;
     }

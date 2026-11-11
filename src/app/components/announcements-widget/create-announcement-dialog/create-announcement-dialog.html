@@ -24,16 +24,6 @@
     </mat-form-field>
 
     <mat-form-field appearance="outline">
-      <mat-label>Status</mat-label>
-      <mat-select formControlName="status" aria-label="Announcement status">
-        <mat-option value="Draft">Draft</mat-option>
-        <mat-option value="Scheduled">Scheduled</mat-option>
-        <mat-option value="Published">Published</mat-option>
-        <mat-option value="Expired">Expired</mat-option>
-      </mat-select>
-    </mat-form-field>
-
-    <mat-form-field appearance="outline">
       <mat-label>Description</mat-label>
       <textarea matInput formControlName="description" rows="4"></textarea>
     </mat-form-field>
@@ -46,19 +36,27 @@
       }
     </mat-form-field>
 
-    <mat-form-field appearance="outline">
-      <mat-label>Date range</mat-label>
-      <mat-date-range-input [rangePicker]="rangePicker">
-        <input matStartDate formControlName="startDate" placeholder="Start date" />
-        <input matEndDate formControlName="endDate" placeholder="End date" />
-      </mat-date-range-input>
-      <mat-datepicker-toggle
-        matIconSuffix
-        [for]="rangePicker"
-        aria-label="Open date range picker"
-      ></mat-datepicker-toggle>
-      <mat-date-range-picker #rangePicker></mat-date-range-picker>
-    </mat-form-field>
+    <div class="announcement-date-fields">
+      <mat-form-field appearance="outline">
+        <mat-label>Start date</mat-label>
+        <input matInput formControlName="startDate" [matDatepicker]="startPicker" [min]="minimumDate" />
+        <mat-datepicker-toggle matIconSuffix [for]="startPicker" aria-label="Choose start date" />
+        <mat-datepicker #startPicker />
+        @if (form.controls.startDate.hasError('matDatepickerMin')) {
+          <mat-error>Choose today or a future date.</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>End date</mat-label>
+        <input matInput formControlName="endDate" [matDatepicker]="endPicker" [min]="minimumDate" />
+        <mat-datepicker-toggle matIconSuffix [for]="endPicker" aria-label="Choose end date" />
+        <mat-datepicker #endPicker />
+        @if (form.controls.endDate.hasError('matDatepickerMin')) {
+          <mat-error>Choose today or a future date.</mat-error>
+        }
+      </mat-form-field>
+    </div>
     @if (form.hasError('dateRange') && (form.controls.startDate.touched || form.controls.endDate.touched)) {
       <p class="form-error" role="alert">End date must be on or after the start date.</p>
     }
@@ -90,6 +88,7 @@
   </mat-dialog-content>
   <app-sticky-footer class="announcement-form-actions" [fixed]="false" [customStyles]="actionFooterStyles">
     <button matButton type="button" (click)="cancel()">Cancel</button>
+    <button matButton type="button" (click)="submit('draft')">Save as draft</button>
     <span id="announcement-submit-help" class="visually-hidden">
       Complete required fields and resolve attachment errors to enable this action.
     </span>
@@ -99,7 +98,7 @@
       aria-describedby="announcement-submit-help"
       [disabled]="form.invalid || !!attachmentError"
     >
-      {{ isEditing ? 'Save announcement' : 'Add announcement' }}
+      Save and publish
     </button>
   </app-sticky-footer>
 </form>

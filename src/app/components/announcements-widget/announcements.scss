@@ -63,6 +63,32 @@
   }
 }
 
+.announcements--scrollable {
+  display: flex;
+  box-sizing: border-box;
+  height: 100%;
+  min-height: 0;
+  flex-direction: column;
+  overflow: hidden;
+
+  .announcements-title {
+    position: sticky;
+    z-index: 1;
+    top: 0;
+    flex: 0 0 auto;
+    margin-bottom: 0;
+    padding-block: 0.25rem;
+    background: var(--color-surface);
+  }
+
+  .announcements-panel {
+    min-height: 0;
+    flex: 1 1 auto;
+    overflow-y: auto;
+    overscroll-behavior-y: contain;
+  }
+}
+
 .announcement-menu-trigger {
   display: inline-flex;
   box-sizing: border-box;

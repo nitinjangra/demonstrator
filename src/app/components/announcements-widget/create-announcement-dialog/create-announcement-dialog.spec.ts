@@ -26,9 +26,9 @@ describe('CreateAnnouncementDialogComponent', () => {
 
     expect(host.querySelector('input[formControlName="title"]')).not.toBeNull();
     expect(host.querySelector('input[formControlName="linkUrl"]')).not.toBeNull();
-    expect(host.querySelector('mat-select[formControlName="status"]')).not.toBeNull();
-    expect(host.querySelector('input[matStartDate]')).not.toBeNull();
-    expect(host.querySelector('input[matEndDate]')).not.toBeNull();
+    expect(host.querySelector('mat-select[formControlName="status"]')).toBeNull();
+    expect(host.querySelector('input[formControlName="startDate"]')).not.toBeNull();
+    expect(host.querySelector('input[formControlName="endDate"]')).not.toBeNull();
     expect(host.querySelector('input[type="file"]')).not.toBeNull();
   });
 
@@ -38,10 +38,11 @@ describe('CreateAnnouncementDialogComponent', () => {
     const buttons = footer.querySelectorAll('button');
 
     expect(footer.classList).not.toContain('sticky-footer--fixed');
-    expect(buttons.length).toBe(2);
+    expect(buttons.length).toBe(3);
     expect(getComputedStyle(footer).gap).toBe('16px');
     expect(footer.style.backgroundColor).toBe('transparent');
-    expect(buttons[1].textContent).toContain('Add announcement');
+    expect(buttons[1].textContent).toContain('Save as draft');
+    expect(buttons[2].textContent).toContain('Save and publish');
 
     fixture.componentRef.setInput('editorData', {
       mode: 'edit',
@@ -49,7 +50,7 @@ describe('CreateAnnouncementDialogComponent', () => {
     });
     fixture.detectChanges();
 
-    expect(footer.querySelectorAll('button')[1].textContent).toContain('Save announcement');
+    expect(footer.querySelectorAll('button')[2].textContent).toContain('Save and publish');
   });
 
   it('keeps the dialog open when the form is invalid', () => {

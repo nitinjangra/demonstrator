@@ -3,6 +3,7 @@ import {
   Component,
   DestroyRef,
   ElementRef,
+  HostListener,
   inject,
   OnInit,
   ViewChild,
@@ -14,8 +15,12 @@ import { MatIconModule } from '@angular/material/icon';
 import { A11yModule } from '@angular/cdk/a11y';
 import { Observable } from 'rxjs';
 import type { Announcement } from '../../../../shared/interfaces/announcement.interface';
-import { AnnouncementsActionService } from '../../../announcements-widget/services/announcements-action.service';
+import {
+  AnnouncementsActionService,
+  resolveAnnouncementStatus,
+} from '../../../announcements-widget/services/announcements-action.service';
 import { StickyFooterComponent } from '../../../../shared/components/sticky-footer/sticky-footer.component';
+import { UnsavedChangesDialogService } from '../../../../shared/components/unsaved-changes-dialog/unsaved-changes-dialog.component';
 import { CreateAnnouncementDialogComponent } from '../../../announcements-widget/create-announcement-dialog/create-announcement-dialog';
 import { AnnouncementPreviewComponent } from '../../../announcements-widget/announcement-preview';
 import type {
@@ -73,6 +78,7 @@ class DeleteAnnouncementConfirmationDialog {
 export class AnnouncementSettings implements OnInit {
   private readonly announcementsService = inject(AnnouncementsActionService);
   private readonly dialog = inject(MatDialog);
+  private readonly unsavedChangesDialog = inject(UnsavedChangesDialogService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly changeDetector = inject(ChangeDetectorRef);
   private returnFocusTo: HTMLElement | null = null;
@@ -84,6 +90,9 @@ export class AnnouncementSettings implements OnInit {
       drawer.nativeElement.querySelector<HTMLElement>('button, input, textarea, select, [tabindex]')?.focus();
     });
   }
+
+  @ViewChild(CreateAnnouncementDialogComponent)
+  private editorComponent?: CreateAnnouncementDialogComponent;
   announcements$: Observable<Announcement[]> = this.announcementsService.getAllAnnouncements();
   announcements: Announcement[] = [];
   private announcementOrder: string[] = [];
@@ -105,6 +114,15 @@ export class AnnouncementSettings implements OnInit {
 
   get hasUnsavedChanges(): boolean {
     return this.hasPendingContentChanges || this.hasOrderChanges;
+  }
+
+  canDeactivate(): boolean | Observable<boolean> {
+    return this.unsavedChangesDialog.confirmIfNeeded(this.hasUnsavedChanges || this.editorOpen);
+  }
+
+  @HostListener('window:beforeunload', ['$event'])
+  warnBeforeLeaving(event: BeforeUnloadEvent): void {
+    this.unsavedChangesDialog.warnBeforeUnload(event, this.hasUnsavedChanges || this.editorOpen);
   }
 
   get canAddAnnouncement(): boolean {
@@ -171,7 +189,11 @@ export class AnnouncementSettings implements OnInit {
     this.changeDetector.markForCheck();
   }
 
-  closeAnnouncementEditor(): void {
+  requestCloseAnnouncementEditor(): void {
+    this.editorComponent?.cancel();
+  }
+
+  dismissAnnouncementEditor(): void {
     this.editorOpen = false;
     this.editorData = null;
     this.changeDetector.markForCheck();
@@ -187,20 +209,26 @@ export class AnnouncementSettings implements OnInit {
 
     if (editorData.mode === 'edit' && editorData.announcement) {
       const id = editorData.announcement.id;
-      const { attachment, ...fields } = result;
+      const { attachment, intent, removeAttachment, ...fields } = result;
       this.announcements = this.announcements.map((item) =>
         item.id === id
           ? {
               ...item,
               ...fields,
+              status: resolveAnnouncementStatus(
+                fields.startDate,
+                fields.endDate,
+                intent ?? (fields.status === 'Draft' ? 'draft' : 'publish'),
+                fields.status ?? item.status,
+              ),
               attachmentUrl: attachment
                 ? URL.createObjectURL(attachment)
-                : result.removeAttachment
+                : removeAttachment
                   ? undefined
                   : item.attachmentUrl,
               attachmentName: attachment
                 ? attachment.name
-                : result.removeAttachment
+                : removeAttachment
                   ? undefined
                   : item.attachmentName,
             }
@@ -209,13 +237,20 @@ export class AnnouncementSettings implements OnInit {
       this.saved = false;
       this.hasPendingContentChanges = true;
     } else {
-      const { attachment, ...fields } = result;
+      const { attachment, intent, ...fields } = result;
+      delete fields.removeAttachment;
       const id = crypto.randomUUID();
       this.announcements = [
         ...this.announcements,
         {
           ...fields,
           id,
+          status: resolveAnnouncementStatus(
+            fields.startDate,
+            fields.endDate,
+            intent ?? (fields.status === 'Draft' ? 'draft' : 'publish'),
+            fields.status,
+          ),
           attachmentUrl: attachment ? URL.createObjectURL(attachment) : undefined,
           attachmentName: attachment?.name,
         },
@@ -225,7 +260,7 @@ export class AnnouncementSettings implements OnInit {
       this.hasPendingContentChanges = true;
     }
 
-    this.closeAnnouncementEditor();
+    this.dismissAnnouncementEditor();
     this.changeDetector.markForCheck();
   }
 
