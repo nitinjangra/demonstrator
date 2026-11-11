@@ -22,13 +22,16 @@ describe('Globalheader', () => {
     await fixture.whenStable();
   });
 
-  it('should render its brand and theme toggle without the disabled menu', () => {
+  it('should render its non-interactive brand and theme toggle without the disabled menu', () => {
     fixture.detectChanges();
 
-    const brandLink = fixture.nativeElement.querySelector('.global-header-brand');
-    expect(brandLink.textContent).toContain('Demonstrator');
-    expect(brandLink.getAttribute('href')).toBe('/landing');
-    expect(brandLink.querySelector('.global-header-home-icon')?.textContent.trim()).toBe('home');
+    const brand = fixture.nativeElement.querySelector('.global-header-brand');
+    expect(brand.textContent).toContain('Demonstrator');
+    expect(brand.querySelector('.global-header-home-icon')?.textContent.trim()).toBe('home');
+    const homeLink = brand.querySelector('.global-header-home-link') as HTMLAnchorElement;
+    expect(homeLink.getAttribute('href')).toBe('/landing');
+    expect(homeLink.getAttribute('aria-label')).toBe('Home');
+    expect(brand.closest('a')).toBeNull();
     expect(fixture.nativeElement.querySelector('app-theme-toggle')).not.toBeNull();
     const settingsButton = fixture.nativeElement.querySelector('button[aria-label="Open settings"]');
     expect(settingsButton).not.toBeNull();
