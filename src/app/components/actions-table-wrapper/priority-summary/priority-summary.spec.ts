@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Priority } from '../../../shared/enums/priority.enum';
-import { mockTableData } from '../shared/mock/actions-table.mock';
+import { actionRowsForTests } from '../actions-table-test-data';
 import { PrioritySummaryComponent } from './priority-summary';
 
 describe('PrioritySummaryComponent', () => {
@@ -9,7 +9,7 @@ describe('PrioritySummaryComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({ imports: [PrioritySummaryComponent] }).compileComponents();
     fixture = TestBed.createComponent(PrioritySummaryComponent);
-    fixture.componentRef.setInput('rowData', mockTableData);
+    fixture.componentRef.setInput('rowData', actionRowsForTests);
     fixture.detectChanges();
   });
 

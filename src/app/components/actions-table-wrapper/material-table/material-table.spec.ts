@@ -1,15 +1,17 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { MaterialTable } from './material-table';
 import { ActionTableRow } from '../../../shared/interfaces/actions-table.interface';
 import { Priority } from '../../../shared/enums/priority.enum';
 import { ActivatedRoute, convertToParamMap, ParamMap } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
+import { clearActionTableTestData, seedActionTableTestData } from '../actions-table-test-data';
 
 describe('MaterialTable', () => {
   let fixture: ComponentFixture<MaterialTable>;
   let queryParams: BehaviorSubject<ParamMap>;
 
   beforeEach(async () => {
+    seedActionTableTestData();
     queryParams = new BehaviorSubject(convertToParamMap({}));
     await TestBed.configureTestingModule({
       imports: [MaterialTable],
@@ -20,6 +22,8 @@ describe('MaterialTable', () => {
     await fixture.whenStable();
     fixture.detectChanges();
   });
+
+  afterEach(() => clearActionTableTestData());
 
   it('should render sortable action columns and rows', () => {
     fixture.detectChanges();
@@ -88,8 +92,13 @@ describe('MaterialTable', () => {
     fixture.detectChanges();
     await fixture.whenStable();
     expect(fixture.componentInstance.selectedPriority()).toBe(Priority.High);
-    expect(fixture.componentInstance.dataSource.paginator?.pageIndex).toBe(0);
     expect(fixture.componentInstance.dataSource.filteredData.length).toBe(6);
+    expect(fixture.componentInstance.dataSource.paginator).toBeNull();
+
+    queryParams.next(convertToParamMap({}));
+    fixture.detectChanges();
+    await fixture.whenStable();
+    expect(fixture.componentInstance.dataSource.paginator?.pageIndex).toBe(0);
   });
 
   it('ignores an unsupported priority query value and leaves all rows visible', () => {
@@ -131,4 +140,23 @@ describe('MaterialTable', () => {
     fixture.detectChanges();
     expect(fixture.nativeElement.querySelector('table')?.classList).toContain('table-route-highlight');
   });
+
+  it('filters no-priority rows and toggles priority filters on and off', () => {
+    fixture.componentInstance.togglePriorityFilter('none');
+    expect(fixture.componentInstance.visibleRowData().length).toBe(2);
+    expect(fixture.componentInstance.dataSource.filteredData.length).toBe(2);
+    fixture.componentInstance.togglePriorityFilter('none');
+    expect(fixture.componentInstance.visibleRowData().length).toBe(20);
+    fixture.componentInstance.togglePriorityFilter(Priority.High);
+    expect(fixture.componentInstance.visibleRowData().length).toBe(6);
+    fixture.componentInstance.clearPriorityFilter();
+    expect(fixture.componentInstance.selectedPriority()).toBeNull();
+  });
+
+  it('clears a route highlight after its timeout', fakeAsync(() => {
+    queryParams.next(convertToParamMap({ priority: 'High' }));
+    expect(fixture.componentInstance.routeAppliedPriority()).toBe(Priority.High);
+    tick(2000);
+    expect(fixture.componentInstance.routeAppliedPriority()).toBeNull();
+  }));
 });

@@ -1,6 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { FeatureToggleService } from '../../shared/services/feature-toggle.service';
+import { clearActionTableTestData, seedActionTableTestData } from './actions-table-test-data';
 
 import { ActionsTableWrapper } from './actions-table-wrapper';
 
@@ -11,6 +12,7 @@ describe('ActionsTableWrapper', () => {
 
   beforeEach(async () => {
     localStorage.removeItem('table-feature');
+    seedActionTableTestData();
     await TestBed.configureTestingModule({
       imports: [ActionsTableWrapper],
       providers: [provideRouter([])],
@@ -22,7 +24,10 @@ describe('ActionsTableWrapper', () => {
     await fixture.whenStable();
   });
 
-  afterEach(() => localStorage.removeItem('table-feature'));
+  afterEach(() => {
+    localStorage.removeItem('table-feature');
+    clearActionTableTestData();
+  });
 
   it('should render AG Grid by default', () => {
     fixture.detectChanges();

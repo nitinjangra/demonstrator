@@ -61,4 +61,5 @@ describe('Globalheader', () => {
 
     expect(TestBed.inject(Router).url).toBe('/settings/overview');
   });
+
 });

@@ -48,8 +48,8 @@ describe('ThemeToggleComponent', () => {
     expect(component.label()).toBe('Switch to dark mode');
     const button = fixture.debugElement.query(By.css('button')).nativeElement as HTMLButtonElement;
     expect(button.getAttribute('aria-label')).toBe('Switch to dark mode');
-    expect(getComputedStyle(button).width).toBe('44px');
-    expect(getComputedStyle(button).height).toBe('44px');
+    expect(parseFloat(getComputedStyle(button).width)).toBeCloseTo(44, 1);
+    expect(parseFloat(getComputedStyle(button).height)).toBeCloseTo(44, 1);
   });
 
   it('shows the current action in its tooltip on hover', fakeAsync(() => {

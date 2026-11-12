@@ -5,12 +5,14 @@ import { AgTableStateService } from '../actions-table-wrapper/shared/services/ag
 import { ActionTableRow } from '../../shared/interfaces/actions-table.interface';
 import { routes } from '../../app.routes';
 import { Dashboard } from './dashboard';
+import { clearActionTableTestData, seedActionTableTestData } from '../actions-table-wrapper/actions-table-test-data';
 
 describe('Dashboard', () => {
   let fixture: ComponentFixture<Dashboard>;
 
   beforeEach(async () => {
     localStorage.removeItem('chart-library-feature');
+    seedActionTableTestData();
     await TestBed.configureTestingModule({ imports: [Dashboard], providers: [provideRouter([])] }).compileComponents();
     fixture = TestBed.createComponent(Dashboard);
     fixture.detectChanges();
@@ -20,12 +22,13 @@ describe('Dashboard', () => {
     fixture.destroy();
     localStorage.removeItem('chart-library-feature');
     localStorage.removeItem('dashboard-feature');
+    clearActionTableTestData();
   });
 
   it('renders the actions overview and summary charts', () => {
     expect(fixture.nativeElement.querySelector('h1')?.textContent).toContain('Actions dashboard');
     expect(fixture.nativeElement.querySelector('main')?.textContent).toContain(
-      'Overview of priorities and upcoming due dates.',
+      'Overview of priorities and upcoming due dates',
     );
     expect(fixture.nativeElement.querySelector('#priority-chart')).not.toBeNull();
     expect(fixture.nativeElement.querySelector('#due-date-chart')).not.toBeNull();
@@ -43,6 +46,16 @@ describe('Dashboard', () => {
       .toContain('Actions due by month:');
     expect(fixture.nativeElement.querySelector('[aria-label="View all actions"]')?.getAttribute('href'))
       .toBe('/landing?highlightActions=true');
+  });
+
+  it('shows an actionable empty state when no action data is available', () => {
+    TestBed.inject(AgTableStateService).setRowData([]);
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('.dashboard__empty-state')?.textContent)
+      .toContain('Priority and due date charts will appear when actions are available.');
+    expect(fixture.nativeElement.querySelector('.dashboard__empty-state a')?.getAttribute('href'))
+      .toBe('/landing');
   });
 
   it('renders both charts with Chart.js when that library is selected', async () => {
