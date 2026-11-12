@@ -1,4 +1,9 @@
 <main class="landing" [class.landing--focus-actions]="highlightActions()">
+  @if (showLoading()) {
+    <div class="landing-loading">
+      <app-loading text="Getting things ready..." />
+    </div>
+  } @else {
   <div class="landing-focus-backdrop" aria-hidden="true"></div>
   <header class="landing-greeting">
     <h1 class="landing-greeting-heading">
@@ -29,4 +34,5 @@
       [enableKeyboardScrolling]="true"
     ></app-announcements>
   </div>
+  }
 </main>

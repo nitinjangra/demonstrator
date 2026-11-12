@@ -1,4 +1,4 @@
-import { Component, DestroyRef, ElementRef, inject, OnInit, signal, ViewChild } from '@angular/core';
+import { Component, DestroyRef, ElementRef, effect, inject, OnInit, signal, ViewChild } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatIconModule } from '@angular/material/icon';
 import { MatNativeDateModule } from '@angular/material/core';
@@ -14,11 +14,12 @@ import type { PriorityFilter } from '../actions-table-wrapper/shared/priority-fi
 import { AgTableStateService } from '../actions-table-wrapper/shared/services/ag-table-state.service';
 import { UserSettingsService } from '../../shared/services/user-settings.service';
 import type { ActionTableRow } from '../../shared/interfaces/actions-table.interface';
+import { LoadingComponent } from '../../shared/components/loading/loading.component';
 
 @Component({
   selector: 'app-landing',
   standalone: true,
-  imports: [AnnouncementsWidgetComponent, ActionsTableWrapper, MatIconModule, MatNativeDateModule],
+  imports: [AnnouncementsWidgetComponent, ActionsTableWrapper, LoadingComponent, MatIconModule, MatNativeDateModule],
   templateUrl: './landing.html',
   styleUrls: ['./landing.scss'],
 })
@@ -35,6 +36,8 @@ export class Landing implements OnInit {
   private pendingActionsFocus = false;
   private actionsHeadingElement?: HTMLElement;
   readonly highlightActions = signal(false);
+  readonly showLoading = signal(false);
+
   timeGreeting = '';
   greetingIcon = '';
   get greetingIconData(): string {
@@ -42,6 +45,18 @@ export class Landing implements OnInit {
   }
   get timeGreetingData(): string {
     return this.timeGreeting;
+  }
+
+  constructor() {
+    effect((onCleanup) => {
+      if (this.tableState.loadStatus() !== 'loading') {
+        this.showLoading.set(false);
+        return;
+      }
+
+      const timer = setTimeout(() => this.showLoading.set(true), 300);
+      onCleanup(() => clearTimeout(timer));
+    });
   }
 
   @ViewChild('actionsHeading', { read: ElementRef })
