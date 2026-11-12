@@ -38,32 +38,7 @@
   </mat-menu>
 
   @let announcementsData = announcements | async;
-  @if (displayedLoadStatus === 'loading') {
-    @if (showLoadingSkeleton()) {
-      <div class="announcements-skeleton" aria-hidden="true">
-        @for (card of [1, 2, 3]; track card) {
-          <div class="announcements-skeleton-card">
-            <ngx-skeleton-loader width="60%" height="1rem" borderRadius="0.3rem" loadingText="Loading announcements" />
-            <ngx-skeleton-loader width="100%" height="0.75rem" borderRadius="0.3rem" loadingText="Loading announcements" />
-            <ngx-skeleton-loader width="84%" height="0.75rem" borderRadius="0.3rem" loadingText="Loading announcements" />
-          </div>
-        }
-      </div>
-    } @else {
-      <span class="visually-hidden" role="status">Loading announcements</span>
-    }
-  } @else if (displayedLoadStatus === 'error' && !announcementsData?.length) {
-    <div class="announcements-load-error" role="alert">
-      <strong>Couldn't load announcements</strong>
-      <span>Check your connection and try again.</span>
-      <button matButton="outlined" type="button" (click)="retryAnnouncements()">Try again</button>
-    </div>
-  } @else {
-    @if (displayedLoadStatus === 'error') {
-      <p class="announcements-refresh-error" role="status">
-        Couldn't refresh announcements. <button type="button" (click)="retryAnnouncements()">Try again</button>
-      </p>
-    }
+
     <div
       class="announcements-panel"
       [class.announcements-panel--refreshing]="displayedLoadStatus === 'refreshing'"
@@ -130,5 +105,4 @@
         }
       </ul>
     </div>
-  }
 </section>

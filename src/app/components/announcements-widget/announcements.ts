@@ -4,7 +4,6 @@ import {
   Component,
   DestroyRef,
   ElementRef,
-  effect,
   inject,
   Input,
   OnChanges,
@@ -18,7 +17,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { RouterLink } from '@angular/router';
 import { AsyncPipe } from '@angular/common';
-import { NgxSkeletonLoaderComponent } from 'ngx-skeleton-loader';
 import { Observable, filter, of } from 'rxjs';
 import type { Announcement } from '../../shared/interfaces/announcement.interface';
 import { HoldFeedbackDirective } from '../../shared/directives/hold-feedback.directive';
@@ -35,7 +33,6 @@ import {
   standalone: true,
   imports: [
     AsyncPipe,
-    NgxSkeletonLoaderComponent,
     MatButtonModule,
     MatDialogModule,
     MatIconModule,
@@ -57,7 +54,6 @@ export class AnnouncementsWidgetComponent implements OnInit, OnChanges {
   readonly isAdmin = inject(UserSettingsService).isAdmin;
   private readonly announcementsActionService = inject(AnnouncementsActionService);
   readonly loadStatus = this.announcementsActionService.loadStatus;
-  readonly showLoadingSkeleton = signal(false);
   private readonly hasProvidedAnnouncements = signal(false);
 
   get canManageAnnouncements(): boolean {
@@ -79,16 +75,6 @@ export class AnnouncementsWidgetComponent implements OnInit, OnChanges {
   }
 
   constructor() {
-    effect((onCleanup) => {
-      const isInitialLoad = !this.hasProvidedAnnouncements() && this.loadStatus() === 'loading';
-      if (!isInitialLoad) {
-        this.showLoadingSkeleton.set(false);
-        return;
-      }
-      const timer = setTimeout(() => this.showLoadingSkeleton.set(true), 300);
-      onCleanup(() => clearTimeout(timer));
-    });
-
     afterEveryRender(() => {
       const descriptions = new Set(
         this.descriptionElements().map(({ nativeElement }) => nativeElement),
@@ -157,9 +143,7 @@ export class AnnouncementsWidgetComponent implements OnInit, OnChanges {
         disableClose: true,
       })
       .afterClosed()
-      .pipe(
-        filter((announcement): announcement is CreateAnnouncementResult => !!announcement),
-      )
+      .pipe(filter((announcement): announcement is CreateAnnouncementResult => !!announcement))
       .subscribe((announcement) => this.announcementsActionService.addAnnouncement(announcement));
   }
 

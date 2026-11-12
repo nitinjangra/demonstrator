@@ -3,6 +3,7 @@ import { ActivatedRoute, convertToParamMap, provideRouter, Router } from '@angul
 import { DateAdapter } from '@angular/material/core';
 import { LiveAnnouncer } from '@angular/cdk/a11y';
 import { BehaviorSubject } from 'rxjs';
+import { AgTableStateService } from '../actions-table-wrapper/shared/services/ag-table-state.service';
 
 import { Landing } from './landing';
 import { WeatherIcon } from '../../shared/constants/icon.const';
@@ -34,6 +35,48 @@ describe('Landing', () => {
 
   it('should provide the native date adapter required by announcement date pickers', () => {
     expect(fixture.debugElement.injector.get(DateAdapter)).toBeTruthy();
+  });
+
+  it('shows the shared loader after the initial load remains pending for 300 ms', () => {
+    const state = TestBed.inject(AgTableStateService);
+    jasmine.clock().install();
+    try {
+      state.loadStatus.set('loading');
+      fixture.detectChanges();
+      expect(fixture.nativeElement.querySelector('app-loading')).toBeNull();
+
+      jasmine.clock().tick(299);
+      fixture.detectChanges();
+      expect(fixture.nativeElement.querySelector('app-loading')).toBeNull();
+
+      jasmine.clock().tick(1);
+      fixture.detectChanges();
+      expect(fixture.nativeElement.querySelector('app-loading')?.textContent).toContain('Getting things ready');
+
+      state.loadStatus.set('loaded');
+      fixture.detectChanges();
+      expect(fixture.nativeElement.querySelector('app-loading')).toBeNull();
+    } finally {
+      jasmine.clock().uninstall();
+    }
+  });
+
+  it('does not show the shared loader when loading completes before 300 ms', () => {
+    const state = TestBed.inject(AgTableStateService);
+    jasmine.clock().install();
+    try {
+      state.loadStatus.set('loading');
+      fixture.detectChanges();
+      jasmine.clock().tick(299);
+      state.loadStatus.set('loaded');
+      fixture.detectChanges();
+      jasmine.clock().tick(1);
+      fixture.detectChanges();
+
+      expect(fixture.nativeElement.querySelector('app-loading')).toBeNull();
+    } finally {
+      jasmine.clock().uninstall();
+    }
   });
 
   it('briefly highlights the actions section when navigation requests it', () => {
