@@ -1,4 +1,4 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { signal } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { firstValueFrom, of } from 'rxjs';
@@ -226,17 +226,13 @@ describe('Branding', () => {
     }
   });
 
-  it('restores dirty state after a successful save timeout when source settings remain unchanged', async () => {
-    jasmine.clock().install();
-    try {
-      fixture.componentInstance.setDraftBrandName('Changed locally');
-      await fixture.componentInstance.saveChanges();
-      jasmine.clock().tick(3000);
-      expect(fixture.componentInstance.saveState()).toBe('dirty');
-    } finally {
-      jasmine.clock().uninstall();
-    }
-  });
+  it('restores dirty state after a successful save timeout when source settings remain unchanged', fakeAsync(() => {
+    fixture.componentInstance.setDraftBrandName('Changed locally');
+    void fixture.componentInstance.saveChanges();
+    tick(16);
+    tick(3000);
+    expect(fixture.componentInstance.saveState()).toBe('dirty');
+  }));
 
   it('handles a missing image file when dropped and keeps image removal when canceled', async () => {
     const event = {

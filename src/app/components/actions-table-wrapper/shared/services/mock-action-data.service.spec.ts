@@ -21,7 +21,7 @@ describe('MockActionDataService', () => {
   it('reads saved arrays and falls back for malformed or non-array values', () => {
     const savedRows = [{ ...mockTableData[0], id: 999 }];
     service.saveRows(savedRows);
-    expect(service.getRows()).toEqual(savedRows);
+    expect(service.getRows()).toEqual(JSON.parse(JSON.stringify(savedRows)));
 
     localStorage.setItem(storageKey, JSON.stringify({ rows: [] }));
     expect(service.getRows()).toBe(mockTableData);

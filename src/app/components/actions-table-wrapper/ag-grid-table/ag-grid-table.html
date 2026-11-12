@@ -6,14 +6,19 @@
   (filterCleared)="clearPriorityFilter()"
 />
 
-<div class="ag-grid-frame" [class.table-route-highlight]="routeAppliedPriority() !== null">
+<div
+  class="ag-grid-frame"
+  [class.table-route-highlight]="routeAppliedPriority() !== null"
+  [class.ag-grid-frame--empty]="rowData().length === 0"
+>
   @if (rowData().length > 0) {
     <ag-grid-angular
       class="actions-grid"
-      aria-label="Actions"
+      [attr.aria-label]="'Actions, ' + rowData().length + ' items'"
       [pagination]="rowData().length > 10"
-      [paginationPageSize]="10"
+      [paginationPageSize]="pageSize()"
       [paginationPageSizeSelector]="[10, 20, 50]"
+      (paginationChanged)="onPaginationChanged($event)"
       [rowData]="rowData()"
       [columnDefs]="columnDefs"
       [defaultColDef]="defaultColDef"

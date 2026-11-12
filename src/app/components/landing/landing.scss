@@ -157,13 +157,16 @@
     }
 
     &-focus-content {
-      display: block;
+      display: flex;
+      flex-direction: column;
       overflow: visible;
     }
 
     &-actions-scroll {
-      display: block;
-      min-height: auto;
+      display: flex;
+      flex: 1 1 auto;
+      flex-direction: column;
+      min-height: 0;
       overflow: visible;
     }
 

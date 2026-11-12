@@ -32,7 +32,7 @@ describe('AgGridTable', () => {
     const priorityFormatter = priority?.valueFormatter as (params: { value: unknown }) => string;
 
     expect(dateFormatter({ value: null })).toBe('—');
-    expect(dateFormatter({ value: '2024-01-05T13:07:00' })).toContain('05-01-2024');
+    expect(dateFormatter({ value: '2024-01-05T13:07:00' })).toBe('Jan 5, 2024');
     expect(priorityFormatter({ value: Priority.High })).toContain('High');
     expect(priorityFormatter({ value: Priority.Medium })).toContain('Medium');
     expect(priorityFormatter({ value: Priority.Low })).toContain('Low');

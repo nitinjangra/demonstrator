@@ -7,6 +7,7 @@ import { mockAnnouncements } from '../../shared/mocks/mock-announcements';
 import { CoreTestingModule } from '../../shared/core/core-testing.module';
 import { AsyncPipe } from '@angular/common';
 import { AnnouncementsActionService } from './services/announcements-action.service';
+import { signal } from '@angular/core';
 describe('AnnouncementsWidgetComponent', () => {
   let component: AnnouncementsWidgetComponent;
   let fixture: ComponentFixture<AnnouncementsWidgetComponent>;
@@ -16,6 +17,7 @@ describe('AnnouncementsWidgetComponent', () => {
     announcementsActionServiceSpy = jasmine.createSpyObj<AnnouncementsActionService>(
       'announcementsActionService',
       ['getAnnouncements', 'handleAnnouncementClick'],
+      { loadStatus: signal<'loading' | 'loaded' | 'refreshing' | 'error'>('loaded'), canAddAnnouncement: false },
     );
 
     await TestBed.configureTestingModule({

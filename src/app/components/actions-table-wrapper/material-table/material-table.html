@@ -5,78 +5,95 @@
   (prioritySelected)="togglePriorityFilter($event)"
   (filterCleared)="clearPriorityFilter()"
 />
-
 @if (visibleRowData().length > 0) {
-<div class="actions-table-viewport" role="region" aria-label="Action rows" tabindex="0">
-  <table
-    mat-table
-    [dataSource]="dataSource"
-    matSort
-    aria-label="Actions"
-    [class.table-route-highlight]="routeAppliedPriority() !== null"
-  >
-  <ng-container matColumnDef="id">
-    <th mat-header-cell *matHeaderCellDef mat-sort-header>ID</th>
-    <td mat-cell *matCellDef="let row">{{ row.id }}</td>
-  </ng-container>
-
-  <ng-container matColumnDef="entityName">
-    <th mat-header-cell *matHeaderCellDef mat-sort-header>Entity name</th>
-    <td mat-cell *matCellDef="let row" class="entity-name" [attr.title]="row.entityName">
-      {{ row.entityName }}
-    </td>
-  </ng-container>
-
-  <ng-container matColumnDef="dueDate">
-    <th mat-header-cell *matHeaderCellDef mat-sort-header>Due date</th>
-    <td mat-cell *matCellDef="let row">
-      @if (isValidDate(row.dueDate)) {
-        {{ dateTimeSettings.formatDateTime(row.dueDate) }}
-      } @else {
-        <span class="no-due-date" aria-label="No due date">—</span>
-      }
-    </td>
-  </ng-container>
-
-  <ng-container matColumnDef="priority">
-    <th mat-header-cell *matHeaderCellDef mat-sort-header>Priority</th>
-    <td mat-cell *matCellDef="let row">
-      @if (row.priority) {
-        <span
-          class="priority-badge"
-          [class.priority-badge--high]="row.priority === 'High'"
-          [class.priority-badge--medium]="row.priority === 'Medium'"
-          [class.priority-badge--low]="row.priority === 'Low'"
-        >
-          @if (row.priority === 'High') {
-            <mat-icon aria-hidden="true">arrow_upward</mat-icon>
-          } @else if (row.priority === 'Medium') {
-            <mat-icon aria-hidden="true">remove</mat-icon>
+  <div class="actions-table-viewport" role="region" aria-label="Action rows" tabindex="0">
+    <table
+      mat-table
+      [dataSource]="dataSource"
+      matSort
+      matSortActive="priority"
+      matSortDirection="desc"
+      [attr.aria-label]="'Actions, ' + visibleRowData().length + ' items'"
+      [class.table-route-highlight]="routeAppliedPriority() !== null"
+    >
+      <caption class="visually-hidden">
+        Actions,
+        {{
+          visibleRowData().length
+        }}
+        items
+      </caption>
+      <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header scope="col">ID</th>
+        <td mat-cell *matCellDef="let row">{{ row.id }}</td>
+      </ng-container>
+      <ng-container matColumnDef="entityName">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header scope="col">Action</th>
+        <td mat-cell *matCellDef="let row" class="entity-name" [attr.title]="row.entityName">
+          {{ row.entityName }}
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="dueDate">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header scope="col">Due date</th>
+        <td mat-cell *matCellDef="let row">
+          @if (isValidDate(row.dueDate)) {
+            <span class="due-date-cell">
+              <time
+                [attr.datetime]="dueDateTime(row.dueDate)"
+                [attr.title]="dateTimeSettings.formatDateTooltip(row.dueDate)"
+              >
+                {{ dateTimeSettings.formatDateOnly(row.dueDate) }}
+              </time>
+              @if (relativeDueLabel(row.dueDate); as dueLabel) {
+                <span class="due-date-cue" [class.due-date-cue--overdue]="isOverdue(row.dueDate)">{{
+                  dueLabel
+                }}</span>
+              }
+            </span>
           } @else {
-            <mat-icon aria-hidden="true">arrow_downward</mat-icon>
+            <span class="no-due-date" aria-label="No due date">—</span>
           }
-          <span>{{ row.priority }}</span>
-        </span>
-      } @else {
-        <span class="no-priority" aria-label="No priority">—</span>
-      }
-    </td>
-  </ng-container>
-
-  <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
-  <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
-  <tr *matNoDataRow>
-    <td class="empty-state" [attr.colspan]="displayedColumns.length">No actions to show.</td>
-  </tr>
-</table>
-</div>
-@if (visibleRowData().length > 10) {
-  <mat-paginator
-    aria-label="Actions table pages"
-    [pageSize]="10"
-    [pageSizeOptions]="pageSizeOptions"
-    showFirstLastButtons
-  ></mat-paginator>
+        </td>
+      </ng-container>
+      <ng-container matColumnDef="priority">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header scope="col">Priority</th>
+        <td mat-cell *matCellDef="let row">
+          @if (row.priority) {
+            <span
+              class="priority-badge"
+              [class.priority-badge--high]="row.priority === 'High'"
+              [class.priority-badge--medium]="row.priority === 'Medium'"
+              [class.priority-badge--low]="row.priority === 'Low'"
+            >
+              @if (row.priority === 'High') {
+                <mat-icon class="priority-badge__icon" aria-hidden="true">arrow_upward</mat-icon>
+              } @else if (row.priority === 'Medium') {
+                <mat-icon class="priority-badge__icon" aria-hidden="true">remove</mat-icon>
+              } @else {
+                <mat-icon class="priority-badge__icon" aria-hidden="true">arrow_downward</mat-icon>
+              }
+              <span>{{ row.priority }}</span>
+            </span>
+          } @else {
+            <span class="no-priority" aria-label="No priority">—</span>
+          }
+        </td>
+      </ng-container>
+      <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+      <tr *matNoDataRow>
+        <td class="empty-state" [attr.colspan]="displayedColumns.length">No actions to show.</td>
+      </tr>
+    </table>
+  </div>
+  @if (visibleRowData().length > 10) {
+    <mat-paginator
+      aria-label="Actions table pages"
+      [pageSize]="pageSize()"
+      [pageSizeOptions]="pageSizeOptions"
+      showFirstLastButtons
+      (page)="onPageChange($event)"
+    ></mat-paginator>
   }
 } @else {
   <div class="actions-empty-state" role="status">

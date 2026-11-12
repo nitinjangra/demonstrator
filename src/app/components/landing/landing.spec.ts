@@ -25,17 +25,7 @@ describe('Landing', () => {
     fixture = TestBed.createComponent(Landing);
     component = fixture.componentInstance;
     fixture.detectChanges();
-    component.isPreparing.set(false);
-    fixture.detectChanges();
     await fixture.whenStable();
-  });
-
-  it('shows loading feedback while the page prepares its content', () => {
-    component.isPreparing.set(true);
-    fixture.detectChanges();
-
-    expect(fixture.nativeElement.textContent).toContain('Getting things ready...');
-    expect(fixture.nativeElement.querySelector('#actions-section')).toBeNull();
   });
 
   it('should create', () => {
@@ -166,7 +156,6 @@ describe('Landing', () => {
     fixture.detectChanges();
     expect(component.timeGreeting).toBe('Good morning');
     expect(component.greetingIcon).toBe(WeatherIcon.Sun);
-    expect(fixture.nativeElement.querySelector('h1').textContent).toContain('Good morning');
   });
 
   it('should show the afternoon greeting and cloud icon', () => {

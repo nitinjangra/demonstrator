@@ -86,7 +86,107 @@
     flex: 1 1 auto;
     overflow-y: auto;
     overscroll-behavior-y: contain;
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+
+    &::-webkit-scrollbar {
+      width: 0.5rem;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      border-radius: 999px;
+      background-color: transparent;
+    }
+
+    &:hover,
+    &:focus-within {
+      scrollbar-color: var(--color-muted-text) transparent;
+
+      &::-webkit-scrollbar-thumb {
+        background-color: var(--color-muted-text);
+      }
+    }
   }
+}
+
+.announcements-skeleton {
+  display: grid;
+  gap: 0.625rem;
+}
+
+.announcements-skeleton-card {
+  display: flex;
+  min-height: 5.25rem;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: 0.625rem;
+  background: var(--color-bg);
+}
+
+.announcement-updating {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-inline-start: auto;
+  color: var(--color-muted-text);
+  font-size: 0.8rem;
+  font-weight: 400;
+}
+
+.announcement-spinner {
+  display: inline-block;
+  width: 0.85rem;
+  height: 0.85rem;
+  border: 2px solid currentColor;
+  border-inline-end-color: transparent;
+  border-radius: 50%;
+  animation: announcement-spinner 0.8s linear infinite;
+}
+
+.announcements-panel--refreshing {
+  opacity: 0.72;
+}
+
+.announcements-refresh-error {
+  margin: 0.25rem 0 0.5rem;
+  color: var(--color-error);
+  font-size: 0.875rem;
+
+  button {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    font: inherit;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+}
+
+.announcements-load-error {
+  display: grid;
+  min-height: 12rem;
+  align-content: center;
+  justify-items: center;
+  gap: 0.5rem;
+  padding: 1rem;
+  border: 1px dashed color-mix(in srgb, var(--color-error) 55%, var(--color-border));
+  border-radius: 0.625rem;
+  color: var(--color-muted-text);
+  text-align: center;
+
+  strong { color: var(--color-text); }
+}
+
+@keyframes announcement-spinner {
+  to { transform: rotate(1turn); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .announcement-spinner { animation: none; }
 }
 
 .announcement-menu-trigger {
@@ -143,6 +243,10 @@
     position: relative;
     z-index: 1;
   }
+}
+
+.announcement-menu-trigger:dir(rtl)::before {
+  transform-origin: right;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -238,7 +342,7 @@
     font: inherit;
     font-size: 0.875rem;
     font-weight: 500;
-    text-align: left;
+    text-align: start;
     text-decoration: underline;
     text-underline-offset: 0.2em;
     cursor: pointer;
