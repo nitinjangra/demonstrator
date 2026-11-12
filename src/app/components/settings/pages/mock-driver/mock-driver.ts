@@ -11,7 +11,6 @@ import { StickyFooterComponent } from '../../../../shared/components/sticky-foot
 import { mockAnnouncements } from '../../../../shared/mocks/mock-announcements';
 import { mockDriverAnnouncements } from '../../../../shared/mocks/mock-driver-announcements';
 import { AnnouncementsWidgetComponent } from '../../../announcements-widget/announcements';
-import { AgTableStateService } from '../../../actions-table-wrapper/shared/services/ag-table-state.service';
 import { MockActionDataService } from '../../../actions-table-wrapper/shared/services/mock-action-data.service';
 import { mockTableData } from '../../../actions-table-wrapper/shared/mock/actions-table.mock';
 import { AnnouncementsActionService } from '../../../announcements-widget/services/announcements-action.service';
@@ -41,10 +40,11 @@ const ANNOUNCEMENT_STATUSES: AnnouncementStatus[] = ['Published', 'Scheduled', '
 })
 export class MockDriver {
   private readonly mockData = inject(MockActionDataService);
-  private readonly tableState = inject(AgTableStateService);
   private readonly announcements = inject(AnnouncementsActionService);
 
   readonly selectedComponent = signal<MockComponent | null>(null);
+  readonly selectedScenario = signal<Scenario>('default');
+  readonly previewRole = signal<'admin' | 'user'>('admin');
   readonly payload = signal('[]');
   readonly appliedPayload = signal('');
   readonly appliedState = signal('Choose a component');
@@ -94,6 +94,7 @@ export class MockDriver {
     if (this.loadingTimer) clearTimeout(this.loadingTimer);
     this.isLoadingPreview.set(false);
     this.selectedComponent.set(component);
+    this.selectedScenario.set('default');
     this.statusMessage.set('');
 
     if (component === 'actions-table') {
@@ -129,11 +130,15 @@ export class MockDriver {
   selectScenario(event: Event): void {
     const scenario = (event.target as HTMLSelectElement).value as Scenario;
     if (!scenario) return;
-    if (this.isDirty && !window.confirm('Replace your unapplied edits with this scenario?')) return;
+    if (this.isDirty && !window.confirm('Replace your unapplied edits with this scenario?')) {
+      (event.target as HTMLSelectElement).value = this.selectedScenario();
+      return;
+    }
     if (this.loadingTimer) clearTimeout(this.loadingTimer);
     this.isLoadingPreview.set(false);
     const component = this.selectedComponent();
     if (!component) return;
+    this.selectedScenario.set(scenario);
     if (scenario === 'error') {
       this.payload.set('[{ "id": ]');
       this.statusMessage.set('Error scenario loaded into the draft. The invalid JSON message is announced below.');
@@ -161,24 +166,21 @@ export class MockDriver {
       data = mockDriverAnnouncements;
     }
     this.payload.set(JSON.stringify(data, null, 2));
-    this.statusMessage.set(`${this.scenarioLabel(scenario)} scenario loaded into the draft. Apply to use it in the app.`);
+    this.statusMessage.set(`${this.scenarioLabel(scenario)} scenario loaded into the draft. Apply to update this preview only.`);
+  }
+
+  setPreviewRole(role: 'admin' | 'user'): void {
+    this.previewRole.set(role);
   }
 
   applyPayload(): void {
     const result = this.payloadResult();
     if (!('component' in result)) return;
 
-    if (result.component === 'actions-table') {
-      this.mockData.saveRows(result.data);
-      this.tableState.setRowData(result.data);
-    } else {
-      this.announcements.saveAnnouncements(result.data);
-    }
     this.appliedPayload.set(this.payload());
     this.appliedAt.set(new Date());
     this.appliedState.set(this.getAppliedState(result.component, result.data));
-    const target = result.component === 'actions-table' ? 'Actions table' : 'Announcement widget';
-    this.statusMessage.set(`Applied to ${target}.`);
+    this.statusMessage.set('Applied to this preview. App data was not changed.');
   }
 
   resetToDefault(): void {
@@ -208,7 +210,7 @@ export class MockDriver {
     );
   }
 
-  private scenarioLabel(scenario: Scenario): string {
+  scenarioLabel(scenario: Scenario): string {
     return {
       default: 'Default',
       empty: 'Empty',
