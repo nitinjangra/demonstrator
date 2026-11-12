@@ -9,6 +9,7 @@ import { RouterLink } from '@angular/router';
 import { ThemeToggleComponent } from '../../shared/components/theme.component';
 import { BrandingService } from '../../shared/services/branding.service';
 import { FeatureToggleService } from '../../shared/services/feature-toggle.service';
+import { LanguageSettingsService, type SupportedLanguage } from '../../shared/services/language-settings.service';
 import {
   PREDEFINED_USER_PROFILES,
   type PredefinedUserProfileId,
@@ -40,9 +41,15 @@ export class GlobalHeaderComponent {
   readonly brandAltText = this.branding.brandAltText;
   readonly dashboardEnabled = inject(FeatureToggleService).dashboardEnabled;
   private readonly userSettings = inject(UserSettingsService);
+  private readonly languageSettings = inject(LanguageSettingsService);
   readonly userName = this.userSettings.firstName;
   readonly isAdmin = this.userSettings.isAdmin;
   readonly userProfiles = PREDEFINED_USER_PROFILES;
+  readonly language = this.languageSettings.language;
+
+  setLanguage(language: SupportedLanguage): void {
+    this.languageSettings.setLanguage(language);
+  }
 
   selectProfile(profileId: PredefinedUserProfileId): void {
     if (this.userSettings.profileId() === profileId) return;

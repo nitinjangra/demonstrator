@@ -22,16 +22,16 @@ describe('Globalheader', () => {
     await fixture.whenStable();
   });
 
-  it('should render its non-interactive brand and theme toggle without the disabled menu', () => {
+  it('should render its linked brand and theme toggle without the disabled menu', () => {
     fixture.detectChanges();
 
     const brand = fixture.nativeElement.querySelector('.global-header-brand');
     expect(brand.textContent).toContain('Demonstrator');
     expect(brand.querySelector('.global-header-home-icon')?.textContent.trim()).toBe('home');
-    const homeLink = brand.querySelector('.global-header-home-link') as HTMLAnchorElement;
+    const homeLink = brand as HTMLAnchorElement;
     expect(homeLink.getAttribute('href')).toBe('/landing');
     expect(homeLink.getAttribute('aria-label')).toBe('Home');
-    expect(brand.closest('a')).toBeNull();
+    expect(brand.closest('a')).toBe(homeLink);
     expect(fixture.nativeElement.querySelector('app-theme-toggle')).not.toBeNull();
     const settingsButton = fixture.nativeElement.querySelector('button[aria-label="Open settings"]');
     expect(settingsButton).not.toBeNull();
@@ -60,6 +60,13 @@ describe('Globalheader', () => {
     await fixture.whenStable();
 
     expect(TestBed.inject(Router).url).toBe('/settings/overview');
+  });
+
+  it('identifies profile switching as a demo control', () => {
+    fixture.detectChanges();
+    (fixture.nativeElement.querySelector('.user-icon') as HTMLButtonElement).click();
+    fixture.detectChanges();
+    expect(document.body.textContent).toContain('Demo profiles only; no access authorization');
   });
 
 });

@@ -115,6 +115,20 @@
         <mat-icon matListItemIcon aria-hidden="true">contrast</mat-icon>
         @if (!isSidebarMinimized) { <span matListItemTitle>Theme</span> }
       </a>
+      <a
+        mat-list-item
+        matTooltip="Language"
+        [matTooltipDisabled]="!isSidebarMinimized"
+        routerLink="/settings/general/language"
+        routerLinkActive="settings-nav-link--active"
+        ariaCurrentWhenActive="page"
+        aria-label="Language"
+        (click)="closeMobileSidebar()"
+        [routerLinkActiveOptions]="{ exact: true }"
+      >
+        <mat-icon matListItemIcon aria-hidden="true">language</mat-icon>
+        @if (!isSidebarMinimized) { <span matListItemTitle>Language</span> }
+      </a>
       @if (!isSidebarMinimized) { <h2 class="settings-nav-group" matSubheader>Developer / Demo</h2> }
       <a
         mat-list-item

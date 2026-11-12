@@ -1,0 +1,35 @@
+﻿<section class="language-settings" aria-labelledby="language-settings-title">
+  <header class="language-settings-heading">
+    <h2 id="language-settings-title">Language &amp; region</h2>
+    <p>Applies to your account on this device.</p>
+  </header>
+
+  <div class="language-preference-row">
+    <div class="language-preference-copy">
+      <h3>Display language</h3>
+      <p>Changes apply immediately. Arabic uses right-to-left layout.</p>
+    </div>
+    <label for="language-preference">Language</label>
+    <select id="language-preference" [value]="language()" (change)="setLanguage($event)">
+      <option value="en-US">English (United States)</option>
+      <option value="ar">Arabic (&#x627;&#x644;&#x639;&#x631;&#x628;&#x64A;&#x629;)</option>
+    </select>
+  </div>
+
+  <section class="language-region-details" aria-labelledby="language-region-format-title">
+    <div>
+      <h3 id="language-region-format-title">Date, time and number format</h3>
+      <p>These preferences are managed separately from display language.</p>
+    </div>
+    <a routerLink="/settings/general/time">Open Date &amp; Time settings</a>
+    <p class="language-region-preview" aria-live="polite">
+      Current format: {{ calendarFormat() === 'dd-mm-yyyy' ? 'Day-Month-Year' : 'Month-Day-Year' }}
+      · {{ clockFormat() === '24h' ? '24-hour' : '12-hour' }}
+    </p>
+  </section>
+
+  <p class="language-settings-note">
+    Announcement text and entity names remain in the language they were written in.
+  </p>
+</section>
+

@@ -29,7 +29,7 @@
 
 .theme-options {
   flex: 0 0 auto;
-  margin-left: auto;
+  margin-inline-start: auto;
 }
 
 .current-theme {
@@ -48,6 +48,6 @@ app-sticky-footer {
 
   .theme-options {
     max-width: 100%;
-    margin-left: 0;
+    margin-inline-start: 0;
   }
 }

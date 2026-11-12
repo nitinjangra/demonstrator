@@ -45,6 +45,7 @@ export class SettingsWrapper {
       announcements: 'Announcement settings',
       branding: 'Branding',
       'feature-toggles': 'Feature toggles',
+      language: 'Language',
       'mock-driver': 'Mock data driver',
       notifications: 'Notifications',
       overview: 'Overview',
