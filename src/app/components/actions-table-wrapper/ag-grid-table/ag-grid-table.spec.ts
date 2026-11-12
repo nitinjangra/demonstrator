@@ -5,6 +5,7 @@ import { ActivatedRoute, convertToParamMap, ParamMap } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
 import { AgGridAngular } from 'ag-grid-angular';
 import { By } from '@angular/platform-browser';
+import { clearActionTableTestData, seedActionTableTestData } from '../actions-table-test-data';
 
 describe('AgGridTable', () => {
   let component: AgGridTable;
@@ -12,6 +13,7 @@ describe('AgGridTable', () => {
   let queryParams: BehaviorSubject<ParamMap>;
 
   beforeEach(() => {
+    seedActionTableTestData();
     queryParams = new BehaviorSubject(convertToParamMap({}));
     TestBed.configureTestingModule({
       imports: [AgGridTable],
@@ -20,6 +22,8 @@ describe('AgGridTable', () => {
     fixture = TestBed.createComponent(AgGridTable);
     component = fixture.componentInstance;
   });
+
+  afterEach(() => clearActionTableTestData());
 
   it('formats present and missing due dates and each priority level', () => {
     const dueDate = component.columnDefs.find((column) => column.field === 'dueDate');
@@ -77,5 +81,16 @@ describe('AgGridTable', () => {
     expect(component.selectedPriority()).toBeNull();
     expect(component.routeAppliedPriority()).toBeNull();
     expect(component.rowData().length).toBe(20);
+  });
+
+  it('filters rows without a priority and toggles the selected priority off', () => {
+    component.togglePriorityFilter('none');
+    expect(component.rowData().length).toBe(2);
+    component.togglePriorityFilter('none');
+    expect(component.rowData().length).toBe(20);
+    component.togglePriorityFilter(Priority.Low);
+    expect(component.rowData().length).toBe(6);
+    component.clearPriorityFilter();
+    expect(component.selectedPriority()).toBeNull();
   });
 });

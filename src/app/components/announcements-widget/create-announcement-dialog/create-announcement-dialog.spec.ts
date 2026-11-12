@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MatDialogRef } from '@angular/material/dialog';
+import { EMPTY } from 'rxjs';
 import { CreateAnnouncementDialogComponent } from './create-announcement-dialog';
 
 describe('CreateAnnouncementDialogComponent', () => {
@@ -9,8 +10,10 @@ describe('CreateAnnouncementDialogComponent', () => {
   beforeEach(async () => {
     dialogRefSpy = jasmine.createSpyObj<MatDialogRef<CreateAnnouncementDialogComponent>>(
       'MatDialogRef',
-      ['close'],
+      ['close', 'backdropClick', 'keydownEvents'],
     );
+    dialogRefSpy.backdropClick.and.returnValue(EMPTY);
+    dialogRefSpy.keydownEvents.and.returnValue(EMPTY);
 
     await TestBed.configureTestingModule({
       imports: [CreateAnnouncementDialogComponent],
@@ -64,13 +67,15 @@ describe('CreateAnnouncementDialogComponent', () => {
 
   it('closes with trimmed values, optional dates, and the selected attachment', () => {
     const attachment = new File(['attachment'], 'brief.png', { type: 'image/png' });
+    const startDate = dateInFuture(2, 15, 30);
+    const endDate = dateInFuture(3, 9, 45);
     fixture.componentInstance.form.setValue({
       title: '  Planned maintenance  ',
       status: 'Draft',
       description: '  Service is unavailable.  ',
       linkUrl: 'https://example.com/maintenance',
-      startDate: new Date(2026, 10, 2),
-      endDate: new Date(2026, 10, 3),
+      startDate,
+      endDate,
     });
     fixture.componentInstance.selectedAttachment = attachment;
 
@@ -82,8 +87,8 @@ describe('CreateAnnouncementDialogComponent', () => {
         status: 'Draft',
         description: 'Service is unavailable.',
         linkUrl: 'https://example.com/maintenance',
-        startDate: new Date(2026, 10, 2),
-        endDate: new Date(2026, 10, 3),
+        startDate: dateOnly(startDate),
+        endDate: dateOnly(endDate),
         attachment,
       }),
     );
@@ -101,8 +106,8 @@ describe('CreateAnnouncementDialogComponent', () => {
   });
 
   it('defaults status to Draft and preserves date-only local calendar values', () => {
-    const startDate = new Date(2026, 10, 2, 15, 30);
-    const endDate = new Date(2026, 10, 3, 9, 45);
+    const startDate = dateInFuture(2, 15, 30);
+    const endDate = dateInFuture(3, 9, 45);
     fixture.componentInstance.form.controls.title.setValue('Maintenance');
     fixture.componentInstance.form.controls.startDate.setValue(startDate);
     fixture.componentInstance.form.controls.endDate.setValue(endDate);
@@ -111,20 +116,20 @@ describe('CreateAnnouncementDialogComponent', () => {
 
     const result = dialogRefSpy.close.calls.mostRecent().args[0];
     expect(result.status).toBe('Draft');
-    expect(result.startDate?.getFullYear()).toBe(2026);
-    expect(result.startDate?.getMonth()).toBe(10);
-    expect(result.startDate?.getDate()).toBe(2);
+    expect(result.startDate?.getFullYear()).toBe(startDate.getFullYear());
+    expect(result.startDate?.getMonth()).toBe(startDate.getMonth());
+    expect(result.startDate?.getDate()).toBe(startDate.getDate());
     expect(result.startDate?.getHours()).toBe(0);
-    expect(result.endDate?.getFullYear()).toBe(2026);
-    expect(result.endDate?.getMonth()).toBe(10);
-    expect(result.endDate?.getDate()).toBe(3);
+    expect(result.endDate?.getFullYear()).toBe(endDate.getFullYear());
+    expect(result.endDate?.getMonth()).toBe(endDate.getMonth());
+    expect(result.endDate?.getDate()).toBe(endDate.getDate());
     expect(result.endDate?.getHours()).toBe(0);
   });
 
   it('rejects an end date earlier than the start date', () => {
     fixture.componentInstance.form.controls.title.setValue('Maintenance');
-    fixture.componentInstance.form.controls.startDate.setValue(new Date(2026, 10, 3));
-    fixture.componentInstance.form.controls.endDate.setValue(new Date(2026, 10, 2));
+    fixture.componentInstance.form.controls.startDate.setValue(dateInFuture(3));
+    fixture.componentInstance.form.controls.endDate.setValue(dateInFuture(2));
 
     fixture.componentInstance.submit();
 
@@ -232,3 +237,14 @@ describe('CreateAnnouncementDialogComponent', () => {
     expect(dialogRefSpy.close).toHaveBeenCalledOnceWith();
   });
 });
+
+function dateInFuture(days: number, hours = 0, minutes = 0): Date {
+  const date = new Date();
+  date.setDate(date.getDate() + days);
+  date.setHours(hours, minutes, 0, 0);
+  return date;
+}
+
+function dateOnly(date: Date): Date {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+}

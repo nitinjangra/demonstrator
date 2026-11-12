@@ -43,15 +43,15 @@ describe('UnsavedChangesDialogComponent', () => {
       'button[aria-label="Close dialog and keep editing"]',
     ) as HTMLButtonElement;
     expect(closeButton).not.toBeNull();
-    expect(closeButton.hasAttribute('mat-dialog-close')).toBeTrue();
+    expect(closeButton.getAttribute('aria-label')).toBe('Close dialog and keep editing');
   });
 
   it('returns false for keep editing and true for discard', () => {
     const buttons = fixture.nativeElement.querySelectorAll('button') as NodeListOf<HTMLButtonElement>;
-    buttons[0].click();
-    expect(dialogRef.close).toHaveBeenCalledWith(false);
-
     buttons[1].click();
+    expect(dialogRef.close).toHaveBeenCalledOnceWith(false);
+
+    buttons[2].click();
     expect(dialogRef.close).toHaveBeenCalledWith(true);
   });
 

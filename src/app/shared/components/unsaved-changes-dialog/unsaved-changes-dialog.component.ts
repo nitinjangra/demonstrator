@@ -16,7 +16,7 @@ import { map, Observable } from 'rxjs';
         type="button"
         class="dialog-close"
         aria-label="Close dialog and keep editing"
-        mat-dialog-close="false"
+        [mat-dialog-close]="false"
       >
         <mat-icon aria-hidden="true">close</mat-icon>
       </button>
