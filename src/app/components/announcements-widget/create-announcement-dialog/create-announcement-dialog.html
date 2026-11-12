@@ -39,20 +39,20 @@
     <div class="announcement-date-fields">
       <mat-form-field appearance="outline">
         <mat-label>Start date</mat-label>
-        <input matInput formControlName="startDate" [matDatepicker]="startPicker" [min]="minimumDate" />
+        <input matInput formControlName="startDate" [matDatepicker]="startPicker" [matDatepickerFilter]="startDateFilter" />
         <mat-datepicker-toggle matIconSuffix [for]="startPicker" aria-label="Choose start date" />
         <mat-datepicker #startPicker />
-        @if (form.controls.startDate.hasError('matDatepickerMin')) {
+        @if (form.controls.startDate.hasError('matDatepickerFilter')) {
           <mat-error>Choose today or a future date.</mat-error>
         }
       </mat-form-field>
 
       <mat-form-field appearance="outline">
         <mat-label>End date</mat-label>
-        <input matInput formControlName="endDate" [matDatepicker]="endPicker" [min]="minimumDate" />
+        <input matInput formControlName="endDate" [matDatepicker]="endPicker" [matDatepickerFilter]="endDateFilter" />
         <mat-datepicker-toggle matIconSuffix [for]="endPicker" aria-label="Choose end date" />
         <mat-datepicker #endPicker />
-        @if (form.controls.endDate.hasError('matDatepickerMin')) {
+        @if (form.controls.endDate.hasError('matDatepickerFilter')) {
           <mat-error>Choose today or a future date.</mat-error>
         }
       </mat-form-field>

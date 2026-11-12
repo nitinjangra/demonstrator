@@ -1,6 +1,10 @@
 import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
+import { of } from 'rxjs';
+import { UnsavedChangesDialogService } from '../../shared/components/unsaved-changes-dialog/unsaved-changes-dialog.component';
+import { LanguageSettingsService } from '../../shared/services/language-settings.service';
+import { UserSettingsService } from '../../shared/services/user-settings.service';
 
 import { GlobalHeaderComponent } from './global-header';
 
@@ -10,11 +14,20 @@ class SettingsOverviewTestRoute {}
 describe('Globalheader', () => {
   let component: GlobalHeaderComponent;
   let fixture: ComponentFixture<GlobalHeaderComponent>;
+  let unsavedChangesDialog: jasmine.SpyObj<UnsavedChangesDialogService>;
 
   beforeEach(async () => {
+    unsavedChangesDialog = jasmine.createSpyObj<UnsavedChangesDialogService>(
+      'UnsavedChangesDialogService',
+      ['confirmActivePageExit'],
+    );
+    unsavedChangesDialog.confirmActivePageExit.and.returnValue(of(true));
     await TestBed.configureTestingModule({
       imports: [GlobalHeaderComponent],
-      providers: [provideRouter([{ path: 'settings/overview', component: SettingsOverviewTestRoute }])],
+      providers: [
+        provideRouter([{ path: 'settings/overview', component: SettingsOverviewTestRoute }]),
+        { provide: UnsavedChangesDialogService, useValue: unsavedChangesDialog },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(GlobalHeaderComponent);
@@ -67,6 +80,30 @@ describe('Globalheader', () => {
     (fixture.nativeElement.querySelector('.user-icon') as HTMLButtonElement).click();
     fixture.detectChanges();
     expect(document.body.textContent).toContain('Demo profiles only; no access authorization');
+  });
+
+  it('does not change language when the active page rejects the confirmation', async () => {
+    const languageSettings = TestBed.inject(LanguageSettingsService);
+    const originalLanguage = languageSettings.language();
+    const nextLanguage = originalLanguage === 'ar' ? 'en-US' : 'ar';
+    unsavedChangesDialog.confirmActivePageExit.and.returnValue(of(false));
+
+    await component.setLanguage(nextLanguage);
+
+    expect(languageSettings.language()).toBe(originalLanguage);
+    expect(localStorage.getItem('language')).not.toBe(nextLanguage);
+  });
+
+  it('does not change profile when the active page rejects the confirmation', async () => {
+    const userSettings = TestBed.inject(UserSettingsService);
+    const originalProfile = userSettings.profileId();
+    const nextProfile = originalProfile === 'standard' ? 'admin' : 'standard';
+    unsavedChangesDialog.confirmActivePageExit.and.returnValue(of(false));
+
+    await component.selectProfile(nextProfile);
+
+    expect(userSettings.profileId()).toBe(originalProfile);
+    expect(localStorage.getItem('active-user-profile')).not.toBe(nextProfile);
   });
 
 });

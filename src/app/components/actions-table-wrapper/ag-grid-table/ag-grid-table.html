@@ -25,14 +25,27 @@
       [theme]="gridTheme"
     />
   } @else {
-    <div class="actions-empty-state" role="status">
-      <mat-icon aria-hidden="true">checklist</mat-icon>
-      @if (sourceRowData().length === 0) {
-        <p class="actions-empty-state-title">You’re all caught up</p>
-        <p class="actions-empty-state-description">No actions need your attention.</p>
-      } @else {
-        <p class="actions-empty-state-description">No actions match this priority filter.</p>
-      }
-    </div>
+    @if (loadStatus() === 'loading') {
+      <div class="actions-empty-state">
+        <app-loading text="Loading actions..." />
+      </div>
+    } @else if (loadStatus() === 'error') {
+      <div class="actions-empty-state" role="alert">
+        <mat-icon aria-hidden="true">error_outline</mat-icon>
+        <p class="actions-empty-state-title">Couldn’t load actions</p>
+        <p class="actions-empty-state-description">Try again to load your actions.</p>
+        <button matButton type="button" (click)="retryLoad()">Retry</button>
+      </div>
+    } @else {
+      <div class="actions-empty-state" role="status">
+        <mat-icon aria-hidden="true">checklist</mat-icon>
+        @if (sourceRowData().length === 0 && (loadStatus() === 'loaded' || loadStatus() === 'refreshing')) {
+          <p class="actions-empty-state-title">You’re all caught up</p>
+          <p class="actions-empty-state-description">No actions need your attention.</p>
+        } @else {
+          <p class="actions-empty-state-description">No actions match this priority filter.</p>
+        }
+      </div>
+    }
   }
 </div>

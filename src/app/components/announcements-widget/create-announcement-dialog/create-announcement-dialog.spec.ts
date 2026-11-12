@@ -159,6 +159,34 @@ describe('CreateAnnouncementDialogComponent', () => {
     }));
   });
 
+  it('keeps existing past schedule dates valid while restricting newly chosen dates', () => {
+    const existingStartDate = dateInFuture(-1);
+    const existingEndDate = dateInFuture(-2);
+    fixture.componentRef.setInput('editorData', {
+      mode: 'edit',
+      announcement: {
+        id: 'past-schedule',
+        title: 'Existing',
+        status: 'Published',
+        startDate: existingStartDate,
+        endDate: existingEndDate,
+      },
+    });
+
+    const component = fixture.componentInstance;
+    expect(component.startDateFilter(existingStartDate)).toBeTrue();
+    expect(component.endDateFilter(existingEndDate)).toBeTrue();
+    expect(component.startDateFilter(dateInFuture(-3))).toBeFalse();
+    expect(component.endDateFilter(dateInFuture(-3))).toBeFalse();
+    expect(component.startDateFilter(dateInFuture(1))).toBeTrue();
+    expect(component.endDateFilter(dateInFuture(1))).toBeTrue();
+  });
+
+  it('keeps past dates unavailable for a new announcement', () => {
+    expect(fixture.componentInstance.startDateFilter(dateInFuture(-1))).toBeFalse();
+    expect(fixture.componentInstance.endDateFilter(dateInFuture(-1))).toBeFalse();
+  });
+
   it('clears optional text fields from the result when they contain only whitespace', () => {
     fixture.componentInstance.form.setValue({
       title: 'Maintenance',

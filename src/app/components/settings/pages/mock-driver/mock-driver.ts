@@ -1,5 +1,5 @@
 import { DatePipe } from '@angular/common';
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, HostListener, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { RouterLink } from '@angular/router';
@@ -14,6 +14,7 @@ import { AnnouncementsWidgetComponent } from '../../../announcements-widget/anno
 import { MockActionDataService } from '../../../actions-table-wrapper/shared/services/mock-action-data.service';
 import { mockTableData } from '../../../actions-table-wrapper/shared/mock/actions-table.mock';
 import { AnnouncementsActionService } from '../../../announcements-widget/services/announcements-action.service';
+import { UnsavedChangesDialogService } from '../../../../shared/components/unsaved-changes-dialog/unsaved-changes-dialog.component';
 
 type MockComponent = 'actions-table' | 'announcement-widget';
 type Scenario = 'default' | 'empty' | 'many' | 'long-text' | 'mixed-statuses' | 'error' | 'loading';
@@ -41,6 +42,7 @@ const ANNOUNCEMENT_STATUSES: AnnouncementStatus[] = ['Published', 'Scheduled', '
 export class MockDriver {
   private readonly mockData = inject(MockActionDataService);
   private readonly announcements = inject(AnnouncementsActionService);
+  private readonly unsavedChangesDialog = inject(UnsavedChangesDialogService);
 
   readonly selectedComponent = signal<MockComponent | null>(null);
   readonly selectedScenario = signal<Scenario>('default');
@@ -124,7 +126,16 @@ export class MockDriver {
   }
 
   get isDirty(): boolean {
-    return this.payload() !== this.appliedPayload();
+    return this.selectedComponent() !== null && this.payload() !== this.appliedPayload();
+  }
+
+  @HostListener('window:beforeunload', ['$event'])
+  warnBeforeLeaving(event: BeforeUnloadEvent): void {
+    this.unsavedChangesDialog.warnBeforeUnload(event, this.isDirty);
+  }
+
+  canDeactivate(): boolean | import('rxjs').Observable<boolean> {
+    return this.unsavedChangesDialog.confirmIfNeeded(this.isDirty);
   }
 
   selectScenario(event: Event): void {

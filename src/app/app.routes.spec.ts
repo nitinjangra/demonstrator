@@ -3,6 +3,7 @@ import { Router, UrlTree } from '@angular/router';
 import type { CanDeactivateFn, CanMatchFn } from '@angular/router';
 import { FeatureToggleService } from './shared/services/feature-toggle.service';
 import { UserSettingsService } from './shared/services/user-settings.service';
+import { UnsavedChangesDialogService } from './shared/components/unsaved-changes-dialog/unsaved-changes-dialog.component';
 import { routes } from './app.routes';
 
 describe('routes', () => {
@@ -61,15 +62,33 @@ describe('routes', () => {
   });
 
   it('invokes settings route guards', () => {
+    const unsavedChanges = jasmine.createSpyObj<UnsavedChangesDialogService>(
+      'UnsavedChangesDialogService',
+      ['confirmCanDeactivate'],
+    );
+    unsavedChanges.confirmCanDeactivate.and.callFake(
+      (component) => component.canDeactivate?.() ?? true,
+    );
+    TestBed.configureTestingModule({
+      providers: [{ provide: UnsavedChangesDialogService, useValue: unsavedChanges }],
+    });
     const settings = routes.find(({ path }) => path === 'settings')!;
     const children = settings.children!;
-    const guard = children.find(({ path }) => path === 'announcements')!.canDeactivate![0] as CanDeactivateFn<{
+    const guard = children.find(({ path }) => path === 'announcements')!
+      .canDeactivate![0] as CanDeactivateFn<{
       canDeactivate: () => boolean;
     }>;
-    expect(guard({ canDeactivate: () => true } as never, {} as never, {} as never, {} as never)).toBeTrue();
-    expect(guard({ canDeactivate: () => false } as never, {} as never, {} as never, {} as never)).toBeFalse();
+    expect(
+      TestBed.runInInjectionContext(() =>
+        guard({ canDeactivate: () => true } as never, {} as never, {} as never, {} as never),
+      ),
+    ).toBeTrue();
+    expect(
+      TestBed.runInInjectionContext(() =>
+        guard({ canDeactivate: () => false } as never, {} as never, {} as never, {} as never),
+      ),
+    ).toBeFalse();
   });
-
 
   it('protects the mock driver with its feature toggle', () => {
     const general = routes.find(({ path }) => path === 'settings')!.children!.find(({ path }) => path === 'general')!;

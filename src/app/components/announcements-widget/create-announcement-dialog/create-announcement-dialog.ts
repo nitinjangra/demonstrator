@@ -84,6 +84,12 @@ export class CreateAnnouncementDialogComponent implements OnInit {
     return this.modeData.mode === 'edit';
   }
 
+  readonly startDateFilter = (date: Date | null): boolean =>
+    this.isDateSelectable(date, this.modeData.announcement?.startDate);
+
+  readonly endDateFilter = (date: Date | null): boolean =>
+    this.isDateSelectable(date, this.modeData.announcement?.endDate);
+
   get isEmbedded(): boolean {
     return this.dialogRef === null;
   }
@@ -203,6 +209,17 @@ export class CreateAnnouncementDialogComponent implements OnInit {
   private toDate(value: Date | null): Date | undefined {
     if (!value) return undefined;
     return new Date(value.getFullYear(), value.getMonth(), value.getDate());
+  }
+
+  private isDateSelectable(date: Date | null, existingDate: Date | string | undefined): boolean {
+    if (!date) return false;
+    if (date >= this.minimumDate) return true;
+    if (!this.isEditing || !existingDate) return false;
+
+    const existing = new Date(existingDate);
+    return date.getFullYear() === existing.getFullYear()
+      && date.getMonth() === existing.getMonth()
+      && date.getDate() === existing.getDate();
   }
 
   private isAllowedImage(file: File): boolean {

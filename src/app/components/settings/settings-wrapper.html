@@ -188,7 +188,10 @@
           }
         </ol>
       </nav>
-      <router-outlet></router-outlet>
+      <router-outlet
+        (activate)="registerActivePage($event)"
+        (deactivate)="unregisterActivePage($event)"
+      ></router-outlet>
     </main>
   </mat-sidenav-content>
 </mat-sidenav-container>

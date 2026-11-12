@@ -16,7 +16,7 @@ describe('AnnouncementsWidgetComponent', () => {
   beforeEach(async () => {
     announcementsActionServiceSpy = jasmine.createSpyObj<AnnouncementsActionService>(
       'announcementsActionService',
-      ['getAnnouncements', 'handleAnnouncementClick'],
+      ['getAnnouncements', 'handleAnnouncementClick', 'loadAnnouncements'],
       { loadStatus: signal<'loading' | 'loaded' | 'refreshing' | 'error'>('loaded'), canAddAnnouncement: false },
     );
 
@@ -53,6 +53,28 @@ describe('AnnouncementsWidgetComponent', () => {
     expect(emptyState).not.toBeNull();
     expect(emptyState.textContent).toContain('No announcements yet');
     expect(fixture.nativeElement.querySelector('.announcements-list-item')).toBeNull();
+  });
+
+  it('does not show the empty state while announcements are loading', () => {
+    announcementsActionServiceSpy.loadStatus.set('loading');
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('.announcements-empty-state')).toBeNull();
+    expect(fixture.nativeElement.querySelector('app-loading')?.textContent).toContain(
+      'Loading announcements',
+    );
+  });
+
+  it('shows a retry control when announcements fail to load', () => {
+    announcementsActionServiceSpy.loadStatus.set('error');
+    fixture.detectChanges();
+
+    const error = fixture.nativeElement.querySelector('.announcements-load-error') as HTMLElement;
+    expect(error.textContent).toContain("Couldn't load announcements");
+    expect(error.querySelector('button')?.textContent).toContain('Try again');
+    (error.querySelector('button') as HTMLButtonElement).click();
+    expect(announcementsActionServiceSpy.loadAnnouncements).toHaveBeenCalled();
+    expect(fixture.nativeElement.querySelector('.announcements-empty-state')).toBeNull();
   });
 
   it('does not show the empty state when announcements are available', async () => {
