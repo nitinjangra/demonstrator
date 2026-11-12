@@ -17,6 +17,7 @@ export const PREDEFINED_USER_PROFILES: ReadonlyArray<{
 
 const ACTIVE_PROFILE_KEY = 'active-user-profile';
 
+// Profiles are browser-local demo personas. They are intentionally not a trusted identity source.
 function readInitialProfileId(): PredefinedUserProfileId {
   const saved = localStorage.getItem(ACTIVE_PROFILE_KEY);
   if (saved === 'admin' || saved === 'standard' || saved === 'invited') return saved;

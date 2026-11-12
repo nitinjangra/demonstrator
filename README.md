@@ -12,6 +12,12 @@ A simple Angular demonstration project with source code, styles, and tooling con
 - Linting: ESLint
 - Formatting: Prettier
 
+## Demo profiles and access controls
+
+This is a static demonstration app. The Admin, Standard user, and Invited user profiles are simulated in browser storage so the interface can demonstrate role-aware navigation. Route guards and feature toggles improve the demo experience; they are not security controls. Do not use them to protect real data or operations. A production deployment must enforce identity, tenant scope, and permissions on a trusted server.
+
+The mock data driver edits sample data in memory for its preview only. Applying a draft does not update the application data sources or persist the draft.
+
 ## Prerequisites
 
 - Node.js 22.22.3+ and npm 10+
