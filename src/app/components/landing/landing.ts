@@ -14,12 +14,11 @@ import type { PriorityFilter } from '../actions-table-wrapper/shared/priority-fi
 import { AgTableStateService } from '../actions-table-wrapper/shared/services/ag-table-state.service';
 import { UserSettingsService } from '../../shared/services/user-settings.service';
 import type { ActionTableRow } from '../../shared/interfaces/actions-table.interface';
-import { LoadingComponent } from '../../shared/components/loading/loading.component';
 
 @Component({
   selector: 'app-landing',
   standalone: true,
-  imports: [AnnouncementsWidgetComponent, ActionsTableWrapper, LoadingComponent, MatIconModule, MatNativeDateModule],
+  imports: [AnnouncementsWidgetComponent, ActionsTableWrapper, MatIconModule, MatNativeDateModule],
   templateUrl: './landing.html',
   styleUrls: ['./landing.scss'],
 })
@@ -32,12 +31,10 @@ export class Landing implements OnInit {
   readonly userName = inject(UserSettingsService).firstName;
   readonly actionCount = toSignal(this.tableState.getRowData(), { initialValue: [] as ActionTableRow[] });
   private highlightTimeout?: ReturnType<typeof setTimeout>;
-  private loadingTimeout?: ReturnType<typeof setTimeout>;
   private pendingHighlightCleanup: { priority: PriorityFilter } | null = null;
   private pendingActionsFocus = false;
   private actionsHeadingElement?: HTMLElement;
   readonly highlightActions = signal(false);
-  readonly isPreparing = signal(true);
   timeGreeting = '';
   greetingIcon = '';
   get greetingIconData(): string {
@@ -58,10 +55,8 @@ export class Landing implements OnInit {
 
   ngOnInit(): void {
     this.timeGreeting = this.getGreeting();
-    this.loadingTimeout = setTimeout(() => this.isPreparing.set(false), 700);
     this.destroyRef.onDestroy(() => {
       if (this.highlightTimeout) clearTimeout(this.highlightTimeout);
-      if (this.loadingTimeout) clearTimeout(this.loadingTimeout);
     });
     this.route.queryParamMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((params) => {
       const priority = parsePriorityFilter(params.get('priority'));

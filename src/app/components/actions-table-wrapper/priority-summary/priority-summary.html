@@ -1,32 +1,39 @@
 @if (rowData().length > 0) {
-<div class="actions-summary" aria-live="polite">
-  <span>{{ rowData().length }} actions</span>
-  @for (filter of filters; track filter.value) {
-    <span
-      [class]="'priority-filter priority-filter--' + filter.className"
-      [class.is-active]="selectedPriority() === filter.value"
-      [class.is-route-highlight]="routeAppliedPriority() === filter.value"
-    >
-      <button
-        class="priority-count"
-        type="button"
-        [attr.aria-pressed]="selectedPriority() === filter.value"
-        (click)="prioritySelected.emit(filter.value)"
+  <div class="actions-summary" aria-live="polite">
+    <span>{{ rowData().length }} actions</span>
+    @for (filter of filters; track filter.value) {
+      <span
+        [class]="'priority-filter priority-filter--' + filter.className"
+        [class.is-active]="selectedPriority() === filter.value"
+        [class.is-route-highlight]="routeAppliedPriority() === filter.value"
       >
-        @if (filter.countKey === 'high') { <span class="priority-symbol" aria-hidden="true">↑</span> }
-        @else if (filter.countKey === 'medium') { <span class="priority-symbol" aria-hidden="true">●</span> }
-        @else if (filter.countKey === 'low') { <span class="priority-symbol" aria-hidden="true">↓</span> }
-        {{ counts()[filter.countKey] }} {{ filter.label }}
-      </button>
-      @if (selectedPriority() === filter.value) {
         <button
-          class="priority-filter-clear"
+          class="priority-count"
           type="button"
-          [attr.aria-label]="filter.clearLabel"
-          (click)="filterCleared.emit()"
-        >&times;</button>
-      }
-    </span>
-  }
-</div>
+          [attr.aria-pressed]="selectedPriority() === filter.value"
+          (click)="prioritySelected.emit(filter.value)"
+        >
+          <span class="priority-count-number">{{ counts()[filter.countKey] }}</span>
+          <span class="priority-count-label">
+          @if (filter.countKey === 'high') {
+            <mat-icon class="priority-symbol priority-badge__icon" aria-hidden="true">arrow_upward</mat-icon>
+          } @else if (filter.countKey === 'medium') {
+            <mat-icon class="priority-symbol priority-badge__icon" aria-hidden="true">remove</mat-icon>
+          } @else if (filter.countKey === 'low') {
+            <mat-icon class="priority-symbol priority-badge__icon" aria-hidden="true">arrow_downward</mat-icon>
+          }
+            <span>{{ filter.label }}</span>
+          </span>
+        </button>
+        @if (selectedPriority() === filter.value) {
+          <button
+            class="priority-filter-clear"
+            type="button"
+            [attr.aria-label]="filter.clearLabel"
+            (click)="filterCleared.emit()"
+          >&times;</button>
+        }
+      </span>
+    }
+  </div>
 }

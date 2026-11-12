@@ -1,5 +1,5 @@
-import { inject, Injectable } from '@angular/core';
-import { BehaviorSubject, map, Observable, take } from 'rxjs';
+import { inject, Injectable, signal } from '@angular/core';
+import { BehaviorSubject, catchError, EMPTY, map, Observable, take, tap } from 'rxjs';
 import { AnnouncementsApiService } from './announcements-api.service';
 import type {
   Announcement,
@@ -82,12 +82,31 @@ export class AnnouncementsActionService {
   private static readonly storageKey = 'announcements';
   private readonly announcementsApiService = inject(AnnouncementsApiService);
   private readonly announcementsSubject = new BehaviorSubject<Announcement[]>([]);
+  readonly loadStatus = signal<'loading' | 'loaded' | 'refreshing' | 'error'>('loading');
 
   constructor() {
+    this.loadAnnouncements();
+  }
+
+  loadAnnouncements(): void {
+    const alreadyLoaded =
+      this.loadStatus() === 'loaded' ||
+      (this.loadStatus() === 'error' && this.announcementsSubject.value.length > 0);
+    this.loadStatus.set(alreadyLoaded ? 'refreshing' : 'loading');
     this.announcementsApiService
       .getAnnouncements()
-      .pipe(take(1))
-      .subscribe((announcements) => this.announcementsSubject.next(this.readSavedAnnouncements() ?? announcements));
+      .pipe(
+        take(1),
+        tap((announcements) => {
+          this.announcementsSubject.next(this.readSavedAnnouncements() ?? announcements);
+          this.loadStatus.set('loaded');
+        }),
+        catchError(() => {
+          this.loadStatus.set('error');
+          return EMPTY;
+        }),
+      )
+      .subscribe();
   }
 
   getAnnouncements(): Observable<Announcement[]> {

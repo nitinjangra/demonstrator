@@ -2,11 +2,15 @@
   class="announcements"
   [class.announcements--scrollable]="enableKeyboardScrolling"
   [attr.aria-labelledby]="enableKeyboardScrolling ? null : 'announcements-title'"
+  [attr.aria-busy]="isBusy"
 >
   <h2 id="announcements-title" class="announcements-title">
     <mat-icon aria-hidden="true">campaign</mat-icon>
     Announcements
-    @if (showContextMenu && isAdmin()) {
+    @if (displayedLoadStatus === 'refreshing') {
+      <span class="announcement-updating" role="status"><span class="announcement-spinner" aria-hidden="true"></span> Updating...</span>
+    }
+    @if (showContextMenu && canManageAnnouncements) {
       <button
         class="announcement-menu-trigger"
         appHoldFeedback
@@ -32,85 +36,99 @@
       <span>{{ canAddAnnouncement ? 'Add announcement' : 'Announcement limit reached (10)' }}</span>
     </button>
   </mat-menu>
+
   @let announcementsData = announcements | async;
-  <div
-    class="announcements-panel"
-    [attr.role]="enableKeyboardScrolling ? 'region' : null"
-    [attr.aria-labelledby]="enableKeyboardScrolling ? 'announcements-title' : null"
-    [attr.tabindex]="enableKeyboardScrolling ? 0 : null"
-  >
-    <ul class="announcements-list">
-      @if (announcementsData) {
-        @if (announcementsData.length === 0) {
-          <li class="announcements-empty-state" role="status">
-            <mat-icon aria-hidden="true">campaign</mat-icon>
-            <p class="announcements-empty-state-title">No announcements yet</p>
-            <p class="announcements-empty-state-description">New announcements will appear here.</p>
-            @if (showContextMenu && isAdmin()) {
-              <button matButton="filled" type="button" [disabled]="!canAddAnnouncement" (click)="openCreateAnnouncementDialog()">
-                Add announcement
-              </button>
-            }
-          </li>
+  @if (displayedLoadStatus === 'loading') {
+    @if (showLoadingSkeleton()) {
+      <div class="announcements-skeleton" aria-hidden="true">
+        @for (card of [1, 2, 3]; track card) {
+          <div class="announcements-skeleton-card">
+            <ngx-skeleton-loader width="60%" height="1rem" borderRadius="0.3rem" loadingText="Loading announcements" />
+            <ngx-skeleton-loader width="100%" height="0.75rem" borderRadius="0.3rem" loadingText="Loading announcements" />
+            <ngx-skeleton-loader width="84%" height="0.75rem" borderRadius="0.3rem" loadingText="Loading announcements" />
+          </div>
         }
-        @for (announcement of announcementsData; track announcement.id) {
-          <li class="announcements-list-item">
-            <article>
-              <h3 class="announcement-title">{{ announcement.title }}</h3>
-              @if (announcement.description) {
-                <p
-                  class="announcement-content"
-                  [class.announcement-content--expanded]="isExpanded(announcement.id)"
-                  [id]="'announcement-description-' + announcement.id"
-                  [attr.data-announcement-id]="announcement.id"
-                  #announcementDescription
-                >
-                  {{ announcement.description }}
-                </p>
-              }
-              @if (announcement.linkUrl) {
-                <a
-                  class="announcement-link"
-                  [href]="announcement.linkUrl"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Read announcement
-                  <span aria-hidden="true"> →</span>
-                  <span class="visually-hidden">: {{ announcement.title }} (opens in a new tab)</span>
-                </a>
-              }
-              @if (announcement.attachmentUrl && announcement.attachmentName) {
-                <a
-                  class="announcement-attachment"
-                  [href]="announcement.attachmentUrl"
-                  [download]="announcement.attachmentName"
-                >
-                  <mat-icon aria-hidden="true">attach_file</mat-icon>
-                  {{ announcement.attachmentName }}
-                </a>
-              }
-              @if (announcement.description && (isTruncated(announcement.id) || isExpanded(announcement.id))) {
-                <button
-                  class="announcement-expand"
-                  type="button"
-                  [attr.aria-expanded]="isExpanded(announcement.id)"
-                  [attr.aria-controls]="'announcement-description-' + announcement.id"
-                  (click)="toggleDescription(announcement.id)"
-                >
-                  {{
-                    isExpanded(announcement.id)
-                      ? 'Show less'
-                      : announcement.linkUrl
-                        ? 'Expand'
-                        : 'Show more'
-                  }}
+      </div>
+    } @else {
+      <span class="visually-hidden" role="status">Loading announcements</span>
+    }
+  } @else if (displayedLoadStatus === 'error' && !announcementsData?.length) {
+    <div class="announcements-load-error" role="alert">
+      <strong>Couldn't load announcements</strong>
+      <span>Check your connection and try again.</span>
+      <button matButton="outlined" type="button" (click)="retryAnnouncements()">Try again</button>
+    </div>
+  } @else {
+    @if (displayedLoadStatus === 'error') {
+      <p class="announcements-refresh-error" role="status">
+        Couldn't refresh announcements. <button type="button" (click)="retryAnnouncements()">Try again</button>
+      </p>
+    }
+    <div
+      class="announcements-panel"
+      [class.announcements-panel--refreshing]="displayedLoadStatus === 'refreshing'"
+      [attr.role]="enableKeyboardScrolling ? 'region' : null"
+      [attr.aria-labelledby]="enableKeyboardScrolling ? 'announcements-title' : null"
+      [attr.tabindex]="enableKeyboardScrolling ? 0 : null"
+    >
+      <ul class="announcements-list">
+        @if (announcementsData) {
+          @if (announcementsData.length === 0) {
+            <li class="announcements-empty-state" role="status">
+              <mat-icon aria-hidden="true">campaign</mat-icon>
+              <p class="announcements-empty-state-title">No announcements yet</p>
+              <p class="announcements-empty-state-description">New announcements will appear here.</p>
+              @if (canManageAnnouncements) {
+                <button matButton="filled" type="button" [disabled]="previewOnly || !canAddAnnouncement" (click)="openCreateAnnouncementDialog()">
+                  Add announcement
                 </button>
               }
-            </article>
-          </li>
+            </li>
+          }
+          @for (announcement of announcementsData; track announcement.id) {
+            <li class="announcements-list-item">
+              <article>
+                <h3 class="announcement-title">{{ announcement.title }}</h3>
+                @if (announcement.description) {
+                  <p
+                    class="announcement-content"
+                    [class.announcement-content--expanded]="isExpanded(announcement.id)"
+                    [id]="'announcement-description-' + announcement.id"
+                    [attr.data-announcement-id]="announcement.id"
+                    #announcementDescription
+                  >
+                    {{ announcement.description }}
+                  </p>
+                }
+                @if (announcement.linkUrl) {
+                  <a class="announcement-link" [href]="announcement.linkUrl" target="_blank" rel="noopener noreferrer">
+                    Read announcement
+                    <span aria-hidden="true"> &rarr;</span>
+                    <span class="visually-hidden">: {{ announcement.title }} (opens in a new tab)</span>
+                  </a>
+                }
+                @if (announcement.attachmentUrl && announcement.attachmentName) {
+                  <a class="announcement-attachment" [href]="announcement.attachmentUrl" [download]="announcement.attachmentName">
+                    <mat-icon aria-hidden="true">attach_file</mat-icon>
+                    {{ announcement.attachmentName }}
+                  </a>
+                }
+                @if (announcement.description && (isTruncated(announcement.id) || isExpanded(announcement.id))) {
+                  <button
+                    class="announcement-expand"
+                    type="button"
+                    [attr.aria-expanded]="isExpanded(announcement.id)"
+                    [attr.aria-controls]="'announcement-description-' + announcement.id"
+                    (click)="toggleDescription(announcement.id)"
+                  >
+                    {{ isExpanded(announcement.id) ? 'Show less' : announcement.linkUrl ? 'Expand' : 'Show more' }}
+                  </button>
+                }
+              </article>
+            </li>
+          }
         }
-      }
-    </ul>
-  </div>
+      </ul>
+    </div>
+  }
 </section>

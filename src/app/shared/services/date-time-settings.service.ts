@@ -41,6 +41,26 @@ export class DateTimeSettingsService {
     return `${dateText} ${this.formatTime(date)}`;
   }
 
+  formatDateOnly(value: Date | string, locale = document.documentElement.lang || 'en-US'): string {
+    const date = this.parseDate(value);
+    if (!Number.isFinite(date.getTime())) return '';
+    return new Intl.DateTimeFormat(locale, {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    }).format(date);
+  }
+
+  formatDateTooltip(value: Date | string, locale = document.documentElement.lang || 'en-US'): string {
+    const date = this.parseDate(value);
+    if (!Number.isFinite(date.getTime())) return '';
+    return new Intl.DateTimeFormat(locale, {
+      dateStyle: 'medium',
+      timeStyle: 'short',
+      hourCycle: this.clockFormat() === '24h' ? 'h23' : 'h12',
+    }).format(date);
+  }
+
   private formatTime(date: Date): string {
     const hours = date.getHours();
     const minutes = String(date.getMinutes()).padStart(2, '0');

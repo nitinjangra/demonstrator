@@ -233,13 +233,21 @@ class RemoveBrandImageDialog {}
         <button matButton type="button" (click)="cancelChanges()">Discard changes</button>
       }
       <button
+        class="branding-save-button"
         matButton="filled"
         type="button"
         aria-label="Save branding"
         [disabled]="!canSaveChanges()"
         (click)="saveChanges()"
       >
-        Save changes
+        <span class="branding-save-button-content">
+          @if (saveState() === 'saving') {
+            <span class="save-spinner" aria-hidden="true"></span>
+            <span>Saving…</span>
+          } @else {
+            <span>Save changes</span>
+          }
+        </span>
       </button>
     </app-sticky-footer>
   `,
@@ -469,8 +477,13 @@ class RemoveBrandImageDialog {}
       border-radius: 50%;
       animation: branding-spin 0.75s linear infinite;
     }
+    .branding-save-button { min-width: 9rem; }
+    .branding-save-button-content { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; }
     @keyframes branding-spin {
       to { transform: rotate(360deg); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .save-spinner { animation: none; border-right-color: currentColor; }
     }
     .visually-hidden {
       position: absolute;

@@ -32,7 +32,9 @@ describe('MaterialTable', () => {
     expect(table).not.toBeNull();
     const summary = fixture.nativeElement.querySelector('.actions-summary') as HTMLElement;
     expect(summary.textContent).toContain('20 actions');
-    expect(summary.textContent).toContain('6 High');
+    const highBadge = summary.querySelector('.priority-filter--high .priority-count') as HTMLButtonElement;
+    expect(highBadge.querySelector('.priority-count-number')?.textContent).toBe('6');
+    expect(highBadge.querySelector('.priority-count-label span:last-child')?.textContent).toBe('High');
     expect(table.querySelectorAll('th[mat-header-cell]').length).toBe(4);
     expect(table.querySelectorAll('tr[mat-row]').length).toBe(10);
     expect(fixture.componentInstance.dataSource.paginator?.pageSize).toBe(10);
