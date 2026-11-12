@@ -7,12 +7,14 @@ import { mockTableData } from '../../../actions-table-wrapper/shared/mock/action
 import { mockDriverAnnouncements } from '../../../../shared/mocks/mock-driver-announcements';
 import { of } from 'rxjs';
 import { MockDriver } from './mock-driver';
+import { UnsavedChangesDialogService } from '../../../../shared/components/unsaved-changes-dialog/unsaved-changes-dialog.component';
 
 describe('MockDriver', () => {
   let fixture: ComponentFixture<MockDriver>;
   let mockData: jasmine.SpyObj<MockActionDataService>;
   let tableState: jasmine.SpyObj<AgTableStateService>;
   let announcements: jasmine.SpyObj<AnnouncementsActionService>;
+  let unsavedChanges: jasmine.SpyObj<UnsavedChangesDialogService>;
 
   beforeEach(async () => {
     mockData = jasmine.createSpyObj<MockActionDataService>('MockActionDataService', ['getRows', 'saveRows']);
@@ -22,6 +24,11 @@ describe('MockDriver', () => {
       'getAnnouncements', 'getAllAnnouncements', 'saveAnnouncements', 'addAnnouncement', 'handleAnnouncementClick',
     ], { canAddAnnouncement: true });
     announcements.getAllAnnouncements.and.returnValue(of(mockDriverAnnouncements));
+    unsavedChanges = jasmine.createSpyObj<UnsavedChangesDialogService>(
+      'UnsavedChangesDialogService',
+      ['confirmIfNeeded', 'warnBeforeUnload'],
+    );
+    unsavedChanges.confirmIfNeeded.and.returnValue(true);
     await TestBed.configureTestingModule({
       imports: [MockDriver],
       providers: [
@@ -29,6 +36,7 @@ describe('MockDriver', () => {
         { provide: MockActionDataService, useValue: mockData },
         { provide: AgTableStateService, useValue: tableState },
         { provide: AnnouncementsActionService, useValue: announcements },
+        { provide: UnsavedChangesDialogService, useValue: unsavedChanges },
       ],
     }).compileComponents();
     fixture = TestBed.createComponent(MockDriver);
@@ -59,6 +67,44 @@ describe('MockDriver', () => {
     expect(announcements.saveAnnouncements).not.toHaveBeenCalled();
   });
 
+  it('guards route navigation only when a selected component has unapplied edits', () => {
+    const component = fixture.componentInstance;
+    expect(component.isDirty).toBeFalse();
+    expect(component.canDeactivate()).toBeTrue();
+    expect(unsavedChanges.confirmIfNeeded).toHaveBeenCalledWith(false);
+
+    component.selectComponent({ target: { value: 'actions-table' } } as unknown as Event);
+    component.onPayloadInput({ target: { value: '[]' } } as unknown as Event);
+    unsavedChanges.confirmIfNeeded.and.returnValue(false);
+    expect(component.isDirty).toBeTrue();
+    expect(component.canDeactivate()).toBeFalse();
+    expect(unsavedChanges.confirmIfNeeded).toHaveBeenCalledWith(true);
+
+    component.applyPayload();
+    expect(component.isDirty).toBeFalse();
+    unsavedChanges.confirmIfNeeded.and.returnValue(true);
+    expect(component.canDeactivate()).toBeTrue();
+    expect(unsavedChanges.confirmIfNeeded).toHaveBeenCalledWith(false);
+  });
+
+  it('warns before browser unload only when the selected component draft is dirty', () => {
+    const component = fixture.componentInstance;
+    const cleanUnloadEvent = new Event('beforeunload') as BeforeUnloadEvent;
+    component.warnBeforeLeaving(cleanUnloadEvent);
+    expect(unsavedChanges.warnBeforeUnload).toHaveBeenCalledWith(cleanUnloadEvent, false);
+
+    component.selectComponent({ target: { value: 'actions-table' } } as unknown as Event);
+    component.onPayloadInput({ target: { value: '[]' } } as unknown as Event);
+    const dirtyUnloadEvent = new Event('beforeunload') as BeforeUnloadEvent;
+    component.warnBeforeLeaving(dirtyUnloadEvent);
+    expect(unsavedChanges.warnBeforeUnload).toHaveBeenCalledWith(dirtyUnloadEvent, true);
+
+    component.applyPayload();
+    const appliedUnloadEvent = new Event('beforeunload') as BeforeUnloadEvent;
+    component.warnBeforeLeaving(appliedUnloadEvent);
+    expect(unsavedChanges.warnBeforeUnload).toHaveBeenCalledWith(appliedUnloadEvent, false);
+  });
+
   it('handles component selection and protects dirty drafts when switching', () => {
     const component = fixture.componentInstance;
     const selection = { target: { value: 'actions-table' } } as unknown as Event;
@@ -78,6 +124,9 @@ describe('MockDriver', () => {
     expect(component.selectedComponent()).toBe('announcement-widget');
     expect(component.announcementItems().length).toBeGreaterThan(0);
     expect(component.announcementStatusCounts().Published).toBeGreaterThan(0);
+    fixture.detectChanges();
+    expect(fixture.nativeElement.querySelectorAll('.announcements-list-item').length)
+      .toBe(component.announcementStatusCounts().Published);
 
     component.selectComponent({ target: { value: 'unknown' } } as unknown as Event);
     expect(component.selectedComponent()).toBeNull();

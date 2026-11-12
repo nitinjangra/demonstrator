@@ -9,6 +9,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs';
 import { FeatureToggleService } from '../../shared/services/feature-toggle.service';
+import { UnsavedChangesDialogService, type CanDeactivatePage } from '../../shared/components/unsaved-changes-dialog/unsaved-changes-dialog.component';
 
 @Component({
   selector: 'app-settings-wrapper',
@@ -21,6 +22,7 @@ export class SettingsWrapper {
   readonly mockDriverEnabled = inject(FeatureToggleService).mockDriverEnabled;
   private readonly router = inject(Router);
   private readonly breakpointObserver = inject(BreakpointObserver);
+  private readonly unsavedChangesDialog = inject(UnsavedChangesDialogService);
   readonly isMobile = signal(false);
   mobileSidebarOpen = false;
   isSidebarMinimized = false;
@@ -65,5 +67,13 @@ export class SettingsWrapper {
 
   closeMobileSidebar(): void {
     if (this.isMobile()) this.mobileSidebarOpen = false;
+  }
+
+  registerActivePage(component: CanDeactivatePage): void {
+    this.unsavedChangesDialog.registerActivePage(component);
+  }
+
+  unregisterActivePage(component: CanDeactivatePage): void {
+    this.unsavedChangesDialog.unregisterActivePage(component);
   }
 }

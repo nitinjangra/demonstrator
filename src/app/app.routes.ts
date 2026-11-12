@@ -2,11 +2,10 @@ import { inject } from '@angular/core';
 import { Router, Routes } from '@angular/router';
 import { FeatureToggleService } from './shared/services/feature-toggle.service';
 import { UserSettingsService } from './shared/services/user-settings.service';
-import type { Observable } from 'rxjs';
+import { UnsavedChangesDialogService, type CanDeactivatePage } from './shared/components/unsaved-changes-dialog/unsaved-changes-dialog.component';
 
-const confirmUnsavedChanges = (component: {
-  canDeactivate: () => boolean | Observable<boolean>;
-}) => component.canDeactivate();
+const confirmUnsavedChanges = (component: CanDeactivatePage) =>
+  inject(UnsavedChangesDialogService).confirmCanDeactivate(component);
 
 // These routes belong to a static demo. The local profile guard only shapes the demo UI;
 // it must never be treated as authorization for protected data or operations.
@@ -103,6 +102,7 @@ export const routes: Routes = [
           },
           {
             path: 'mock-driver',
+            canDeactivate: [confirmUnsavedChanges],
             canMatch: [
               () =>
                 inject(FeatureToggleService).mockDriverEnabled() ||

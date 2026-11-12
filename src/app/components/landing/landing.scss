@@ -103,7 +103,6 @@
         margin: 0 0 0.5rem;
         font-size: 1.25rem;
       }
-
     }
 
     &-content h2.landing-section-heading {
@@ -118,7 +117,7 @@
       }
     }
 
-    &-actions-scroll {
+    .landing-actions-scroll {
       display: flex;
       flex-direction: column;
       min-width: 0;
@@ -162,7 +161,7 @@
       overflow: visible;
     }
 
-    &-actions-scroll {
+    &-focus &-actions-scroll {
       display: flex;
       flex: 1 1 auto;
       flex-direction: column;

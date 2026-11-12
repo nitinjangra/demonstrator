@@ -46,9 +46,17 @@
       [attr.aria-labelledby]="enableKeyboardScrolling ? 'announcements-title' : null"
       [attr.tabindex]="enableKeyboardScrolling ? 0 : null"
     >
-      <ul class="announcements-list">
-        @if (announcementsData) {
-          @if (announcementsData.length === 0) {
+      @if (displayedLoadStatus === 'loading') {
+        <app-loading text="Loading announcements..." />
+      } @else if (displayedLoadStatus === 'error') {
+        <div class="announcements-load-error" role="alert">
+          <strong>Couldn't load announcements</strong>
+          <span>Check your connection and try again.</span>
+          <button matButton type="button" (click)="retryAnnouncements()">Try again</button>
+        </div>
+      } @else {
+        <ul class="announcements-list">
+          @if (displayedLoadStatus === 'loaded' && announcementsData?.length === 0) {
             <li class="announcements-empty-state" role="status">
               <mat-icon aria-hidden="true">campaign</mat-icon>
               <p class="announcements-empty-state-title">No announcements yet</p>
@@ -60,7 +68,7 @@
               }
             </li>
           }
-          @for (announcement of announcementsData; track announcement.id) {
+          @for (announcement of announcementsData ?? []; track announcement.id) {
             <li class="announcements-list-item">
               <article>
                 <h3 class="announcement-title">{{ announcement.title }}</h3>
@@ -102,7 +110,7 @@
               </article>
             </li>
           }
-        }
-      </ul>
+        </ul>
+      }
     </div>
 </section>

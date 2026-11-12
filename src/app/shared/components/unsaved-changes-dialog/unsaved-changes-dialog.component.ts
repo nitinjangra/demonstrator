@@ -2,7 +2,11 @@ import { Component, inject, Injectable } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
-import { map, Observable } from 'rxjs';
+import { isObservable, map, Observable, of } from 'rxjs';
+
+export interface CanDeactivatePage {
+  canDeactivate?: () => boolean | Observable<boolean>;
+}
 
 @Component({
   selector: 'app-unsaved-changes-dialog',
@@ -52,6 +56,24 @@ export class UnsavedChangesDialogComponent {}
 @Injectable({ providedIn: 'root' })
 export class UnsavedChangesDialogService {
   private readonly dialog = inject(MatDialog);
+  private activePage: CanDeactivatePage | null = null;
+
+  registerActivePage(component: CanDeactivatePage): void {
+    this.activePage = component;
+  }
+
+  unregisterActivePage(component: CanDeactivatePage): void {
+    if (this.activePage === component) this.activePage = null;
+  }
+
+  confirmCanDeactivate(component: CanDeactivatePage): boolean | Observable<boolean> {
+    return component.canDeactivate?.() ?? true;
+  }
+
+  confirmActivePageExit(): Observable<boolean> {
+    const result = this.activePage ? this.confirmCanDeactivate(this.activePage) : true;
+    return isObservable(result) ? result : of(result);
+  }
 
   confirmIfNeeded(hasUnsavedChanges: boolean): boolean | Observable<boolean> {
     if (!hasUnsavedChanges) return true;

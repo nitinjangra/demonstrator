@@ -20,6 +20,7 @@ import { AsyncPipe } from '@angular/common';
 import { Observable, filter, of } from 'rxjs';
 import type { Announcement } from '../../shared/interfaces/announcement.interface';
 import { HoldFeedbackDirective } from '../../shared/directives/hold-feedback.directive';
+import { LoadingComponent } from '../../shared/components/loading/loading.component';
 import { CreateAnnouncementDialogComponent } from './create-announcement-dialog/create-announcement-dialog';
 import { UserSettingsService } from '../../shared/services/user-settings.service';
 import type { CreateAnnouncementResult } from './types/create-announcement.types';
@@ -39,6 +40,7 @@ import {
     MatMenuModule,
     RouterLink,
     HoldFeedbackDirective,
+    LoadingComponent,
   ],
   templateUrl: './announcements.html',
   styleUrls: ['./announcements.scss'],

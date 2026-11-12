@@ -16,19 +16,23 @@ import { parsePriorityFilter } from '../shared/priority-filter';
 import { compareActionUrgency, daysUntilActionDue, parseActionDate, relativeDueLabel } from '../shared/action-urgency';
 import { LanguageSettingsService } from '../../../shared/services/language-settings.service';
 import { UserSettingsService } from '../../../shared/services/user-settings.service';
+import { LoadingComponent } from '../../../shared/components/loading/loading.component';
+import { MatButtonModule } from '@angular/material/button';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
 @Component({
   selector: 'app-ag-grid-table',
   standalone: true,
-  imports: [AgGridAngular, MatIconModule, PrioritySummaryComponent],
+  imports: [AgGridAngular, MatButtonModule, MatIconModule, LoadingComponent, PrioritySummaryComponent],
   templateUrl: './ag-grid-table.html',
   styleUrl: './ag-grid-table.scss',
 })
 export class AgGridTable {
   private readonly actionService = inject(AgTableActionService);
   private readonly state = inject(AgTableStateService);
+  readonly loadStatus = this.state.loadStatus;
+  readonly retryLoad = () => this.actionService.loadGridData();
   private readonly dateTimeSettings = inject(DateTimeSettingsService);
   private readonly languageSettings = inject(LanguageSettingsService);
   private readonly userSettings = inject(UserSettingsService);
