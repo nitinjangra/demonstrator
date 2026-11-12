@@ -8,6 +8,9 @@ const confirmUnsavedChanges = (component: {
   canDeactivate: () => boolean | Observable<boolean>;
 }) => component.canDeactivate();
 
+// These routes belong to a static demo. The local profile guard only shapes the demo UI;
+// it must never be treated as authorization for protected data or operations.
+
 export const routes: Routes = [
   {
     path: '',
@@ -83,6 +86,13 @@ export const routes: Routes = [
             loadComponent: () =>
               import('./components/settings/pages/theme-setting/theme-setting').then(
                 (m) => m.ThemeSetting,
+              ),
+          },
+          {
+            path: 'language',
+            loadComponent: () =>
+              import('./components/settings/pages/language-setting/language-setting').then(
+                (m) => m.LanguageSetting,
               ),
           },
           {

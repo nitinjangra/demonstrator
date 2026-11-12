@@ -31,12 +31,14 @@ describe('SettingsWrapper', () => {
     expect(sidebar.textContent).toContain('Branding');
     expect(sidebar.textContent).toContain('Date & time');
     expect(sidebar.textContent).toContain('Theme');
+    expect(sidebar.textContent).toContain('Language');
     expect(sidebar.textContent).toContain('Feature toggles');
     expect(sidebar.textContent).toContain('Notifications');
     expect(sidebar.textContent).toContain('Announcement settings');
     expect(sidebar.querySelector('a[href="/settings/general/branding"]')).not.toBeNull();
     expect(sidebar.querySelector('a[href="/settings/general/time"]')).not.toBeNull();
     expect(sidebar.querySelector('a[href="/settings/general/theme"]')).not.toBeNull();
+    expect(sidebar.querySelector('a[href="/settings/general/language"]')).not.toBeNull();
     expect(sidebar.querySelector('a[href="/settings/general/feature-toggles"]')).not.toBeNull();
     expect(sidebar.querySelector('a[href="/settings/general/mock-driver"]')).toBeNull();
     expect(sidebar.querySelector('a[href="/settings/general/notifications"]')).not.toBeNull();
@@ -52,6 +54,7 @@ describe('SettingsWrapper', () => {
       'Notifications',
       'Date & time',
       'Theme',
+      'Language',
       'Feature toggles',
     ]);
   });
