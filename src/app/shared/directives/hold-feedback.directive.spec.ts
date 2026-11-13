@@ -5,7 +5,13 @@ import { HoldFeedbackDirective } from './hold-feedback.directive';
 @Component({
   standalone: true,
   imports: [HoldFeedbackDirective],
-  template: `<button appHoldFeedback [holdFeedbackDuration]="duration()" (holdFeedbackComplete)="onComplete()">Hold</button>`,
+  template: `<button
+    appHoldFeedback
+    [holdFeedbackDuration]="duration()"
+    (holdFeedbackComplete)="onComplete()"
+  >
+    Hold
+  </button>`,
 })
 class HostComponent {
   duration = signal<number | undefined>(100);
@@ -39,12 +45,18 @@ describe('HoldFeedbackDirective', () => {
   });
 
   it('starts only primary left-button pointer holds and completes after duration', fakeAsync(() => {
-    button.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, isPrimary: false, button: 0 }));
+    button.dispatchEvent(
+      new PointerEvent('pointerdown', { bubbles: true, isPrimary: false, button: 0 }),
+    );
     expect(button.classList).not.toContain('hold-feedback--active');
-    button.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, isPrimary: true, button: 1 }));
+    button.dispatchEvent(
+      new PointerEvent('pointerdown', { bubbles: true, isPrimary: true, button: 1 }),
+    );
     expect(button.classList).not.toContain('hold-feedback--active');
 
-    button.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, isPrimary: true, button: 0 }));
+    button.dispatchEvent(
+      new PointerEvent('pointerdown', { bubbles: true, isPrimary: true, button: 0 }),
+    );
     fixture.detectChanges();
     expect(directive.isHolding).toBeTrue();
     tick(100);
@@ -56,8 +68,13 @@ describe('HoldFeedbackDirective', () => {
   it('cancels pointer holds on release, leave, cancel, and blur', fakeAsync(() => {
     const cancelEvents = ['pointerup', 'pointerleave', 'pointercancel', 'blur'];
     for (const eventName of cancelEvents) {
-      button.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, isPrimary: true, button: 0 }));
-      const event = eventName === 'blur' ? new Event(eventName) : new PointerEvent(eventName, { bubbles: true });
+      button.dispatchEvent(
+        new PointerEvent('pointerdown', { bubbles: true, isPrimary: true, button: 0 }),
+      );
+      const event =
+        eventName === 'blur'
+          ? new Event(eventName)
+          : new PointerEvent(eventName, { bubbles: true });
       button.dispatchEvent(event);
       tick(100);
     }
@@ -67,7 +84,9 @@ describe('HoldFeedbackDirective', () => {
 
   it('supports Space and Enter, ignores repeats and unrelated keys, and cancels on keyup', fakeAsync(() => {
     button.dispatchEvent(new KeyboardEvent('keydown', { key: 'x', bubbles: true }));
-    button.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', repeat: true, bubbles: true }));
+    button.dispatchEvent(
+      new KeyboardEvent('keydown', { key: 'Enter', repeat: true, bubbles: true }),
+    );
     expect(button.classList).not.toContain('hold-feedback--active');
 
     button.dispatchEvent(new KeyboardEvent('keydown', { key: ' ', bubbles: true }));
@@ -87,7 +106,9 @@ describe('HoldFeedbackDirective', () => {
   it('holds without a timer when no duration is configured and clamps negative durations', fakeAsync(() => {
     fixture.componentInstance.duration.set(undefined);
     fixture.detectChanges();
-    button.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, isPrimary: true, button: 0 }));
+    button.dispatchEvent(
+      new PointerEvent('pointerdown', { bubbles: true, isPrimary: true, button: 0 }),
+    );
     fixture.detectChanges();
     tick(3000);
     expect(directive.isHolding).toBeTrue();
@@ -96,7 +117,9 @@ describe('HoldFeedbackDirective', () => {
     button.dispatchEvent(new PointerEvent('pointerup', { bubbles: true }));
     fixture.componentInstance.duration.set(-1);
     fixture.detectChanges();
-    button.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, isPrimary: true, button: 0 }));
+    button.dispatchEvent(
+      new PointerEvent('pointerdown', { bubbles: true, isPrimary: true, button: 0 }),
+    );
     tick(0);
     expect(fixture.componentInstance.complete).toBe(1);
   }));

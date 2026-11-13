@@ -3,6 +3,7 @@
 ## [1.3.0] - 2026-11-03
 
 ### Features
+
 - announce action filter navigation
 - add action drilldown and table pagination
 - add announcement management workflows
@@ -16,13 +17,16 @@
 - add version check and improve changelog generation in release script
 
 ### Fixes
+
 - update chart descriptions and action link for clarity
 - address announcement and dashboard feedback
 
 ### Refactoring
+
 - share priority query parsing
 
 ### Tests
+
 - raise announcement coverage above threshold
 - cover route guard and hold directive
 - enforce coverage thresholds in karma
@@ -31,10 +35,12 @@
 - add Jasmine coverage for app components
 
 ### Chores
+
 - add MCP configuration
 - remove obsolete eslint ignore file
 
 ### Other Changes
+
 - style(settings): align page and sidebar layouts
 - style(announcements): refine editor dialog spacing
 - style(material): use app theme colors for controls
@@ -47,6 +53,7 @@
 ## [1.2.0] - 2026-10-13
 
 ### Features
+
 - enhance matchMedia mock in theme component tests for better theme preference handling
 - add tooltip for theme toggle button and enhance unit tests
 - add unit tests for various components and services, enhance existing tests
@@ -59,13 +66,16 @@
 - add ag grid table for actions (#14)
 
 ### Tests
+
 - enhance unit tests for various components and services
 
 ### Chores
+
 - update Angular dependencies to version 22.2.1 and other devDependencies
 - add .agents to ignorelist
 
 ### Other Changes
+
 - Merge pull request #37 from nitinjangra/development
 - Merge pull request #33 from nitinjangra/dev-to-master
 - build(deps): bump webpack-dev-server (#24)

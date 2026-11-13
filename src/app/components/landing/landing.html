@@ -4,35 +4,39 @@
       <app-loading text="Getting things ready..." />
     </div>
   } @else {
-  <div class="landing-focus-backdrop" aria-hidden="true"></div>
-  <header class="landing-greeting">
-    <h1 class="landing-greeting-heading">
-      {{ timeGreeting }}, {{ userName() }}
-      <span class="landing-greeting-heading-icon" aria-hidden="true">{{ greetingIcon }}</span>
-    </h1>
-    <p class="landing-greeting-description">
-      {{ actionCount().length === 0 ? 'You’re all caught up. No actions need your attention' : 'Here’s what needs your attention today' }}.
-    </p>
-  </header>
-  <div class="landing-focus">
-    <section
-      id="actions-section"
-      class="landing-focus-content"
-      [class.landing-focus-content--highlight]="highlightActions()"
-      aria-labelledby="actions-heading"
-    >
-      <h2 #actionsHeading id="actions-heading" class="landing-section-heading" tabindex="-1">
-        <mat-icon aria-hidden="true">task_alt</mat-icon>
-        Actions
-      </h2>
-      <div class="landing-actions-scroll" role="region" aria-label="Actions table" tabindex="0">
-        <app-actions-table-wrapper></app-actions-table-wrapper>
-      </div>
-    </section>
-    <app-announcements
-      class="landing-focus-announcements"
-      [enableKeyboardScrolling]="true"
-    ></app-announcements>
-  </div>
+    <div class="landing-focus-backdrop" aria-hidden="true"></div>
+    <header class="landing-greeting">
+      <h1 class="landing-greeting-heading">
+        {{ timeGreeting }}, {{ userName() }}
+        <span class="landing-greeting-heading-icon" aria-hidden="true">{{ greetingIcon }}</span>
+      </h1>
+      <p class="landing-greeting-description">
+        {{
+          actionCount().length === 0
+            ? 'You’re all caught up. No actions need your attention'
+            : 'Here’s what needs your attention today'
+        }}.
+      </p>
+    </header>
+    <div class="landing-focus">
+      <section
+        id="actions-section"
+        class="landing-focus-content"
+        [class.landing-focus-content--highlight]="highlightActions()"
+        aria-labelledby="actions-heading"
+      >
+        <h2 #actionsHeading id="actions-heading" class="landing-section-heading" tabindex="-1">
+          <mat-icon aria-hidden="true">task_alt</mat-icon>
+          Actions
+        </h2>
+        <div class="landing-actions-scroll" role="region" aria-label="Actions table" tabindex="0">
+          <app-actions-table-wrapper></app-actions-table-wrapper>
+        </div>
+      </section>
+      <app-announcements
+        class="landing-focus-announcements"
+        [enableKeyboardScrolling]="true"
+      ></app-announcements>
+    </div>
   }
 </main>

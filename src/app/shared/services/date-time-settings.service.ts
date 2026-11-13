@@ -51,7 +51,10 @@ export class DateTimeSettingsService {
     }).format(date);
   }
 
-  formatDateTooltip(value: Date | string, locale = document.documentElement.lang || 'en-US'): string {
+  formatDateTooltip(
+    value: Date | string,
+    locale = document.documentElement.lang || 'en-US',
+  ): string {
     const date = this.parseDate(value);
     if (!Number.isFinite(date.getTime())) return '';
     return new Intl.DateTimeFormat(locale, {
@@ -90,8 +93,6 @@ export class DateTimeSettingsService {
   }
 
   private readCalendarFormat(): CalendarFormat {
-    return localStorage.getItem(CALENDAR_FORMAT_KEY) === 'mm-dd-yyyy'
-      ? 'mm-dd-yyyy'
-      : 'dd-mm-yyyy';
+    return localStorage.getItem(CALENDAR_FORMAT_KEY) === 'mm-dd-yyyy' ? 'mm-dd-yyyy' : 'dd-mm-yyyy';
   }
 }

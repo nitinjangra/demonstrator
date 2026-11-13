@@ -11,7 +11,10 @@ import { ThemeToggleComponent } from '../../shared/components/theme.component';
 import { UnsavedChangesDialogService } from '../../shared/components/unsaved-changes-dialog/unsaved-changes-dialog.component';
 import { BrandingService } from '../../shared/services/branding.service';
 import { FeatureToggleService } from '../../shared/services/feature-toggle.service';
-import { LanguageSettingsService, type SupportedLanguage } from '../../shared/services/language-settings.service';
+import {
+  LanguageSettingsService,
+  type SupportedLanguage,
+} from '../../shared/services/language-settings.service';
 import {
   PREDEFINED_USER_PROFILES,
   type PredefinedUserProfileId,

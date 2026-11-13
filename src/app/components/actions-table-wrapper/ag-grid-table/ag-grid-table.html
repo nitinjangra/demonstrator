@@ -39,7 +39,10 @@
     } @else {
       <div class="actions-empty-state" role="status">
         <mat-icon aria-hidden="true">checklist</mat-icon>
-        @if (sourceRowData().length === 0 && (loadStatus() === 'loaded' || loadStatus() === 'refreshing')) {
+        @if (
+          sourceRowData().length === 0 &&
+          (loadStatus() === 'loaded' || loadStatus() === 'refreshing')
+        ) {
           <p class="actions-empty-state-title">You’re all caught up</p>
           <p class="actions-empty-state-description">No actions need your attention.</p>
         } @else {

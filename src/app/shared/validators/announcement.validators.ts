@@ -12,9 +12,7 @@ export const httpUrlValidator: ValidatorFn = (control): ValidationErrors | null 
   }
 };
 
-export const announcementDateRangeValidator: ValidatorFn = (
-  control,
-): ValidationErrors | null => {
+export const announcementDateRangeValidator: ValidatorFn = (control): ValidationErrors | null => {
   const startDate = parseAnnouncementDate(control.get('startDate')?.value);
   const endDate = parseAnnouncementDate(control.get('endDate')?.value);
 
@@ -27,8 +25,12 @@ export const announcementDateRangeValidator: ValidatorFn = (
 const parseAnnouncementDate = (value: unknown): Date | undefined | null => {
   if (value === null || value === undefined || value === '') return undefined;
 
-  const date = value instanceof Date ? new Date(value.getTime()) :
-    typeof value === 'string' ? new Date(value) : null;
+  const date =
+    value instanceof Date
+      ? new Date(value.getTime())
+      : typeof value === 'string'
+        ? new Date(value)
+        : null;
 
   return date && !Number.isNaN(date.getTime()) ? date : null;
 };

@@ -70,7 +70,9 @@ describe('Branding', () => {
   });
 
   it('uses shared before-unload handling based on dirty state', () => {
-    const event = { preventDefault: jasmine.createSpy('preventDefault') } as unknown as BeforeUnloadEvent;
+    const event = {
+      preventDefault: jasmine.createSpy('preventDefault'),
+    } as unknown as BeforeUnloadEvent;
     fixture.componentInstance.warnBeforeLeaving(event);
     expect(unsavedDialogSpy.warnBeforeUnload).toHaveBeenCalledWith(event, false);
     fixture.componentInstance.setDraftBrandName('Edited name');
@@ -92,10 +94,16 @@ describe('Branding', () => {
     fixture.componentInstance.setDraftBrandName('A'.repeat(31));
     fixture.detectChanges();
 
-    expect(fixture.nativeElement.querySelector('#brand-name-counter').textContent).toContain('31 / 30');
+    expect(fixture.nativeElement.querySelector('#brand-name-counter').textContent).toContain(
+      '31 / 30',
+    );
     expect(fixture.nativeElement.textContent).toContain('30 characters or fewer');
-    const buttons = fixture.nativeElement.querySelectorAll('button') as NodeListOf<HTMLButtonElement>;
-    const saveButton = Array.from(buttons).find((button) => button.textContent?.trim() === 'Save changes')!;
+    const buttons = fixture.nativeElement.querySelectorAll(
+      'button',
+    ) as NodeListOf<HTMLButtonElement>;
+    const saveButton = Array.from(buttons).find(
+      (button) => button.textContent?.trim() === 'Save changes',
+    )!;
     expect(saveButton.disabled).toBeTrue();
   });
 
@@ -117,7 +125,9 @@ describe('Branding', () => {
   it('uses the shared confirmation when leaving with unsaved changes', async () => {
     fixture.componentInstance.setDraftBrandName('Unsaved name');
 
-    expect(await firstValueFrom(fixture.componentInstance.canDeactivate() as Observable<boolean>)).toBeFalse();
+    expect(
+      await firstValueFrom(fixture.componentInstance.canDeactivate() as Observable<boolean>),
+    ).toBeFalse();
     expect(unsavedDialogSpy.confirmIfNeeded).toHaveBeenCalledOnceWith(true);
   });
 
@@ -160,22 +170,32 @@ describe('Branding', () => {
     fixture.componentInstance.draftBrandName.set('Example organization');
     fixture.componentInstance.draftMode.set('image');
     fixture.detectChanges();
-    const previewImages = fixture.nativeElement.querySelectorAll('.header-preview img') as NodeListOf<HTMLImageElement>;
+    const previewImages = fixture.nativeElement.querySelectorAll(
+      '.header-preview img',
+    ) as NodeListOf<HTMLImageElement>;
     expect(previewImages[0].alt).toBe('Example organization');
-    expect(fixture.nativeElement.querySelector('.logo-preview-tile img').alt).toBe('Brand image preview');
+    expect(fixture.nativeElement.querySelector('.logo-preview-tile img').alt).toBe(
+      'Brand image preview',
+    );
 
-    const dragEvent = { preventDefault: jasmine.createSpy('preventDefault') } as unknown as DragEvent;
+    const dragEvent = {
+      preventDefault: jasmine.createSpy('preventDefault'),
+    } as unknown as DragEvent;
     fixture.componentInstance.onLogoDragOver(dragEvent);
     expect(fixture.componentInstance.isLogoDragOver()).toBeTrue();
     fixture.componentInstance.onLogoDragLeave(dragEvent);
     expect(fixture.componentInstance.isLogoDragOver()).toBeFalse();
     expect(dragEvent.preventDefault).toHaveBeenCalledTimes(2);
 
-    fixture.componentInstance.captureLogoDimensions({ target: { naturalWidth: 32, naturalHeight: 48 } } as unknown as Event);
+    fixture.componentInstance.captureLogoDimensions({
+      target: { naturalWidth: 32, naturalHeight: 48 },
+    } as unknown as Event);
     expect(fixture.componentInstance.logoDimensions()).toContain('32');
     expect(fixture.componentInstance.logoDimensions()).toContain('48');
     expect(fixture.componentInstance.hasFineDetailsWarning()).toBeTrue();
-    fixture.componentInstance.captureLogoDimensions({ target: { naturalWidth: 0, naturalHeight: 0 } } as unknown as Event);
+    fixture.componentInstance.captureLogoDimensions({
+      target: { naturalWidth: 0, naturalHeight: 0 },
+    } as unknown as Event);
     expect(fixture.componentInstance.logoDimensions()).toContain('32');
     expect(fixture.componentInstance.formatFileSize(0)).toBe('1 KB');
   });
@@ -186,11 +206,15 @@ describe('Branding', () => {
     expect(emptyInput.value).toBe('');
 
     const unsupported = new File(['bad'], 'logo.svg', { type: '' });
-    fixture.componentInstance.onLogoSelected({ target: { files: [unsupported], value: 'logo.svg' } } as unknown as Event);
+    fixture.componentInstance.onLogoSelected({
+      target: { files: [unsupported], value: 'logo.svg' },
+    } as unknown as Event);
     expect(fixture.componentInstance.logoError()).toBe('Choose a PNG or JPEG image.');
 
     const valid = new File(['png'], 'logo.PNG', { type: '' });
-    fixture.componentInstance.onLogoSelected({ target: { files: [valid], value: 'logo.PNG' } } as unknown as Event);
+    fixture.componentInstance.onLogoSelected({
+      target: { files: [valid], value: 'logo.PNG' },
+    } as unknown as Event);
     expect(fixture.componentInstance.isProcessing()).toBeTrue();
   });
 
@@ -199,13 +223,23 @@ describe('Branding', () => {
     const input = { files: [file], value: 'organization.png' } as unknown as HTMLInputElement;
     const originalRead = FileReader.prototype.readAsDataURL;
     spyOn(FileReader.prototype, 'readAsDataURL').and.callFake(function (this: FileReader) {
-      Object.defineProperty(this, 'result', { configurable: true, value: 'data:image/png;base64,abc' });
+      Object.defineProperty(this, 'result', {
+        configurable: true,
+        value: 'data:image/png;base64,abc',
+      });
       this.onload?.call(this, new ProgressEvent('load') as ProgressEvent<FileReader>);
     });
     const originalImage = window.Image;
     const imageSpy = jasmine.createSpy('Image');
     (window as unknown as { Image: unknown }).Image = function () {
-      const image = { naturalWidth: 128, naturalHeight: 96, onload: null as (() => void) | null, set src(_value: string) { this.onload?.(); } };
+      const image = {
+        naturalWidth: 128,
+        naturalHeight: 96,
+        onload: null as (() => void) | null,
+        set src(_value: string) {
+          this.onload?.();
+        },
+      };
       imageSpy();
       return image;
     } as unknown as typeof Image;
@@ -246,8 +280,9 @@ describe('Branding', () => {
     fixture.componentInstance.draftMode.set('image');
     fixture.componentInstance.requestLogoRemoval();
     const closed = firstValueFrom(TestBed.inject(MatDialog).afterAllClosed);
-    const keepButton = Array.from(document.body.querySelectorAll<HTMLButtonElement>('button'))
-      .find((button) => button.textContent?.trim() === 'Keep image')!;
+    const keepButton = Array.from(document.body.querySelectorAll<HTMLButtonElement>('button')).find(
+      (button) => button.textContent?.trim() === 'Keep image',
+    )!;
     keepButton.click();
     await closed;
     expect(fixture.componentInstance.draftLogo()).toBe('data:image/png;base64,abc');
@@ -257,7 +292,9 @@ describe('Branding', () => {
     fixture.componentInstance.saveState.set('saving');
     expect(fixture.componentInstance.canDeactivate()).toBeFalse();
     fixture.componentInstance.saveState.set('error');
-    expect(await firstValueFrom(fixture.componentInstance.canDeactivate() as Observable<boolean>)).toBeFalse();
+    expect(
+      await firstValueFrom(fixture.componentInstance.canDeactivate() as Observable<boolean>),
+    ).toBeFalse();
     expect(unsavedDialogSpy.confirmIfNeeded).toHaveBeenCalledWith(true);
   });
 

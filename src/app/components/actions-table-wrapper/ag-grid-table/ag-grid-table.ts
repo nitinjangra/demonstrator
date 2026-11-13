@@ -13,7 +13,12 @@ import { AgTableStateService } from '../shared/services/ag-table-state.service';
 import { ActivatedRoute } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { parsePriorityFilter } from '../shared/priority-filter';
-import { compareActionUrgency, daysUntilActionDue, parseActionDate, relativeDueLabel } from '../shared/action-urgency';
+import {
+  compareActionUrgency,
+  daysUntilActionDue,
+  parseActionDate,
+  relativeDueLabel,
+} from '../shared/action-urgency';
 import { LanguageSettingsService } from '../../../shared/services/language-settings.service';
 import { UserSettingsService } from '../../../shared/services/user-settings.service';
 import { LoadingComponent } from '../../../shared/components/loading/loading.component';
@@ -24,7 +29,13 @@ ModuleRegistry.registerModules([AllCommunityModule]);
 @Component({
   selector: 'app-ag-grid-table',
   standalone: true,
-  imports: [AgGridAngular, MatButtonModule, MatIconModule, LoadingComponent, PrioritySummaryComponent],
+  imports: [
+    AgGridAngular,
+    MatButtonModule,
+    MatIconModule,
+    LoadingComponent,
+    PrioritySummaryComponent,
+  ],
   templateUrl: './ag-grid-table.html',
   styleUrl: './ag-grid-table.scss',
 })
@@ -50,7 +61,9 @@ export class AgGridTable {
     if (priority === 'none') {
       return this.sourceRowData().filter((row) => !row.priority);
     }
-    return priority ? this.sourceRowData().filter((row) => row.priority === priority) : this.sourceRowData();
+    return priority
+      ? this.sourceRowData().filter((row) => row.priority === priority)
+      : this.sourceRowData();
   });
   readonly gridTheme = themeQuartz.withParams({
     accentColor: 'var(--color-primary)',
@@ -177,11 +190,12 @@ export class AgGridTable {
     badge.className = `priority-badge priority-badge--${modifier}`;
     icon.className = 'material-icons priority-badge__icon';
     icon.setAttribute('aria-hidden', 'true');
-    icon.textContent = priority === Priority.High
-      ? 'arrow_upward'
-      : priority === Priority.Low
-        ? 'arrow_downward'
-        : 'remove';
+    icon.textContent =
+      priority === Priority.High
+        ? 'arrow_upward'
+        : priority === Priority.Low
+          ? 'arrow_downward'
+          : 'remove';
     label.textContent = priority;
     badge.append(icon, label);
 

@@ -51,7 +51,8 @@ describe('action urgency helpers', () => {
       row(6, null),
     ];
 
-    expect(rows.sort((left, right) => compareActionUrgency(left, right, today)).map(({ id }) => id))
-      .toEqual([1, 4, 2, 5, 3, 6]);
+    expect(
+      rows.sort((left, right) => compareActionUrgency(left, right, today)).map(({ id }) => id),
+    ).toEqual([1, 4, 2, 5, 3, 6]);
   });
 });

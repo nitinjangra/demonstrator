@@ -19,6 +19,8 @@ export class LanguageSetting {
   readonly calendarFormat = this.dateTimeSettings.calendarFormat;
 
   setLanguage(event: Event): void {
-    this.languageSettings.setLanguage((event.target as HTMLSelectElement).value as SupportedLanguage);
+    this.languageSettings.setLanguage(
+      (event.target as HTMLSelectElement).value as SupportedLanguage,
+    );
   }
 }

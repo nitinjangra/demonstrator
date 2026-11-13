@@ -17,7 +17,9 @@ describe('AgGridTable', () => {
     queryParams = new BehaviorSubject(convertToParamMap({}));
     TestBed.configureTestingModule({
       imports: [AgGridTable],
-      providers: [{ provide: ActivatedRoute, useValue: { queryParamMap: queryParams.asObservable() } }],
+      providers: [
+        { provide: ActivatedRoute, useValue: { queryParamMap: queryParams.asObservable() } },
+      ],
     });
     fixture = TestBed.createComponent(AgGridTable);
     component = fixture.componentInstance;
@@ -52,13 +54,16 @@ describe('AgGridTable', () => {
   });
 
   it('applies the priority supplied by the route query parameter', () => {
-    queryParams.next(convertToParamMap({ priority: 'High', highlightActions: 'true', tab: 'actions' }));
+    queryParams.next(
+      convertToParamMap({ priority: 'High', highlightActions: 'true', tab: 'actions' }),
+    );
 
     expect(component.selectedPriority()).toBe(Priority.High);
     expect(component.routeAppliedPriority()).toBe(Priority.High);
     fixture.detectChanges();
-    expect(fixture.nativeElement.querySelector('.ag-grid-frame')?.classList)
-      .toContain('table-route-highlight');
+    expect(fixture.nativeElement.querySelector('.ag-grid-frame')?.classList).toContain(
+      'table-route-highlight',
+    );
   });
 
   it('enables pagination with ten rows per page by default', async () => {
@@ -67,7 +72,8 @@ describe('AgGridTable', () => {
 
     expect(fixture.nativeElement.querySelector('.ag-paging-panel')).not.toBeNull();
     expect(fixture.nativeElement.querySelector('.ag-paging-row-summary-panel')).not.toBeNull();
-    const grid = fixture.debugElement.query(By.directive(AgGridAngular)).componentInstance as AgGridAngular;
+    const grid = fixture.debugElement.query(By.directive(AgGridAngular))
+      .componentInstance as AgGridAngular;
     expect(grid.api.paginationGetPageSize()).toBe(10);
     expect(grid.api.paginationGetTotalPages()).toBe(2);
     grid.api.paginationGoToNextPage();

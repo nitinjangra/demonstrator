@@ -8,17 +8,31 @@
       <button mat-menu-item>Item 2</button>
     </mat-menu>
   }
-  <a class="global-header-brand global-header-home-link" routerLink="/landing" aria-label="Home" title="Home">
+  <a
+    class="global-header-brand global-header-home-link"
+    routerLink="/landing"
+    aria-label="Home"
+    title="Home"
+  >
     <mat-icon class="global-header-home-icon" aria-hidden="true">home</mat-icon>
     @if (brandMode() === 'image' && brandLogo()) {
-      <img class="global-header-brand-image" [src]="brandLogo()" [alt]="brandAltText() || brandName()" />
+      <img
+        class="global-header-brand-image"
+        [src]="brandLogo()"
+        [alt]="brandAltText() || brandName()"
+      />
     } @else {
       <span class="global-header-brand-label" [title]="brandName()">{{ brandName() }}</span>
     }
   </a>
   <span class="example-spacer"></span>
   @if (dashboardEnabled() && isAdmin()) {
-    <a class="global-header-dashboard" routerLink="/dashboard" aria-label="Dashboard" title="Dashboard">
+    <a
+      class="global-header-dashboard"
+      routerLink="/dashboard"
+      aria-label="Dashboard"
+      title="Dashboard"
+    >
       <mat-icon aria-hidden="true">dashboard</mat-icon>
     </a>
   }
@@ -55,11 +69,15 @@
     <mat-menu #languageMenu="matMenu" aria-label="Choose language">
       <button mat-menu-item type="button" (click)="setLanguage('en-US')">
         <span>English (United States)</span>
-        @if (language() === 'en-US') { <mat-icon aria-hidden="true">check</mat-icon> }
+        @if (language() === 'en-US') {
+          <mat-icon aria-hidden="true">check</mat-icon>
+        }
       </button>
       <button mat-menu-item type="button" (click)="setLanguage('ar')">
         <span>العربية · Arabic</span>
-        @if (language() === 'ar') { <mat-icon aria-hidden="true">check</mat-icon> }
+        @if (language() === 'ar') {
+          <mat-icon aria-hidden="true">check</mat-icon>
+        }
       </button>
       <mat-divider />
       <button mat-menu-item type="button" routerLink="/settings/general/language">
@@ -78,7 +96,12 @@
     }
   </mat-menu>
   @if (isAdmin()) {
-    <button class="settings-icon" type="button" routerLink="/settings/overview" aria-label="Open settings">
+    <button
+      class="settings-icon"
+      type="button"
+      routerLink="/settings/overview"
+      aria-label="Open settings"
+    >
       <mat-icon aria-hidden="true">settings</mat-icon>
     </button>
   }

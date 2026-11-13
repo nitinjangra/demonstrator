@@ -18,7 +18,10 @@ describe('AgTableStateService', () => {
     ];
     const emissions: ActionTableRow[][] = [];
 
-    service.getRowData().pipe(take(2)).subscribe((value) => emissions.push(value));
+    service
+      .getRowData()
+      .pipe(take(2))
+      .subscribe((value) => emissions.push(value));
     service.setRowData(rows);
 
     expect(emissions).toEqual([[], rows]);

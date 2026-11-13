@@ -16,7 +16,9 @@ export class BrandingService {
   private readonly brandModeSignal = signal<BrandDisplayMode>(this.readBrandMode());
   private readonly brandLogoSignal = signal(localStorage.getItem(BRAND_LOGO_KEY) ?? '');
   private readonly brandLogoNameSignal = signal(localStorage.getItem(BRAND_LOGO_NAME_KEY) ?? '');
-  private readonly brandLogoSizeSignal = signal(Number(localStorage.getItem(BRAND_LOGO_SIZE_KEY) ?? 0));
+  private readonly brandLogoSizeSignal = signal(
+    Number(localStorage.getItem(BRAND_LOGO_SIZE_KEY) ?? 0),
+  );
   private readonly brandAltTextSignal = signal(localStorage.getItem(BRAND_ALT_TEXT_KEY) ?? '');
 
   readonly brandName = this.brandNameSignal.asReadonly();

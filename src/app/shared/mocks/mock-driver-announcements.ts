@@ -12,13 +12,15 @@ export const mockDriverAnnouncements: Announcement[] = [
     id: 'mock-announcement-published',
     title: 'Product update',
     status: 'Published',
-    description: 'A published announcement without date restrictions for the homepage widget preview.',
+    description:
+      'A published announcement without date restrictions for the homepage widget preview.',
   },
   {
     id: 'mock-announcement-scheduled',
     title: 'Scheduled maintenance window',
     status: 'Scheduled',
-    description: 'Maintenance is planned for next week. This item starts in seven days and ends two days later.',
+    description:
+      'Maintenance is planned for next week. This item starts in seven days and ends two days later.',
     startDate: inDays(7),
     endDate: inDays(9),
   },
@@ -48,6 +50,7 @@ export const mockDriverAnnouncements: Announcement[] = [
     id: 'mock-announcement-rtl',
     title: '\u062a\u062d\u062f\u064a\u062b \u0647\u0627\u0645 \u0644\u0644\u062e\u062f\u0645\u0629',
     status: 'Published',
-    description: '\u0646\u0635 \u062a\u062c\u0631\u064a\u0628\u064a \u0644\u0644\u062a\u062d\u0642\u0642 \u0645\u0646 \u0639\u0631\u0636 \u0627\u0644\u0645\u062d\u062a\u0648\u0649 \u0645\u0646 \u0627\u0644\u064a\u0645\u064a\u0646 \u0625\u0644\u0649 \u0627\u0644\u064a\u0633\u0627\u0631.',
+    description:
+      '\u0646\u0635 \u062a\u062c\u0631\u064a\u0628\u064a \u0644\u0644\u062a\u062d\u0642\u0642 \u0645\u0646 \u0639\u0631\u0636 \u0627\u0644\u0645\u062d\u062a\u0648\u0649 \u0645\u0646 \u0627\u0644\u064a\u0645\u064a\u0646 \u0625\u0644\u0649 \u0627\u0644\u064a\u0633\u0627\u0631.',
   },
 ];

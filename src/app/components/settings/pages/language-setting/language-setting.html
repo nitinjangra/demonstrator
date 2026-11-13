@@ -23,8 +23,9 @@
     </div>
     <a routerLink="/settings/general/time">Open Date &amp; Time settings</a>
     <p class="language-region-preview" aria-live="polite">
-      Current format: {{ calendarFormat() === 'dd-mm-yyyy' ? 'Day-Month-Year' : 'Month-Day-Year' }}
-      · {{ clockFormat() === '24h' ? '24-hour' : '12-hour' }}
+      Current format:
+      {{ calendarFormat() === 'dd-mm-yyyy' ? 'Day-Month-Year' : 'Month-Day-Year' }} ·
+      {{ clockFormat() === '24h' ? '24-hour' : '12-hour' }}
     </p>
   </section>
 
@@ -32,4 +33,3 @@
     Announcement text and entity names remain in the language they were written in.
   </p>
 </section>
-

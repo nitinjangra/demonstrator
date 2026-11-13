@@ -13,10 +13,9 @@ describe('UnsavedChangesDialogComponent', () => {
   let dialog: jasmine.SpyObj<MatDialog>;
 
   beforeEach(async () => {
-    dialogRef = jasmine.createSpyObj<MatDialogRef<UnsavedChangesDialogComponent>>(
-      'MatDialogRef',
-      ['close'],
-    );
+    dialogRef = jasmine.createSpyObj<MatDialogRef<UnsavedChangesDialogComponent>>('MatDialogRef', [
+      'close',
+    ]);
     dialog = jasmine.createSpyObj<MatDialog>('MatDialog', ['open']);
     dialog.open.and.returnValue({ afterClosed: () => of(false) } as never);
 
@@ -47,7 +46,9 @@ describe('UnsavedChangesDialogComponent', () => {
   });
 
   it('returns false for keep editing and true for discard', () => {
-    const buttons = fixture.nativeElement.querySelectorAll('button') as NodeListOf<HTMLButtonElement>;
+    const buttons = fixture.nativeElement.querySelectorAll(
+      'button',
+    ) as NodeListOf<HTMLButtonElement>;
     buttons[1].click();
     expect(dialogRef.close).toHaveBeenCalledOnceWith(false);
 

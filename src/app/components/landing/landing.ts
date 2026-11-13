@@ -1,4 +1,13 @@
-import { Component, DestroyRef, ElementRef, effect, inject, OnInit, signal, ViewChild } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  ElementRef,
+  effect,
+  inject,
+  OnInit,
+  signal,
+  ViewChild,
+} from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatIconModule } from '@angular/material/icon';
 import { MatNativeDateModule } from '@angular/material/core';
@@ -19,7 +28,13 @@ import { LoadingComponent } from '../../shared/components/loading/loading.compon
 @Component({
   selector: 'app-landing',
   standalone: true,
-  imports: [AnnouncementsWidgetComponent, ActionsTableWrapper, LoadingComponent, MatIconModule, MatNativeDateModule],
+  imports: [
+    AnnouncementsWidgetComponent,
+    ActionsTableWrapper,
+    LoadingComponent,
+    MatIconModule,
+    MatNativeDateModule,
+  ],
   templateUrl: './landing.html',
   styleUrls: ['./landing.scss'],
 })
@@ -30,7 +45,9 @@ export class Landing implements OnInit {
   private readonly liveAnnouncer = inject(LiveAnnouncer);
   private readonly tableState = inject(AgTableStateService);
   readonly userName = inject(UserSettingsService).firstName;
-  readonly actionCount = toSignal(this.tableState.getRowData(), { initialValue: [] as ActionTableRow[] });
+  readonly actionCount = toSignal(this.tableState.getRowData(), {
+    initialValue: [] as ActionTableRow[],
+  });
   private highlightTimeout?: ReturnType<typeof setTimeout>;
   private pendingHighlightCleanup: { priority: PriorityFilter } | null = null;
   private pendingActionsFocus = false;
@@ -102,16 +119,18 @@ export class Landing implements OnInit {
       if (params.has('highlightActions')) {
         const cleanupRequest = { priority };
         this.pendingHighlightCleanup = cleanupRequest;
-        void this.router.navigate([], {
-          relativeTo: this.route,
-          queryParams: { highlightActions: null },
-          queryParamsHandling: 'merge',
-          replaceUrl: true,
-        }).then((navigated) => {
-          if (!navigated && this.pendingHighlightCleanup === cleanupRequest) {
-            this.pendingHighlightCleanup = null;
-          }
-        });
+        void this.router
+          .navigate([], {
+            relativeTo: this.route,
+            queryParams: { highlightActions: null },
+            queryParamsHandling: 'merge',
+            replaceUrl: true,
+          })
+          .then((navigated) => {
+            if (!navigated && this.pendingHighlightCleanup === cleanupRequest) {
+              this.pendingHighlightCleanup = null;
+            }
+          });
       }
     });
   }

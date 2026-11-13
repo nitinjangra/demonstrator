@@ -34,7 +34,8 @@ describe('StickyFooterComponent', () => {
     expect(getComputedStyle(footer).justifyContent).toBe('flex-end');
     expect(getComputedStyle(footer).borderTopStyle).toBe('solid');
 
-    const defaultFooter = fixture.nativeElement.querySelectorAll('app-sticky-footer')[1]
+    const defaultFooter = fixture.nativeElement
+      .querySelectorAll('app-sticky-footer')[1]
       .querySelector('footer') as HTMLElement;
     expect(getComputedStyle(defaultFooter).paddingTop).toBe('12.8px');
   });

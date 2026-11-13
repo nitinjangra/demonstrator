@@ -22,7 +22,12 @@
 </section>
 
 <app-sticky-footer [fixed]="true">
-  <button matButton="filled" type="button" [disabled]="!hasUnsavedChanges()" (click)="saveChanges()">
+  <button
+    matButton="filled"
+    type="button"
+    [disabled]="!hasUnsavedChanges()"
+    (click)="saveChanges()"
+  >
     Save changes
   </button>
 </app-sticky-footer>

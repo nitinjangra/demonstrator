@@ -54,10 +54,16 @@ describe('routes', () => {
         { provide: Router, useValue: router },
       ],
     });
-    const dashboardGuard = routes.find(({ path }) => path === 'dashboard')?.canMatch?.[1] as CanMatchFn;
-    const settingsGuard = routes.find(({ path }) => path === 'settings')?.canMatch?.[0] as CanMatchFn;
-    expect(TestBed.runInInjectionContext(() => dashboardGuard(null as never, [], {} as never))).toEqual({ redirect: true } as unknown as UrlTree);
-    expect(TestBed.runInInjectionContext(() => settingsGuard(null as never, [], {} as never))).toEqual({ redirect: true } as unknown as UrlTree);
+    const dashboardGuard = routes.find(({ path }) => path === 'dashboard')
+      ?.canMatch?.[1] as CanMatchFn;
+    const settingsGuard = routes.find(({ path }) => path === 'settings')
+      ?.canMatch?.[0] as CanMatchFn;
+    expect(
+      TestBed.runInInjectionContext(() => dashboardGuard(null as never, [], {} as never)),
+    ).toEqual({ redirect: true } as unknown as UrlTree);
+    expect(
+      TestBed.runInInjectionContext(() => settingsGuard(null as never, [], {} as never)),
+    ).toEqual({ redirect: true } as unknown as UrlTree);
     expect(router.createUrlTree).toHaveBeenCalledTimes(2);
   });
 
@@ -91,19 +97,28 @@ describe('routes', () => {
   });
 
   it('protects the mock driver with its feature toggle', () => {
-    const general = routes.find(({ path }) => path === 'settings')!.children!.find(({ path }) => path === 'general')!;
-    const guard = general.children!.find(({ path }) => path === 'mock-driver')!.canMatch![0] as CanMatchFn;
+    const general = routes
+      .find(({ path }) => path === 'settings')!
+      .children!.find(({ path }) => path === 'general')!;
+    const guard = general.children!.find(({ path }) => path === 'mock-driver')!
+      .canMatch![0] as CanMatchFn;
     const router = { createUrlTree: jasmine.createSpy().and.returnValue({ redirect: true }) };
-    TestBed.configureTestingModule({ providers: [
-      { provide: FeatureToggleService, useValue: { mockDriverEnabled: () => true } },
-      { provide: Router, useValue: router },
-    ] });
+    TestBed.configureTestingModule({
+      providers: [
+        { provide: FeatureToggleService, useValue: { mockDriverEnabled: () => true } },
+        { provide: Router, useValue: router },
+      ],
+    });
     expect(TestBed.runInInjectionContext(() => guard(null as never, [], {} as never))).toBeTrue();
     TestBed.resetTestingModule();
-    TestBed.configureTestingModule({ providers: [
-      { provide: FeatureToggleService, useValue: { mockDriverEnabled: () => false } },
-      { provide: Router, useValue: router },
-    ] });
-    expect(TestBed.runInInjectionContext(() => guard(null as never, [], {} as never))).toEqual({ redirect: true } as unknown as UrlTree);
+    TestBed.configureTestingModule({
+      providers: [
+        { provide: FeatureToggleService, useValue: { mockDriverEnabled: () => false } },
+        { provide: Router, useValue: router },
+      ],
+    });
+    expect(TestBed.runInInjectionContext(() => guard(null as never, [], {} as never))).toEqual({
+      redirect: true,
+    } as unknown as UrlTree);
   });
 });

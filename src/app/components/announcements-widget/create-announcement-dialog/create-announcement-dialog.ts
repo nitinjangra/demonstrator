@@ -17,7 +17,10 @@ import {
   httpUrlValidator,
   trimmedRequiredValidator,
 } from '../../../shared/validators/announcement.validators';
-import type { AnnouncementEditorData, CreateAnnouncementResult } from '../types/create-announcement.types';
+import type {
+  AnnouncementEditorData,
+  CreateAnnouncementResult,
+} from '../types/create-announcement.types';
 
 const ACCEPTED_ATTACHMENT_TYPES = '.jpg,.jpeg,.png,image/jpeg,image/png';
 
@@ -41,16 +44,21 @@ const ACCEPTED_ATTACHMENT_TYPES = '.jpg,.jpeg,.png,image/jpeg,image/png';
 export class CreateAnnouncementDialogComponent implements OnInit {
   private static readonly maxAttachmentSizeBytes = 2 * 1024 * 1024;
   readonly acceptedAttachmentTypes = ACCEPTED_ATTACHMENT_TYPES;
-  readonly minimumDate = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate());
+  readonly minimumDate = new Date(
+    new Date().getFullYear(),
+    new Date().getMonth(),
+    new Date().getDate(),
+  );
   private readonly formBuilder = inject(FormBuilder);
   private readonly destroyRef = inject(DestroyRef);
   private readonly unsavedChangesDialog = inject(UnsavedChangesDialogService);
   private readonly injectedData = inject<AnnouncementEditorData | null>(MAT_DIALOG_DATA, {
     optional: true,
   });
-  private readonly dialogRef = inject<
-    MatDialogRef<CreateAnnouncementDialogComponent, CreateAnnouncementResult> | null
-  >(MatDialogRef, { optional: true });
+  private readonly dialogRef = inject<MatDialogRef<
+    CreateAnnouncementDialogComponent,
+    CreateAnnouncementResult
+  > | null>(MatDialogRef, { optional: true });
 
   @Input() editorData: AnnouncementEditorData | null = null;
   @Output() saved = new EventEmitter<CreateAnnouncementResult>();
@@ -217,9 +225,11 @@ export class CreateAnnouncementDialogComponent implements OnInit {
     if (!this.isEditing || !existingDate) return false;
 
     const existing = new Date(existingDate);
-    return date.getFullYear() === existing.getFullYear()
-      && date.getMonth() === existing.getMonth()
-      && date.getDate() === existing.getDate();
+    return (
+      date.getFullYear() === existing.getFullYear() &&
+      date.getMonth() === existing.getMonth() &&
+      date.getDate() === existing.getDate()
+    );
   }
 
   private isAllowedImage(file: File): boolean {

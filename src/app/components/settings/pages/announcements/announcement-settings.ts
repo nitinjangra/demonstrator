@@ -48,8 +48,14 @@ interface DeleteAnnouncementDialogData {
     </mat-dialog-actions>
   `,
   styles: `
-    .announcement-title { margin-bottom: 0; font-weight: 600; overflow-wrap: anywhere; }
-    .mat-mdc-dialog-actions button { min-height: 2.75rem; }
+    .announcement-title {
+      margin-bottom: 0;
+      font-weight: 600;
+      overflow-wrap: anywhere;
+    }
+    .mat-mdc-dialog-actions button {
+      min-height: 2.75rem;
+    }
     .mat-mdc-dialog-actions button:focus-visible {
       outline: 2px solid var(--color-primary, #3f51b5);
       outline-offset: 2px;
@@ -87,7 +93,9 @@ export class AnnouncementSettings implements OnInit {
   set editorDrawer(drawer: ElementRef<HTMLElement> | undefined) {
     if (!drawer) return;
     queueMicrotask(() => {
-      drawer.nativeElement.querySelector<HTMLElement>('button, input, textarea, select, [tabindex]')?.focus();
+      drawer.nativeElement
+        .querySelector<HTMLElement>('button, input, textarea, select, [tabindex]')
+        ?.focus();
     });
   }
 
@@ -286,6 +294,7 @@ export class AnnouncementSettings implements OnInit {
   }
 
   private captureReturnFocus(): void {
-    this.returnFocusTo = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    this.returnFocusTo =
+      document.activeElement instanceof HTMLElement ? document.activeElement : null;
   }
 }
