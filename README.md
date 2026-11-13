@@ -2,105 +2,63 @@
 
 [![CI](https://github.com/nitinjangra/demonstrator/actions/workflows/ci.yml/badge.svg)](https://github.com/nitinjangra/demonstrator/actions/workflows/ci.yml)
 
-A simple Angular demonstration project with source code, styles, and tooling configured for development, testing, and linting.
+An Angular demo workspace for exploring an actions dashboard, announcements, configurable tables, and application settings. It uses sample data and browser-local preferences; it does not connect to a production API.
 
-## Project overview
+## Features
 
-- Angular version: 22.x
-- TypeScript version: 6.0.x
-- Build system: Angular CLI / `@angular/build`
-- Linting: ESLint
-- Formatting: Prettier
+- Landing page with announcements and an actions table.
+- Actions table implementations using Angular Material and AG Grid, with sorting and priority filtering.
+- Optional dashboard with action summaries and charts.
+- Settings for branding, theme, language, date and time, notifications, announcements, and feature toggles.
+- Mock data driver for previewing sample content.
+- Responsive layouts, accessible labels and status announcements, and right-to-left layout support.
 
-## Demo profiles and access controls
+## Demo security boundary
 
-This is a static demonstration app. The Admin, Standard user, and Invited user profiles are simulated in browser storage so the interface can demonstrate role-aware navigation. Route guards and feature toggles improve the demo experience; they are not security controls. Do not use them to protect real data or operations. A production deployment must enforce identity, tenant scope, and permissions on a trusted server.
+User profiles and role-aware navigation are simulated in browser storage. Route guards and feature toggles only shape the demo interface; they do not authorize access to protected data or operations. The app has no backend or real authentication. Do not use it to handle sensitive data or as an authorization boundary. A production service needs trusted identity and server-side authorization for every protected operation.
 
-The mock data driver edits sample data in memory for its preview only. Applying a draft does not update the application data sources or persist the draft.
+## Requirements
 
-## Prerequisites
-
-- Node.js 22.22.3+ and npm 10+
+- Node.js 22.22.3 (the version used by CI)
+- npm 10.9.3 (the version declared by `packageManager`)
 - Git
 
-## Setup
+## Getting started
 
 ```bash
-npm install
-```
-
-## Continuous integration
-
-Run the reusable CI script locally as:
-
-```bash
-npm run ci
-```
-
-## Development
-
-Run the local development server:
-
-```bash
+npm ci
 npm start
 ```
 
-Then open the app in your browser at:
+Open [http://localhost:4200](http://localhost:4200).
 
-```text
-http://localhost:4200
-```
+## Common commands
 
-## Build
+| Command                | Purpose                                                                                                        |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `npm start`            | Run the development server.                                                                                    |
+| `npm run build`        | Create an optimized production build in `dist/demonstrator/browser`.                                           |
+| `npm test`             | Run unit tests with Karma.                                                                                     |
+| `npm run lint`         | Lint the repository with ESLint.                                                                               |
+| `npm run format`       | Format supported files with Prettier.                                                                          |
+| `npm run format:check` | Check formatting without changing files.                                                                       |
+| `npm run ci`           | Audit dependencies, lint, check formatting, run unit tests with coverage thresholds, and build for production. |
 
-Build the application for production:
+Git commits run ESLint and Prettier on staged source files through Husky and lint-staged.
 
-```bash
-npm run build
-```
+## Deployment
 
-## Tests
+The GitHub Pages workflow builds and deploys the static app from `master`. The production build uses `/demonstrator/` as its base path. The workflow can also be started manually from GitHub Actions.
 
-Run unit tests with Karma:
+## Project layout
 
-```bash
-npm test
-```
-
-## Linting
-
-Check TypeScript and Angular source files:
-
-```bash
-npm run lint
-```
-
-## Continuous integration
-
-This repository includes a GitHub Actions workflow at `.github/workflows/ci.yml`.
-The CI job runs on `push` and `pull_request` for the `development` branch and executes:
-
-- `npm ci`
-- `npm run lint`
-- `npm test -- --watch=false --browsers=ChromeHeadless`
-
-## Repository structure
-
-- `src/` — application source files
-- `src/app/` — Angular app components, routes, services, and shared modules
-- `src/assets/` — static asset files
-- `src/styles.scss` — global styles
-- `angular.json` — Angular workspace and build configuration
-- `.eslintrc.json` — ESLint configuration
-- `.prettierrc` — Prettier formatting rules
-
-## Contributing
-
-1. Fork the repository
-2. Create a branch for your feature or fix
-3. Install dependencies and run tests locally
-4. Submit a pull request with a clear description of your changes
+- `src/app/components/` — landing page, dashboard, actions tables, announcements, and settings.
+- `src/app/shared/` — shared components, services, types, mock data, and styles.
+- `src/styles.scss` — global styles.
+- `public/` — static files copied to the build output.
+- `ARCHITECTURE.md` — current app boundaries and data flow.
+- `CHANGELOG.md` — release history.
 
 ## License
 
-This repository is licensed under the GNU General Public License v3. See `LICENSE` for details.
+GNU General Public License v3. See [LICENSE](./LICENSE).
