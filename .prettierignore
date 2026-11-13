@@ -1,0 +1,11 @@
+# Dependencies and generated output
+node_modules/
+dist/
+coverage/
+out-tsc/
+.angular/
+.vscode/
+.mcp.json
+
+# Lockfiles and generated assets
+package-lock.json
