@@ -42,7 +42,10 @@ class RemoveBrandImageDialog {}
   template: `
     <section aria-labelledby="branding-title">
       <h2 id="branding-title">Header branding</h2>
-      <p>Choose what appears beside the home icon in the application header. Visible to everyone in your organization.</p>
+      <p>
+        Choose what appears beside the home icon in the application header. Visible to everyone in
+        your organization.
+      </p>
 
       <div class="branding-card">
         <div class="branding-card-header">
@@ -100,7 +103,11 @@ class RemoveBrandImageDialog {}
                   (drop)="onLogoDrop($event)"
                 >
                   @if (draftLogo()) {
-                    <img [src]="draftLogo()" [alt]="draftAltText() || 'Brand image preview'" (load)="captureLogoDimensions($event)" />
+                    <img
+                      [src]="draftLogo()"
+                      [alt]="draftAltText() || 'Brand image preview'"
+                      (load)="captureLogoDimensions($event)"
+                    />
                   } @else {
                     <span>Drop image here</span>
                   }
@@ -109,7 +116,9 @@ class RemoveBrandImageDialog {}
                   @if (draftLogoName()) {
                     <p class="file-details">
                       <strong>{{ draftLogoName() }}</strong> · {{ formatFileSize(draftLogoSize()) }}
-                      @if (logoDimensions()) { · {{ logoDimensions() }} }
+                      @if (logoDimensions()) {
+                        · {{ logoDimensions() }}
+                      }
                     </p>
                   } @else {
                     <p class="file-details">No image selected</p>
@@ -141,13 +150,15 @@ class RemoveBrandImageDialog {}
                 </div>
               </div>
               <p id="brand-logo-help" class="upload-help">
-                PNG or JPEG, up to 500 KB. Square marks work best; wide logos are scaled to 32 px tall.
-                Transparent backgrounds are supported. Drag an image onto the preview to replace it.
+                PNG or JPEG, up to 500 KB. Square marks work best; wide logos are scaled to 32 px
+                tall. Transparent backgrounds are supported. Drag an image onto the preview to
+                replace it.
               </p>
               @if (hasFineDetailsWarning()) {
                 <p class="image-quality-warning" role="status">
                   <mat-icon aria-hidden="true">warning</mat-icon>
-                  Fine detail or small text in this image may be hard to read at header size. Check the previews below.
+                  Fine detail or small text in this image may be hard to read at header size. Check
+                  the previews below.
                 </p>
               }
               @if (isProcessing()) {
@@ -170,10 +181,15 @@ class RemoveBrandImageDialog {}
                   aria-describedby="brand-alt-help brand-alt-error"
                   (input)="setDraftAltText($any($event.target).value)"
                 />
-                <mat-hint id="brand-alt-help">Describe the logo for screen readers, usually your organization name. Shown if the image fails to load.</mat-hint>
+                <mat-hint id="brand-alt-help"
+                  >Describe the logo for screen readers, usually your organization name. Shown if
+                  the image fails to load.</mat-hint
+                >
               </mat-form-field>
               @if (draftLogo() && !isAltTextValid()) {
-                <p class="brand-name-error" id="brand-alt-error" role="alert">Image alt text is required.</p>
+                <p class="brand-name-error" id="brand-alt-error" role="alert">
+                  Image alt text is required.
+                </p>
               }
               <div class="preview-heading">
                 <h3 class="card-section-title">Preview</h3>
@@ -181,7 +197,10 @@ class RemoveBrandImageDialog {}
               </div>
               <div class="logo-previews" aria-label="Header image preview in light and dark themes">
                 <div class="theme-preview">
-                  <div class="header-preview header-preview--light" aria-label="Light theme preview">
+                  <div
+                    class="header-preview header-preview--light"
+                    aria-label="Light theme preview"
+                  >
                     <mat-icon aria-hidden="true">home</mat-icon>
                     @if (draftLogo()) {
                       <img [src]="draftLogo()" [alt]="draftAltText() || draftBrandName()" />
@@ -209,7 +228,13 @@ class RemoveBrandImageDialog {}
       </div>
     </section>
     <app-sticky-footer [fixed]="true" [customStyles]="stickyFooterStyles">
-      <div class="branding-footer-status" [attr.data-state]="saveState()" role="status" aria-live="polite" aria-atomic="true">
+      <div
+        class="branding-footer-status"
+        [attr.data-state]="saveState()"
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+      >
         @switch (saveState()) {
           @case ('dirty') {
             <mat-icon aria-hidden="true">edit</mat-icon>
@@ -312,7 +337,10 @@ class RemoveBrandImageDialog {}
       gap: 1rem;
       margin-top: 1.25rem;
     }
-    .logo-controls { display: grid; gap: 0.75rem; }
+    .logo-controls {
+      display: grid;
+      gap: 0.75rem;
+    }
     .logo-previews {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -331,7 +359,10 @@ class RemoveBrandImageDialog {}
       gap: 1rem;
       margin-top: 0.5rem;
     }
-    .preview-heading > span { color: var(--color-muted-text); font-size: 0.8rem; }
+    .preview-heading > span {
+      color: var(--color-muted-text);
+      font-size: 0.8rem;
+    }
     .header-preview {
       display: flex;
       align-items: center;
@@ -369,8 +400,14 @@ class RemoveBrandImageDialog {}
       align-items: center;
       gap: 1rem;
     }
-    .logo-file-details { display: grid; min-width: 0; gap: 0.75rem; }
-    .logo-file-details .file-details { overflow-wrap: anywhere; }
+    .logo-file-details {
+      display: grid;
+      min-width: 0;
+      gap: 0.75rem;
+    }
+    .logo-file-details .file-details {
+      overflow-wrap: anywhere;
+    }
     .logo-preview-tile {
       display: grid;
       flex: 0 0 6rem;
@@ -381,7 +418,12 @@ class RemoveBrandImageDialog {}
       border: 1px solid var(--color-border);
       border-radius: 0.5rem;
       background-color: #1c2538;
-      background-image: conic-gradient(#26324a 25%, transparent 0 50%, #26324a 0 75%, transparent 0);
+      background-image: conic-gradient(
+        #26324a 25%,
+        transparent 0 50%,
+        #26324a 0 75%,
+        transparent 0
+      );
       background-size: 1rem 1rem;
       cursor: copy;
     }
@@ -444,7 +486,9 @@ class RemoveBrandImageDialog {}
       color: #f0d27a;
       font-size: 0.875rem;
     }
-    .image-quality-warning mat-icon { flex: 0 0 auto; }
+    .image-quality-warning mat-icon {
+      flex: 0 0 auto;
+    }
     .logo-error {
       margin: 0;
       color: var(--color-error);
@@ -465,9 +509,15 @@ class RemoveBrandImageDialog {}
       color: var(--color-text);
       font-size: 0.875rem;
     }
-    .branding-footer-status[data-state='error'] { color: var(--color-error); }
-    .branding-footer-status[data-state='saved'] { color: var(--color-success, #2e7d32); }
-    .branding-footer-status mat-icon { flex: 0 0 auto; }
+    .branding-footer-status[data-state='error'] {
+      color: var(--color-error);
+    }
+    .branding-footer-status[data-state='saved'] {
+      color: var(--color-success, #2e7d32);
+    }
+    .branding-footer-status mat-icon {
+      flex: 0 0 auto;
+    }
     .save-spinner {
       box-sizing: border-box;
       width: 1rem;
@@ -477,13 +527,25 @@ class RemoveBrandImageDialog {}
       border-radius: 50%;
       animation: branding-spin 0.75s linear infinite;
     }
-    .branding-save-button { min-width: 9rem; }
-    .branding-save-button-content { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; }
+    .branding-save-button {
+      min-width: 9rem;
+    }
+    .branding-save-button-content {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
     @keyframes branding-spin {
-      to { transform: rotate(360deg); }
+      to {
+        transform: rotate(360deg);
+      }
     }
     @media (prefers-reduced-motion: reduce) {
-      .save-spinner { animation: none; border-right-color: currentColor; }
+      .save-spinner {
+        animation: none;
+        border-right-color: currentColor;
+      }
     }
     .visually-hidden {
       position: absolute;
@@ -564,7 +626,8 @@ export class Branding {
     () =>
       (this.hasUnsavedChanges() || this.saveState() === 'error') &&
       this.isBrandNameValid() &&
-      !this.isProcessing() && this.saveState() !== 'saving' &&
+      !this.isProcessing() &&
+      this.saveState() !== 'saving' &&
       (this.draftMode() === 'label' || (!!this.draftLogo() && this.isAltTextValid())),
   );
 

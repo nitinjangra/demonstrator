@@ -15,7 +15,10 @@ mat-form-field {
   }
 }
 
-:host { display: block; min-width: 0; }
+:host {
+  display: block;
+  min-width: 0;
+}
 
 .announcement-form-title {
   display: flex;
@@ -76,7 +79,11 @@ mat-form-field {
   padding: 1rem 1.5rem 0.5rem;
 }
 
-mat-form-field { display: block; width: 100%; min-width: 0; }
+mat-form-field {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
 
 mat-dialog-content:not(.announcement-form-content--embedded) {
   max-height: min(65dvh, calc(100dvh - 13rem));

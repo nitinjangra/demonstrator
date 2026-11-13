@@ -7,7 +7,9 @@ describe('PrioritySummaryComponent', () => {
   let fixture: ComponentFixture<PrioritySummaryComponent>;
 
   beforeEach(async () => {
-    await TestBed.configureTestingModule({ imports: [PrioritySummaryComponent] }).compileComponents();
+    await TestBed.configureTestingModule({
+      imports: [PrioritySummaryComponent],
+    }).compileComponents();
     fixture = TestBed.createComponent(PrioritySummaryComponent);
     fixture.componentRef.setInput('rowData', actionRowsForTests);
     fixture.detectChanges();
@@ -27,12 +29,16 @@ describe('PrioritySummaryComponent', () => {
         `.priority-filter--${className} .priority-count`,
       ) as HTMLButtonElement;
       expect(button.querySelector('.priority-count-number')?.textContent).toBe(count);
-      expect(button.querySelector('.priority-count-label span:last-child')?.textContent).toBe(label);
+      expect(button.querySelector('.priority-count-label span:last-child')?.textContent).toBe(
+        label,
+      );
     }
   });
 
   it('places each count before the priority icon and label', () => {
-    const highBadge = fixture.nativeElement.querySelector('.priority-filter--high .priority-count') as HTMLButtonElement;
+    const highBadge = fixture.nativeElement.querySelector(
+      '.priority-filter--high .priority-count',
+    ) as HTMLButtonElement;
     const count = highBadge.querySelector('.priority-count-number');
     const label = highBadge.querySelector('.priority-count-label');
 
@@ -76,9 +82,11 @@ describe('PrioritySummaryComponent', () => {
     fixture.componentRef.setInput('routeAppliedPriority', Priority.Medium);
     fixture.detectChanges();
 
-    expect(fixture.nativeElement.querySelector('.priority-filter--medium')?.classList)
-      .toContain('is-route-highlight');
-    expect(fixture.nativeElement.querySelector('.priority-filter--high')?.classList)
-      .not.toContain('is-route-highlight');
+    expect(fixture.nativeElement.querySelector('.priority-filter--medium')?.classList).toContain(
+      'is-route-highlight',
+    );
+    expect(fixture.nativeElement.querySelector('.priority-filter--high')?.classList).not.toContain(
+      'is-route-highlight',
+    );
   });
 });

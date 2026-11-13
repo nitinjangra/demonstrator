@@ -36,7 +36,8 @@ export function relativeDueLabel(
   const daysUntilDue = daysUntilActionDue(value, now);
   if (daysUntilDue === null) return null;
   if (locale.startsWith('ar')) {
-    if (daysUntilDue < 0) return `متأخر ${Math.abs(daysUntilDue)} ${Math.abs(daysUntilDue) === 1 ? 'يوم' : 'أيام'}`;
+    if (daysUntilDue < 0)
+      return `متأخر ${Math.abs(daysUntilDue)} ${Math.abs(daysUntilDue) === 1 ? 'يوم' : 'أيام'}`;
     if (daysUntilDue === 0) return 'مستحق اليوم';
     if (daysUntilDue <= 7) return `خلال ${daysUntilDue} ${daysUntilDue === 1 ? 'يوم' : 'أيام'}`;
     return null;
@@ -50,7 +51,11 @@ export function relativeDueLabel(
   return null;
 }
 
-export function compareActionUrgency(left: ActionTableRow, right: ActionTableRow, now = new Date()): number {
+export function compareActionUrgency(
+  left: ActionTableRow,
+  right: ActionTableRow,
+  now = new Date(),
+): number {
   const leftDueOffset = daysUntilActionDue(left.dueDate, now);
   const rightDueOffset = daysUntilActionDue(right.dueDate, now);
   const leftOverdue = leftDueOffset !== null && leftDueOffset < 0;
@@ -59,10 +64,14 @@ export function compareActionUrgency(left: ActionTableRow, right: ActionTableRow
 
   const priorityOrder = (priority: Priority | undefined): number => {
     switch (priority) {
-      case Priority.High: return 0;
-      case Priority.Medium: return 1;
-      case Priority.Low: return 2;
-      default: return 3;
+      case Priority.High:
+        return 0;
+      case Priority.Medium:
+        return 1;
+      case Priority.Low:
+        return 2;
+      default:
+        return 3;
     }
   };
   const priorityDifference = priorityOrder(left.priority) - priorityOrder(right.priority);

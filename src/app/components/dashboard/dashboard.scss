@@ -13,8 +13,14 @@
   gap: 1rem;
   margin-bottom: 1.5rem;
 
-  h1 { margin: 0; font-size: clamp(1.5rem, 2.5vw, 1.9rem); }
-  p { margin: 0.5rem 0 0; color: var(--color-muted-text); }
+  h1 {
+    margin: 0;
+    font-size: clamp(1.5rem, 2.5vw, 1.9rem);
+  }
+  p {
+    margin: 0.5rem 0 0;
+    color: var(--color-muted-text);
+  }
 }
 
 .dashboard__summary {
@@ -37,7 +43,9 @@
   gap: 0.5rem;
   padding: 1rem;
 
-  strong { font-size: 1.75rem; }
+  strong {
+    font-size: 1.75rem;
+  }
 }
 
 .summary-card--link {
@@ -55,7 +63,10 @@
   outline-offset: 3px;
 }
 
-.summary-card__label { color: var(--color-muted-text); font-size: 0.9rem; }
+.summary-card__label {
+  color: var(--color-muted-text);
+  font-size: 0.9rem;
+}
 
 .dashboard__charts {
   display: grid;
@@ -67,10 +78,19 @@
   min-width: 0;
   padding: 1rem;
 
-  h2 { display: flex; min-height: 2.75rem; align-items: center; margin: 0 0 0.75rem; font-size: 1.05rem; }
+  h2 {
+    display: flex;
+    min-height: 2.75rem;
+    align-items: center;
+    margin: 0 0 0.75rem;
+    font-size: 1.05rem;
+  }
 }
 
-.chart-card__canvas { position: relative; height: 18rem; }
+.chart-card__canvas {
+  position: relative;
+  height: 18rem;
+}
 
 .dashboard__empty-state {
   grid-column: 1 / -1;
@@ -80,9 +100,18 @@
   background: var(--color-surface);
   text-align: center;
 
-  h2 { margin: 0 0 0.5rem; font-size: 1.1rem; }
-  p { margin: 0 0 1rem; color: var(--color-muted-text); }
-  a { color: var(--color-primary); text-underline-offset: 0.15em; }
+  h2 {
+    margin: 0 0 0.5rem;
+    font-size: 1.1rem;
+  }
+  p {
+    margin: 0 0 1rem;
+    color: var(--color-muted-text);
+  }
+  a {
+    color: var(--color-primary);
+    text-underline-offset: 0.15em;
+  }
 }
 
 .visually-hidden {
@@ -98,7 +127,14 @@
 }
 
 @media (max-width: 760px) {
-  .dashboard__header { align-items: flex-start; flex-direction: column; }
-  .dashboard__summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .dashboard__charts { grid-template-columns: 1fr; }
+  .dashboard__header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .dashboard__summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .dashboard__charts {
+    grid-template-columns: 1fr;
+  }
 }

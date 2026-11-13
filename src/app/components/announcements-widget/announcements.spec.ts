@@ -17,7 +17,10 @@ describe('AnnouncementsWidgetComponent', () => {
     announcementsActionServiceSpy = jasmine.createSpyObj<AnnouncementsActionService>(
       'announcementsActionService',
       ['getAnnouncements', 'handleAnnouncementClick', 'loadAnnouncements'],
-      { loadStatus: signal<'loading' | 'loaded' | 'refreshing' | 'error'>('loaded'), canAddAnnouncement: false },
+      {
+        loadStatus: signal<'loading' | 'loaded' | 'refreshing' | 'error'>('loaded'),
+        canAddAnnouncement: false,
+      },
     );
 
     await TestBed.configureTestingModule({
@@ -88,8 +91,7 @@ describe('AnnouncementsWidgetComponent', () => {
     await fixture.whenStable();
 
     expect(fixture.nativeElement.querySelector('.announcements-empty-state')).toBeNull();
-    expect(fixture.nativeElement.querySelectorAll('.announcements-list-item').length)
-      .toBe(1);
+    expect(fixture.nativeElement.querySelectorAll('.announcements-list-item').length).toBe(1);
   });
 
   describe('ngOnInit', () => {
@@ -145,9 +147,7 @@ describe('AnnouncementsWidgetComponent', () => {
     fixture.detectChanges();
     await fixture.whenStable();
 
-    const button = fixture.nativeElement.querySelector(
-      '.announcement-expand',
-    ) as HTMLButtonElement;
+    const button = fixture.nativeElement.querySelector('.announcement-expand') as HTMLButtonElement;
     const descriptionId = button.getAttribute('aria-controls');
 
     expect(button.textContent.trim()).toBe('Show more');
@@ -205,9 +205,7 @@ describe('AnnouncementsWidgetComponent', () => {
     fixture.detectChanges();
 
     const host = fixture.nativeElement as HTMLElement;
-    const description = host.querySelector(
-      '.announcement-content',
-    ) as HTMLParagraphElement;
+    const description = host.querySelector('.announcement-content') as HTMLParagraphElement;
     Object.defineProperties(description, {
       scrollHeight: { configurable: true, value: 100 },
       clientHeight: { configurable: true, value: 80 },
@@ -240,9 +238,7 @@ describe('AnnouncementsWidgetComponent', () => {
     fixture.detectChanges();
 
     const host = fixture.nativeElement as HTMLElement;
-    const description = host.querySelector(
-      '.announcement-content',
-    ) as HTMLParagraphElement;
+    const description = host.querySelector('.announcement-content') as HTMLParagraphElement;
     Object.defineProperties(description, {
       scrollHeight: { configurable: true, value: 40 },
       clientHeight: { configurable: true, value: 40 },
@@ -256,7 +252,9 @@ describe('AnnouncementsWidgetComponent', () => {
   it('should render the heading above and outside the announcement panel', () => {
     fixture.detectChanges();
 
-    const heading = fixture.nativeElement.querySelector('.announcements-title') as HTMLHeadingElement;
+    const heading = fixture.nativeElement.querySelector(
+      '.announcements-title',
+    ) as HTMLHeadingElement;
     const panel = fixture.nativeElement.querySelector('.announcements-panel') as HTMLElement;
 
     expect(heading.tagName).toBe('H2');

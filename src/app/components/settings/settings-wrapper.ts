@@ -9,12 +9,24 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs';
 import { FeatureToggleService } from '../../shared/services/feature-toggle.service';
-import { UnsavedChangesDialogService, type CanDeactivatePage } from '../../shared/components/unsaved-changes-dialog/unsaved-changes-dialog.component';
+import {
+  UnsavedChangesDialogService,
+  type CanDeactivatePage,
+} from '../../shared/components/unsaved-changes-dialog/unsaved-changes-dialog.component';
 
 @Component({
   selector: 'app-settings-wrapper',
   standalone: true,
-  imports: [MatButtonModule, MatIconModule, MatListModule, MatSidenavModule, MatTooltipModule, RouterLink, RouterLinkActive, RouterOutlet],
+  imports: [
+    MatButtonModule,
+    MatIconModule,
+    MatListModule,
+    MatSidenavModule,
+    MatTooltipModule,
+    RouterLink,
+    RouterLinkActive,
+    RouterOutlet,
+  ],
   templateUrl: './settings-wrapper.html',
   styleUrl: './settings-wrapper.scss',
 })
@@ -42,7 +54,8 @@ export class SettingsWrapper {
   }
 
   private getCurrentPage(): string {
-    const page = this.router.url.split(/[?#]/, 1)[0].split('/').filter(Boolean).at(-1) ?? 'overview';
+    const page =
+      this.router.url.split(/[?#]/, 1)[0].split('/').filter(Boolean).at(-1) ?? 'overview';
     const pageLabels: Record<string, string> = {
       announcements: 'Announcement settings',
       branding: 'Branding',

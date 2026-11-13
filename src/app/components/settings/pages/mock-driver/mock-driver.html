@@ -5,13 +5,20 @@
 >
   <header class="mock-driver-header">
     <h2 id="mock-driver-title">Mock data driver</h2>
-    <p>Pick a component, choose a scenario, then apply it to preview how the app behaves with that data.</p>
+    <p>
+      Pick a component, choose a scenario, then apply it to preview how the app behaves with that
+      data.
+    </p>
   </header>
 
   <div class="driver-toolbar">
     <label class="component-picker" for="mock-driver-component">
       <span>Component</span>
-      <select id="mock-driver-component" [value]="selectedComponent() ?? ''" (change)="selectComponent($event)">
+      <select
+        id="mock-driver-component"
+        [value]="selectedComponent() ?? ''"
+        (change)="selectComponent($event)"
+      >
         <option value="">Choose a component</option>
         <option value="actions-table">Actions table</option>
         <option value="announcement-widget">Announcement widget</option>
@@ -29,7 +36,9 @@
         <option value="empty">Empty</option>
         <option value="many">Many (50)</option>
         <option value="long-text">Long text</option>
-        @if (selectedComponent() === 'announcement-widget') { <option value="mixed-statuses">Mixed statuses</option> }
+        @if (selectedComponent() === 'announcement-widget') {
+          <option value="mixed-statuses">Mixed statuses</option>
+        }
         <option value="error">Error</option>
         <option value="loading">Loading</option>
       </select>
@@ -41,7 +50,9 @@
         } @else {
           <mat-icon aria-hidden="true">check_circle</mat-icon>
           Applied: {{ scenarioLabel(selectedScenario()) }}
-          @if (appliedAt(); as applied) { &middot; {{ applied | date:'shortTime' }} }
+          @if (appliedAt(); as applied) {
+            &middot; {{ applied | date: 'shortTime' }}
+          }
         }
       </p>
     }
@@ -53,12 +64,29 @@
         <div class="pane-heading">
           <div>
             <h3 id="mock-preview-title">Preview</h3>
-            <p>{{ isDirty ? 'Showing the unapplied draft.' : 'Matches the applied preview data.' }} Live app data is never changed here.</p>
+            <p>
+              {{ isDirty ? 'Showing the unapplied draft.' : 'Matches the applied preview data.' }}
+              Live app data is never changed here.
+            </p>
           </div>
           @if (component === 'announcement-widget') {
             <div class="preview-role-toggle" role="group" aria-label="Preview role">
-              <button type="button" [class.is-active]="previewRole() === 'admin'" [attr.aria-pressed]="previewRole() === 'admin'" (click)="setPreviewRole('admin')">Admin</button>
-              <button type="button" [class.is-active]="previewRole() === 'user'" [attr.aria-pressed]="previewRole() === 'user'" (click)="setPreviewRole('user')">User</button>
+              <button
+                type="button"
+                [class.is-active]="previewRole() === 'admin'"
+                [attr.aria-pressed]="previewRole() === 'admin'"
+                (click)="setPreviewRole('admin')"
+              >
+                Admin
+              </button>
+              <button
+                type="button"
+                [class.is-active]="previewRole() === 'user'"
+                [attr.aria-pressed]="previewRole() === 'user'"
+                (click)="setPreviewRole('user')"
+              >
+                User
+              </button>
             </div>
           }
         </div>
@@ -85,7 +113,12 @@
             <div class="table-preview-wrap">
               <table class="table-preview">
                 <thead>
-                  <tr><th scope="col">ID</th><th scope="col">Entity name</th><th scope="col">Due date</th><th scope="col">Priority</th></tr>
+                  <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">Entity name</th>
+                    <th scope="col">Due date</th>
+                    <th scope="col">Priority</th>
+                  </tr>
                 </thead>
                 <tbody>
                   @for (row of actionRows().slice(0, 5); track row.id) {
@@ -122,17 +155,24 @@
         <div class="editor-toolbar">
           <div>
             <h3 id="mock-editor-title">Mock data</h3>
-            <p class="applied-state">Valid JSON &middot; {{ itemCount() ?? 0 }} {{ component === 'actions-table' ? 'actions' : 'announcements' }}</p>
+            <p class="applied-state">
+              Valid JSON &middot; {{ itemCount() ?? 0 }}
+              {{ component === 'actions-table' ? 'actions' : 'announcements' }}
+            </p>
             @if (component === 'announcement-widget' && itemCount() !== null) {
               <p class="status-counts">
-                Published {{ announcementStatusCounts().Published }} &middot; Scheduled {{ announcementStatusCounts().Scheduled }} &middot;
-                Draft {{ announcementStatusCounts().Draft }} &middot; Expired {{ announcementStatusCounts().Expired }}
+                Published {{ announcementStatusCounts().Published }} &middot; Scheduled
+                {{ announcementStatusCounts().Scheduled }} &middot; Draft
+                {{ announcementStatusCounts().Draft }} &middot; Expired
+                {{ announcementStatusCounts().Expired }}
               </p>
             }
           </div>
         </div>
 
-        <label class="visually-hidden" for="mock-data-payload">{{ component === 'actions-table' ? 'Action rows' : 'Announcements' }} JSON</label>
+        <label class="visually-hidden" for="mock-data-payload"
+          >{{ component === 'actions-table' ? 'Action rows' : 'Announcements' }} JSON</label
+        >
         <textarea
           id="mock-data-payload"
           spellcheck="false"
@@ -140,19 +180,35 @@
           aria-label="Mock data JSON"
           [value]="payload()"
           [attr.aria-invalid]="validationError() ? 'true' : null"
-          [attr.aria-describedby]="validationError() ? 'mock-driver-help mock-driver-error' : 'mock-driver-help'"
+          [attr.aria-describedby]="
+            validationError() ? 'mock-driver-help mock-driver-error' : 'mock-driver-help'
+          "
           (input)="onPayloadInput($event)"
         ></textarea>
-        <p id="mock-driver-help" class="mock-driver-help">Edit the JSON draft, then apply to refresh this preview. Live app data is not changed.</p>
+        <p id="mock-driver-help" class="mock-driver-help">
+          Edit the JSON draft, then apply to refresh this preview. Live app data is not changed.
+        </p>
 
         <details class="data-shape">
           <summary>Data shape</summary>
           @if (component === 'actions-table') {
-            <p><code>id</code> number &middot; <code>entityName</code> string &middot; <code>entityId</code> string</p>
-            <p><code>dueDate</code> ISO date or null &middot; <code>priority</code> High, Medium, Low, optional</p>
+            <p>
+              <code>id</code> number &middot; <code>entityName</code> string &middot;
+              <code>entityId</code> string
+            </p>
+            <p>
+              <code>dueDate</code> ISO date or null &middot; <code>priority</code> High, Medium,
+              Low, optional
+            </p>
           } @else {
-            <p><code>id</code> string &middot; <code>title</code> string &middot; <code>status</code> Published, Scheduled, Draft, Expired</p>
-            <p>Optional: <code>description</code>, <code>linkUrl</code>, <code>startDate</code>, <code>endDate</code>, image and attachment fields</p>
+            <p>
+              <code>id</code> string &middot; <code>title</code> string &middot;
+              <code>status</code> Published, Scheduled, Draft, Expired
+            </p>
+            <p>
+              Optional: <code>description</code>, <code>linkUrl</code>, <code>startDate</code>,
+              <code>endDate</code>, image and attachment fields
+            </p>
           }
         </details>
 
@@ -166,10 +222,17 @@
       <div class="mock-driver-status-row">
         <p class="mock-driver-status" role="status" aria-live="polite">{{ statusMessage() }}</p>
         @if (statusMessage().startsWith('Applied')) {
-          <a class="open-home-link" matButton="text" routerLink="/landing">Open home page <mat-icon aria-hidden="true">arrow_forward</mat-icon></a>
+          <a class="open-home-link" matButton="text" routerLink="/landing"
+            >Open home page <mat-icon aria-hidden="true">arrow_forward</mat-icon></a
+          >
         }
       </div>
-      <button matButton="filled" type="button" [disabled]="validationError() !== null || !isDirty" (click)="applyPayload()">
+      <button
+        matButton="filled"
+        type="button"
+        [disabled]="validationError() !== null || !isDirty"
+        (click)="applyPayload()"
+      >
         Apply mock data
       </button>
       <button matButton="outlined" type="button" (click)="resetToDefault()">

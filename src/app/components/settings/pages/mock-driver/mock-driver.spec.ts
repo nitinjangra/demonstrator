@@ -17,12 +17,26 @@ describe('MockDriver', () => {
   let unsavedChanges: jasmine.SpyObj<UnsavedChangesDialogService>;
 
   beforeEach(async () => {
-    mockData = jasmine.createSpyObj<MockActionDataService>('MockActionDataService', ['getRows', 'saveRows']);
+    mockData = jasmine.createSpyObj<MockActionDataService>('MockActionDataService', [
+      'getRows',
+      'saveRows',
+    ]);
     mockData.getRows.and.returnValue(mockTableData);
-    tableState = jasmine.createSpyObj<AgTableStateService>('AgTableStateService', ['getRowData', 'setRowData']);
-    announcements = jasmine.createSpyObj<AnnouncementsActionService>('AnnouncementsActionService', [
-      'getAnnouncements', 'getAllAnnouncements', 'saveAnnouncements', 'addAnnouncement', 'handleAnnouncementClick',
-    ], { canAddAnnouncement: true });
+    tableState = jasmine.createSpyObj<AgTableStateService>('AgTableStateService', [
+      'getRowData',
+      'setRowData',
+    ]);
+    announcements = jasmine.createSpyObj<AnnouncementsActionService>(
+      'AnnouncementsActionService',
+      [
+        'getAnnouncements',
+        'getAllAnnouncements',
+        'saveAnnouncements',
+        'addAnnouncement',
+        'handleAnnouncementClick',
+      ],
+      { canAddAnnouncement: true },
+    );
     announcements.getAllAnnouncements.and.returnValue(of(mockDriverAnnouncements));
     unsavedChanges = jasmine.createSpyObj<UnsavedChangesDialogService>(
       'UnsavedChangesDialogService',
@@ -54,7 +68,11 @@ describe('MockDriver', () => {
     const component = fixture.componentInstance;
     component.selectComponent({ target: { value: 'actions-table' } } as unknown as Event);
     component.onPayloadInput({
-      target: { value: JSON.stringify([{ id: 1, entityName: 'Preview only', entityId: 'preview', dueDate: null }]) },
+      target: {
+        value: JSON.stringify([
+          { id: 1, entityName: 'Preview only', entityId: 'preview', dueDate: null },
+        ]),
+      },
     } as unknown as Event);
     component.applyPayload();
 
@@ -125,8 +143,9 @@ describe('MockDriver', () => {
     expect(component.announcementItems().length).toBeGreaterThan(0);
     expect(component.announcementStatusCounts().Published).toBeGreaterThan(0);
     fixture.detectChanges();
-    expect(fixture.nativeElement.querySelectorAll('.announcements-list-item').length)
-      .toBe(component.announcementStatusCounts().Published);
+    expect(fixture.nativeElement.querySelectorAll('.announcements-list-item').length).toBe(
+      component.announcementStatusCounts().Published,
+    );
 
     component.selectComponent({ target: { value: 'unknown' } } as unknown as Event);
     expect(component.selectedComponent()).toBeNull();
@@ -138,7 +157,8 @@ describe('MockDriver', () => {
     const component = fixture.componentInstance;
     const confirm = spyOn(window, 'confirm').and.returnValue(true);
     component.selectedComponent.set('actions-table');
-    const scenario = (value: string) => component.selectScenario({ target: { value } } as unknown as Event);
+    const scenario = (value: string) =>
+      component.selectScenario({ target: { value } } as unknown as Event);
 
     scenario('');
     expect(component.statusMessage()).toBe('');
@@ -212,10 +232,18 @@ describe('MockDriver', () => {
       expect(component.validationError()).toContain(message);
     }
 
-    component.payload.set(JSON.stringify([
-      { id: 1, entityName: 'No priority', entityId: 'none', dueDate: null },
-      { id: 2, entityName: 'Valid priority', entityId: 'priority', dueDate: '2026-11-12', priority: 'High' },
-    ]));
+    component.payload.set(
+      JSON.stringify([
+        { id: 1, entityName: 'No priority', entityId: 'none', dueDate: null },
+        {
+          id: 2,
+          entityName: 'Valid priority',
+          entityId: 'priority',
+          dueDate: '2026-11-12',
+          priority: 'High',
+        },
+      ]),
+    );
     expect(component.validationError()).toBeNull();
     expect(component.actionRows().length).toBe(2);
     expect(component.announcementItems()).toEqual([]);
@@ -243,15 +271,33 @@ describe('MockDriver', () => {
       expect(component.validationError()).toBeTruthy();
     }
 
-    component.payload.set(JSON.stringify([
-      { id: 'one', title: 'One', status: 'Published', description: 'Text', imageUrl: '', attachmentUrl: '', attachmentName: '', linkUrl: '', startDate: null, endDate: null },
-      { id: 'two', title: 'Two', status: 'Scheduled', startDate: '2026-11-13' },
-      { id: 'three', title: 'Three', status: 'Draft', endDate: '2026-11-14' },
-      { id: 'four', title: 'Four', status: 'Expired' },
-    ]));
+    component.payload.set(
+      JSON.stringify([
+        {
+          id: 'one',
+          title: 'One',
+          status: 'Published',
+          description: 'Text',
+          imageUrl: '',
+          attachmentUrl: '',
+          attachmentName: '',
+          linkUrl: '',
+          startDate: null,
+          endDate: null,
+        },
+        { id: 'two', title: 'Two', status: 'Scheduled', startDate: '2026-11-13' },
+        { id: 'three', title: 'Three', status: 'Draft', endDate: '2026-11-14' },
+        { id: 'four', title: 'Four', status: 'Expired' },
+      ]),
+    );
     expect(component.validationError()).toBeNull();
     expect(component.itemCount()).toBe(4);
-    expect(component.announcementStatusCounts()).toEqual({ Published: 1, Scheduled: 1, Draft: 1, Expired: 1 });
+    expect(component.announcementStatusCounts()).toEqual({
+      Published: 1,
+      Scheduled: 1,
+      Draft: 1,
+      Expired: 1,
+    });
     expect(component.actionRows()).toEqual([]);
   });
 });

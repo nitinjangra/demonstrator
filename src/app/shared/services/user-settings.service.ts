@@ -10,9 +10,27 @@ export const PREDEFINED_USER_PROFILES: ReadonlyArray<{
   isAdmin: boolean;
   description: string;
 }> = [
-  { id: 'admin', tenantId: 'admin-profile', name: 'Admin', isAdmin: true, description: 'Full access' },
-  { id: 'standard', tenantId: 'standard-profile', name: 'Standard user', isAdmin: false, description: 'No admin privileges' },
-  { id: 'invited', tenantId: 'invited-profile', name: 'Invited user', isAdmin: false, description: 'Invited account flow' },
+  {
+    id: 'admin',
+    tenantId: 'admin-profile',
+    name: 'Admin',
+    isAdmin: true,
+    description: 'Full access',
+  },
+  {
+    id: 'standard',
+    tenantId: 'standard-profile',
+    name: 'Standard user',
+    isAdmin: false,
+    description: 'No admin privileges',
+  },
+  {
+    id: 'invited',
+    tenantId: 'invited-profile',
+    name: 'Invited user',
+    isAdmin: false,
+    description: 'Invited account flow',
+  },
 ];
 
 const ACTIVE_PROFILE_KEY = 'active-user-profile';
@@ -27,8 +45,8 @@ function readInitialProfileId(): PredefinedUserProfileId {
 @Injectable({ providedIn: 'root' })
 export class UserSettingsService {
   private readonly profileIdSignal = signal(readInitialProfileId());
-  private readonly activeProfile = computed(
-    () => PREDEFINED_USER_PROFILES.find(({ id }) => id === this.profileIdSignal())!,
+  private readonly activeProfile = computed(() =>
+    PREDEFINED_USER_PROFILES.find(({ id }) => id === this.profileIdSignal())!,
   );
   private readonly tenantIdSignal = signal(this.activeProfile().tenantId);
 
@@ -50,5 +68,4 @@ export class UserSettingsService {
     localStorage.setItem(USER_NAME_KEY, profile.name);
     localStorage.setItem(ADMIN_MODE_KEY, String(profile.isAdmin));
   }
-
 }

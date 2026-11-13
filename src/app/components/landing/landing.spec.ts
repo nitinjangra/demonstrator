@@ -51,7 +51,9 @@ describe('Landing', () => {
 
       jasmine.clock().tick(1);
       fixture.detectChanges();
-      expect(fixture.nativeElement.querySelector('app-loading')?.textContent).toContain('Getting things ready');
+      expect(fixture.nativeElement.querySelector('app-loading')?.textContent).toContain(
+        'Getting things ready',
+      );
 
       state.loadStatus.set('loaded');
       fixture.detectChanges();
@@ -87,18 +89,23 @@ describe('Landing', () => {
     queryParams.next(convertToParamMap({ highlightActions: 'true' }));
     fixture.detectChanges();
 
-    expect(fixture.nativeElement.querySelector('#actions-section')?.classList)
-      .toContain('landing-focus-content--highlight');
-    expect(fixture.nativeElement.querySelector('main.landing')?.classList)
-      .toContain('landing--focus-actions');
-    expect(fixture.nativeElement.querySelector('.landing-focus-backdrop')?.getAttribute('aria-hidden'))
-      .toBe('true');
+    expect(fixture.nativeElement.querySelector('#actions-section')?.classList).toContain(
+      'landing-focus-content--highlight',
+    );
+    expect(fixture.nativeElement.querySelector('main.landing')?.classList).toContain(
+      'landing--focus-actions',
+    );
+    expect(
+      fixture.nativeElement.querySelector('.landing-focus-backdrop')?.getAttribute('aria-hidden'),
+    ).toBe('true');
     jasmine.clock().tick(2000);
     fixture.detectChanges();
-    expect(fixture.nativeElement.querySelector('#actions-section')?.classList)
-      .not.toContain('landing-focus-content--highlight');
-    expect(fixture.nativeElement.querySelector('main.landing')?.classList)
-      .not.toContain('landing--focus-actions');
+    expect(fixture.nativeElement.querySelector('#actions-section')?.classList).not.toContain(
+      'landing-focus-content--highlight',
+    );
+    expect(fixture.nativeElement.querySelector('main.landing')?.classList).not.toContain(
+      'landing--focus-actions',
+    );
     jasmine.clock().uninstall();
   });
 
@@ -110,16 +117,20 @@ describe('Landing', () => {
     queryParams.next(convertToParamMap({ priority: 'High' }));
     fixture.detectChanges();
 
-    expect(fixture.nativeElement.querySelector('#actions-section')?.classList)
-      .toContain('landing-focus-content--highlight');
-    expect(fixture.nativeElement.querySelector('main.landing')?.classList)
-      .toContain('landing--focus-actions');
+    expect(fixture.nativeElement.querySelector('#actions-section')?.classList).toContain(
+      'landing-focus-content--highlight',
+    );
+    expect(fixture.nativeElement.querySelector('main.landing')?.classList).toContain(
+      'landing--focus-actions',
+    );
     jasmine.clock().tick(2000);
     fixture.detectChanges();
-    expect(fixture.nativeElement.querySelector('#actions-section')?.classList)
-      .not.toContain('landing-focus-content--highlight');
-    expect(fixture.nativeElement.querySelector('main.landing')?.classList)
-      .not.toContain('landing--focus-actions');
+    expect(fixture.nativeElement.querySelector('#actions-section')?.classList).not.toContain(
+      'landing-focus-content--highlight',
+    );
+    expect(fixture.nativeElement.querySelector('main.landing')?.classList).not.toContain(
+      'landing--focus-actions',
+    );
     jasmine.clock().uninstall();
   });
 
@@ -142,7 +153,10 @@ describe('Landing', () => {
     fixture.detectChanges();
     queryParams.next(convertToParamMap({ highlightActions: 'true' }));
 
-    expect(announce).toHaveBeenCalledWith('Actions section opened. All priorities are shown.', 'polite');
+    expect(announce).toHaveBeenCalledWith(
+      'Actions section opened. All priorities are shown.',
+      'polite',
+    );
   });
 
   it('preserves priority query parameters when highlight and priority are combined', () => {
@@ -151,15 +165,20 @@ describe('Landing', () => {
     jasmine.clock().install();
 
     fixture.detectChanges();
-    queryParams.next(convertToParamMap({ highlightActions: 'true', priority: 'High', tab: 'actions' }));
+    queryParams.next(
+      convertToParamMap({ highlightActions: 'true', priority: 'High', tab: 'actions' }),
+    );
     fixture.detectChanges();
 
     expect(component.highlightActions()).toBeTrue();
-    expect(navigate).toHaveBeenCalledWith([], jasmine.objectContaining({
-      queryParams: { highlightActions: null },
-      queryParamsHandling: 'merge',
-      replaceUrl: true,
-    }));
+    expect(navigate).toHaveBeenCalledWith(
+      [],
+      jasmine.objectContaining({
+        queryParams: { highlightActions: null },
+        queryParamsHandling: 'merge',
+        replaceUrl: true,
+      }),
+    );
 
     queryParams.next(convertToParamMap({ priority: 'High', tab: 'actions' }));
     fixture.detectChanges();

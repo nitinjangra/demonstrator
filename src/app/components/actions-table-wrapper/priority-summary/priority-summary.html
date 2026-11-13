@@ -15,13 +15,19 @@
         >
           <span class="priority-count-number">{{ counts()[filter.countKey] }}</span>
           <span class="priority-count-label">
-          @if (filter.countKey === 'high') {
-            <mat-icon class="priority-symbol priority-badge__icon" aria-hidden="true">arrow_upward</mat-icon>
-          } @else if (filter.countKey === 'medium') {
-            <mat-icon class="priority-symbol priority-badge__icon" aria-hidden="true">remove</mat-icon>
-          } @else if (filter.countKey === 'low') {
-            <mat-icon class="priority-symbol priority-badge__icon" aria-hidden="true">arrow_downward</mat-icon>
-          }
+            @if (filter.countKey === 'high') {
+              <mat-icon class="priority-symbol priority-badge__icon" aria-hidden="true"
+                >arrow_upward</mat-icon
+              >
+            } @else if (filter.countKey === 'medium') {
+              <mat-icon class="priority-symbol priority-badge__icon" aria-hidden="true"
+                >remove</mat-icon
+              >
+            } @else if (filter.countKey === 'low') {
+              <mat-icon class="priority-symbol priority-badge__icon" aria-hidden="true"
+                >arrow_downward</mat-icon
+              >
+            }
             <span>{{ filter.label }}</span>
           </span>
         </button>
@@ -31,7 +37,9 @@
             type="button"
             [attr.aria-label]="filter.clearLabel"
             (click)="filterCleared.emit()"
-          >&times;</button>
+          >
+            &times;
+          </button>
         }
       </span>
     }

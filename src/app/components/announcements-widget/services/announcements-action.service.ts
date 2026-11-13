@@ -124,16 +124,19 @@ export class AnnouncementsActionService {
   }
 
   saveAnnouncements(announcements: Announcement[]): void {
-    this.announcementsSubject.next(announcements.map((announcement) => ({
-      ...announcement,
-      status: announcement.status === 'Draft'
-        ? 'Draft'
-        : this.getStatusForDates(
-            announcement.startDate,
-            announcement.endDate,
-            announcement.status,
-          ),
-    })));
+    this.announcementsSubject.next(
+      announcements.map((announcement) => ({
+        ...announcement,
+        status:
+          announcement.status === 'Draft'
+            ? 'Draft'
+            : this.getStatusForDates(
+                announcement.startDate,
+                announcement.endDate,
+                announcement.status,
+              ),
+      })),
+    );
     this.persistAnnouncements();
   }
 
@@ -196,9 +199,10 @@ export class AnnouncementsActionService {
           ...announcement,
           startDate,
           endDate,
-          status: announcement.status === 'Draft'
-            ? 'Draft'
-            : this.getStatusForDates(startDate, endDate, announcement.status ?? 'Draft'),
+          status:
+            announcement.status === 'Draft'
+              ? 'Draft'
+              : this.getStatusForDates(startDate, endDate, announcement.status ?? 'Draft'),
         };
       });
     } catch {

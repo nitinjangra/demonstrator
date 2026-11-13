@@ -5,7 +5,10 @@ import { MatIconModule } from '@angular/material/icon';
 import { RouterLink } from '@angular/router';
 import { Priority } from '../../../../shared/enums/priority.enum';
 import type { ActionTableRow } from '../../../../shared/interfaces/actions-table.interface';
-import type { Announcement, AnnouncementStatus } from '../../../../shared/interfaces/announcement.interface';
+import type {
+  Announcement,
+  AnnouncementStatus,
+} from '../../../../shared/interfaces/announcement.interface';
 import { take } from 'rxjs';
 import { StickyFooterComponent } from '../../../../shared/components/sticky-footer/sticky-footer.component';
 import { mockAnnouncements } from '../../../../shared/mocks/mock-announcements';
@@ -87,7 +90,9 @@ export class MockDriver {
     const component = value === 'actions-table' || value === 'announcement-widget' ? value : null;
     const currentComponent = this.selectedComponent();
     if (
-      currentComponent && currentComponent !== component && this.isDirty &&
+      currentComponent &&
+      currentComponent !== component &&
+      this.isDirty &&
       !window.confirm('Discard your unapplied edits and switch components?')
     ) {
       (event.target as HTMLSelectElement).value = currentComponent;
@@ -152,7 +157,9 @@ export class MockDriver {
     this.selectedScenario.set(scenario);
     if (scenario === 'error') {
       this.payload.set('[{ "id": ]');
-      this.statusMessage.set('Error scenario loaded into the draft. The invalid JSON message is announced below.');
+      this.statusMessage.set(
+        'Error scenario loaded into the draft. The invalid JSON message is announced below.',
+      );
       return;
     }
     if (scenario === 'loading') {
@@ -166,18 +173,24 @@ export class MockDriver {
     let data: ActionTableRow[] | Announcement[] = defaultData;
     if (scenario === 'empty') data = [];
     if (scenario === 'many') {
-      data = component === 'actions-table' ? this.createSampleActions(50) : this.createManyAnnouncements(50);
+      data =
+        component === 'actions-table'
+          ? this.createSampleActions(50)
+          : this.createManyAnnouncements(50);
     }
     if (scenario === 'long-text') {
-      data = component === 'announcement-widget'
-        ? this.createLongTextAnnouncements()
-        : this.createSampleActions(1, true);
+      data =
+        component === 'announcement-widget'
+          ? this.createLongTextAnnouncements()
+          : this.createSampleActions(1, true);
     }
     if (scenario === 'mixed-statuses' && component === 'announcement-widget') {
       data = mockDriverAnnouncements;
     }
     this.payload.set(JSON.stringify(data, null, 2));
-    this.statusMessage.set(`${this.scenarioLabel(scenario)} scenario loaded into the draft. Apply to update this preview only.`);
+    this.statusMessage.set(
+      `${this.scenarioLabel(scenario)} scenario loaded into the draft. Apply to update this preview only.`,
+    );
   }
 
   setPreviewRole(role: 'admin' | 'user'): void {
@@ -197,10 +210,7 @@ export class MockDriver {
   resetToDefault(): void {
     const component = this.selectedComponent();
     if (!component) return;
-    if (
-      this.isDirty &&
-      !window.confirm('Replace your unapplied draft with the project default?')
-    ) {
+    if (this.isDirty && !window.confirm('Replace your unapplied draft with the project default?')) {
       return;
     }
 
@@ -233,7 +243,10 @@ export class MockDriver {
     }[scenario];
   }
 
-  private getAppliedState(component: MockComponent, data: ActionTableRow[] | Announcement[]): string {
+  private getAppliedState(
+    component: MockComponent,
+    data: ActionTableRow[] | Announcement[],
+  ): string {
     const projectDefault = component === 'actions-table' ? mockTableData : mockAnnouncements;
     return JSON.stringify(data) === JSON.stringify(projectDefault)
       ? 'Project default'
@@ -261,12 +274,14 @@ export class MockDriver {
   }
 
   private createLongTextAnnouncements(): Announcement[] {
-    return [{
-      id: 'long-title-announcement',
-      title: `A long announcement title for checking wrapping and layout ${'across narrow screens '.repeat(5)}`,
-      status: 'Published',
-      description: `This announcement has no fixed limit on its description. ${'Review the full message and make sure the preview remains readable. '.repeat(10)}`,
-    }];
+    return [
+      {
+        id: 'long-title-announcement',
+        title: `A long announcement title for checking wrapping and layout ${'across narrow screens '.repeat(5)}`,
+        status: 'Published',
+        description: `This announcement has no fixed limit on its description. ${'Review the full message and make sure the preview remains readable. '.repeat(10)}`,
+      },
+    ];
   }
 
   private parsePayload(value: string): PayloadResult {
@@ -309,7 +324,10 @@ export class MockDriver {
       ) {
         return { error: `Action ${index + 1} must have a valid ISO dueDate or null.` };
       }
-      if (row['priority'] !== undefined && !Object.values(Priority).includes(row['priority'] as Priority)) {
+      if (
+        row['priority'] !== undefined &&
+        !Object.values(Priority).includes(row['priority'] as Priority)
+      ) {
         return { error: `Action ${index + 1} priority must be High, Medium, or Low.` };
       }
 
@@ -339,10 +357,18 @@ export class MockDriver {
         return { error: `Announcement ${index + 1} must have a title.` };
       }
       if (!ANNOUNCEMENT_STATUSES.includes(announcement['status'] as AnnouncementStatus)) {
-        return { error: `Announcement ${index + 1} status must be Published, Scheduled, Draft, or Expired.` };
+        return {
+          error: `Announcement ${index + 1} status must be Published, Scheduled, Draft, or Expired.`,
+        };
       }
 
-      const optionalTextFields = ['description', 'imageUrl', 'attachmentUrl', 'attachmentName', 'linkUrl'];
+      const optionalTextFields = [
+        'description',
+        'imageUrl',
+        'attachmentUrl',
+        'attachmentName',
+        'linkUrl',
+      ];
       for (const field of optionalTextFields) {
         if (announcement[field] !== undefined && typeof announcement[field] !== 'string') {
           return { error: `Announcement ${index + 1} ${field} must be a string when provided.` };
@@ -358,11 +384,21 @@ export class MockDriver {
         id: announcement['id'],
         title: announcement['title'],
         status: announcement['status'] as AnnouncementStatus,
-        ...(typeof announcement['description'] === 'string' ? { description: announcement['description'] } : {}),
-        ...(typeof announcement['imageUrl'] === 'string' ? { imageUrl: announcement['imageUrl'] } : {}),
-        ...(typeof announcement['attachmentUrl'] === 'string' ? { attachmentUrl: announcement['attachmentUrl'] } : {}),
-        ...(typeof announcement['attachmentName'] === 'string' ? { attachmentName: announcement['attachmentName'] } : {}),
-        ...(typeof announcement['linkUrl'] === 'string' ? { linkUrl: announcement['linkUrl'] } : {}),
+        ...(typeof announcement['description'] === 'string'
+          ? { description: announcement['description'] }
+          : {}),
+        ...(typeof announcement['imageUrl'] === 'string'
+          ? { imageUrl: announcement['imageUrl'] }
+          : {}),
+        ...(typeof announcement['attachmentUrl'] === 'string'
+          ? { attachmentUrl: announcement['attachmentUrl'] }
+          : {}),
+        ...(typeof announcement['attachmentName'] === 'string'
+          ? { attachmentName: announcement['attachmentName'] }
+          : {}),
+        ...(typeof announcement['linkUrl'] === 'string'
+          ? { linkUrl: announcement['linkUrl'] }
+          : {}),
         ...(startDate ? { startDate } : {}),
         ...(endDate ? { endDate } : {}),
       });

@@ -178,15 +178,21 @@
   color: var(--color-muted-text);
   text-align: center;
 
-  strong { color: var(--color-text); }
+  strong {
+    color: var(--color-text);
+  }
 }
 
 @keyframes announcement-spinner {
-  to { transform: rotate(1turn); }
+  to {
+    transform: rotate(1turn);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .announcement-spinner { animation: none; }
+  .announcement-spinner {
+    animation: none;
+  }
 }
 
 .announcement-menu-trigger {

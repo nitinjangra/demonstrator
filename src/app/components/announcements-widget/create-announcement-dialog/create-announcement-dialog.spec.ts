@@ -150,13 +150,15 @@ describe('CreateAnnouncementDialogComponent', () => {
     });
     fixture.componentInstance.ngOnInit();
 
-    expect(fixture.componentInstance.form.getRawValue()).toEqual(jasmine.objectContaining({
-      title: 'Existing',
-      description: '',
-      linkUrl: '',
-      startDate: new Date(2026, 10, 2),
-      endDate: new Date(2026, 10, 4),
-    }));
+    expect(fixture.componentInstance.form.getRawValue()).toEqual(
+      jasmine.objectContaining({
+        title: 'Existing',
+        description: '',
+        linkUrl: '',
+        startDate: new Date(2026, 10, 2),
+        endDate: new Date(2026, 10, 4),
+      }),
+    );
   });
 
   it('keeps existing past schedule dates valid while restricting newly chosen dates', () => {
@@ -199,30 +201,37 @@ describe('CreateAnnouncementDialogComponent', () => {
 
     fixture.componentInstance.submit();
 
-    expect(dialogRefSpy.close).toHaveBeenCalledWith(jasmine.objectContaining({
-      description: undefined,
-      linkUrl: undefined,
-      startDate: undefined,
-      endDate: undefined,
-    }));
+    expect(dialogRefSpy.close).toHaveBeenCalledWith(
+      jasmine.objectContaining({
+        description: undefined,
+        linkUrl: undefined,
+        startDate: undefined,
+        endDate: undefined,
+      }),
+    );
   });
 
   it('accepts image attachments and rejects unsupported or oversized files', () => {
     const component = fixture.componentInstance;
     const input = document.createElement('input');
     input.type = 'file';
-    const event = (file: File | undefined) => ({
-      target: { files: file ? [file] : [], value: 'selected' },
-    } as unknown as Event);
+    const event = (file: File | undefined) =>
+      ({
+        target: { files: file ? [file] : [], value: 'selected' },
+      }) as unknown as Event;
 
     component.onAttachmentSelected(event(new File(['image'], 'photo.jpg', { type: 'image/jpeg' })));
     expect(component.selectedAttachment?.name).toBe('photo.jpg');
 
-    component.onAttachmentSelected(event(new File(['document'], 'notes.pdf', { type: 'application/pdf' })));
+    component.onAttachmentSelected(
+      event(new File(['document'], 'notes.pdf', { type: 'application/pdf' })),
+    );
     expect(component.selectedAttachment).toBeUndefined();
     expect(component.attachmentError).toContain('JPG or PNG');
 
-    const oversized = new File([new Uint8Array(2 * 1024 * 1024 + 1)], 'large.png', { type: 'image/png' });
+    const oversized = new File([new Uint8Array(2 * 1024 * 1024 + 1)], 'large.png', {
+      type: 'image/png',
+    });
     component.onAttachmentSelected(event(oversized));
     expect(component.attachmentError).toContain('2 MB or smaller');
 

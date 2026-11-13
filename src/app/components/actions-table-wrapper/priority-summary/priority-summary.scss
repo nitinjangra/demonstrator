@@ -26,7 +26,9 @@
   overflow: hidden;
   border: 1px solid transparent;
   border-radius: 999px;
-  transition: background-color 150ms ease, border-color 150ms ease;
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease;
 
   &:hover,
   &.is-active {

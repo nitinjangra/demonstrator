@@ -5,7 +5,10 @@ import { AgTableStateService } from '../actions-table-wrapper/shared/services/ag
 import { ActionTableRow } from '../../shared/interfaces/actions-table.interface';
 import { routes } from '../../app.routes';
 import { Dashboard } from './dashboard';
-import { clearActionTableTestData, seedActionTableTestData } from '../actions-table-wrapper/actions-table-test-data';
+import {
+  clearActionTableTestData,
+  seedActionTableTestData,
+} from '../actions-table-wrapper/actions-table-test-data';
 
 describe('Dashboard', () => {
   let fixture: ComponentFixture<Dashboard>;
@@ -13,7 +16,10 @@ describe('Dashboard', () => {
   beforeEach(async () => {
     localStorage.removeItem('chart-library-feature');
     seedActionTableTestData();
-    await TestBed.configureTestingModule({ imports: [Dashboard], providers: [provideRouter([])] }).compileComponents();
+    await TestBed.configureTestingModule({
+      imports: [Dashboard],
+      providers: [provideRouter([])],
+    }).compileComponents();
     fixture = TestBed.createComponent(Dashboard);
     fixture.detectChanges();
   });
@@ -32,30 +38,47 @@ describe('Dashboard', () => {
     );
     expect(fixture.nativeElement.querySelector('#priority-chart')).not.toBeNull();
     expect(fixture.nativeElement.querySelector('#due-date-chart')).not.toBeNull();
-    expect(fixture.nativeElement.querySelector('[aria-label="View high priority actions"]')?.getAttribute('href'))
-      .toContain('/landing?priority=High');
-    expect(fixture.nativeElement.querySelector('[aria-label="View medium priority actions"]')?.getAttribute('href'))
-      .toContain('/landing?priority=Medium');
-    expect(fixture.nativeElement.querySelector('[aria-label="View low priority actions"]')?.getAttribute('href'))
-      .toContain('/landing?priority=Low');
-    expect(fixture.nativeElement.querySelector('[aria-label="View actions with no priority"]')?.getAttribute('href'))
-      .toContain('/landing?priority=none');
-    expect(fixture.nativeElement.querySelector('#priority-chart-description')?.textContent)
-      .toContain('Actions by priority:');
-    expect(fixture.nativeElement.querySelector('#due-date-chart-description')?.textContent)
-      .toContain('Actions due by month:');
-    expect(fixture.nativeElement.querySelector('[aria-label="View all actions"]')?.getAttribute('href'))
-      .toBe('/landing?highlightActions=true');
+    expect(
+      fixture.nativeElement
+        .querySelector('[aria-label="View high priority actions"]')
+        ?.getAttribute('href'),
+    ).toContain('/landing?priority=High');
+    expect(
+      fixture.nativeElement
+        .querySelector('[aria-label="View medium priority actions"]')
+        ?.getAttribute('href'),
+    ).toContain('/landing?priority=Medium');
+    expect(
+      fixture.nativeElement
+        .querySelector('[aria-label="View low priority actions"]')
+        ?.getAttribute('href'),
+    ).toContain('/landing?priority=Low');
+    expect(
+      fixture.nativeElement
+        .querySelector('[aria-label="View actions with no priority"]')
+        ?.getAttribute('href'),
+    ).toContain('/landing?priority=none');
+    expect(
+      fixture.nativeElement.querySelector('#priority-chart-description')?.textContent,
+    ).toContain('Actions by priority:');
+    expect(
+      fixture.nativeElement.querySelector('#due-date-chart-description')?.textContent,
+    ).toContain('Actions due by month:');
+    expect(
+      fixture.nativeElement.querySelector('[aria-label="View all actions"]')?.getAttribute('href'),
+    ).toBe('/landing?highlightActions=true');
   });
 
   it('shows an actionable empty state when no action data is available', () => {
     TestBed.inject(AgTableStateService).setRowData([]);
     fixture.detectChanges();
 
-    expect(fixture.nativeElement.querySelector('.dashboard__empty-state')?.textContent)
-      .toContain('Priority and due date charts will appear when actions are available.');
-    expect(fixture.nativeElement.querySelector('.dashboard__empty-state a')?.getAttribute('href'))
-      .toBe('/landing');
+    expect(fixture.nativeElement.querySelector('.dashboard__empty-state')?.textContent).toContain(
+      'Priority and due date charts will appear when actions are available.',
+    );
+    expect(
+      fixture.nativeElement.querySelector('.dashboard__empty-state a')?.getAttribute('href'),
+    ).toBe('/landing');
   });
 
   it('renders both charts with Chart.js when that library is selected', async () => {
@@ -72,9 +95,11 @@ describe('Dashboard', () => {
   it('navigates to the matching priority filter when a Chart.js pie slice is clicked', async () => {
     await waitForChartRender();
     const navigate = spyOn(TestBed.inject(Router), 'navigate').and.resolveTo(true);
-    const chart = (fixture.componentInstance as unknown as {
-      charts: { options: { onClick?: (event: never, elements: { index: number }[]) => void } }[];
-    }).charts[0];
+    const chart = (
+      fixture.componentInstance as unknown as {
+        charts: { options: { onClick?: (event: never, elements: { index: number }[]) => void } }[];
+      }
+    ).charts[0];
 
     chart.options.onClick?.(undefined as never, [{ index: 3 }]);
 
@@ -99,9 +124,13 @@ describe('Dashboard', () => {
     fixture.detectChanges();
     await waitForChartRender();
     const navigate = spyOn(TestBed.inject(Router), 'navigate').and.resolveTo(true);
-    const charts = (fixture.componentInstance as unknown as {
-      highchartsInstances: { series: { data: { firePointEvent: (event: string) => void }[] }[] }[];
-    }).highchartsInstances;
+    const charts = (
+      fixture.componentInstance as unknown as {
+        highchartsInstances: {
+          series: { data: { firePointEvent: (event: string) => void }[] }[];
+        }[];
+      }
+    ).highchartsInstances;
 
     charts[0].series[0].data[0].firePointEvent('click');
 
@@ -135,7 +164,9 @@ describe('Dashboard route', () => {
   });
 
   it('redirects to the landing page when the dashboard is disabled', async () => {
-    await TestBed.configureTestingModule({ providers: [provideRouter(routes)] }).compileComponents();
+    await TestBed.configureTestingModule({
+      providers: [provideRouter(routes)],
+    }).compileComponents();
 
     const router = TestBed.inject(Router);
     await router.navigateByUrl('/dashboard');
@@ -145,5 +176,7 @@ describe('Dashboard route', () => {
 });
 
 function waitForChartRender(): Promise<void> {
-  return new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve())));
+  return new Promise((resolve) =>
+    requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+  );
 }

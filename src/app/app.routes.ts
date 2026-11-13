@@ -2,7 +2,10 @@ import { inject } from '@angular/core';
 import { Router, Routes } from '@angular/router';
 import { FeatureToggleService } from './shared/services/feature-toggle.service';
 import { UserSettingsService } from './shared/services/user-settings.service';
-import { UnsavedChangesDialogService, type CanDeactivatePage } from './shared/components/unsaved-changes-dialog/unsaved-changes-dialog.component';
+import {
+  UnsavedChangesDialogService,
+  type CanDeactivatePage,
+} from './shared/components/unsaved-changes-dialog/unsaved-changes-dialog.component';
 
 const confirmUnsavedChanges = (component: CanDeactivatePage) =>
   inject(UnsavedChangesDialogService).confirmCanDeactivate(component);
@@ -22,9 +25,7 @@ export const routes: Routes = [
       () =>
         inject(FeatureToggleService).dashboardEnabled() ||
         inject(Router).createUrlTree(['/landing']),
-      () =>
-        inject(UserSettingsService).isAdmin() ||
-        inject(Router).createUrlTree(['/landing']),
+      () => inject(UserSettingsService).isAdmin() || inject(Router).createUrlTree(['/landing']),
     ],
     loadComponent: () => import('./components/dashboard/dashboard').then((m) => m.Dashboard),
   },
@@ -35,11 +36,10 @@ export const routes: Routes = [
   {
     path: 'settings',
     canMatch: [
-      () =>
-        inject(UserSettingsService).isAdmin() ||
-        inject(Router).createUrlTree(['/landing']),
+      () => inject(UserSettingsService).isAdmin() || inject(Router).createUrlTree(['/landing']),
     ],
-    loadComponent: () => import('./components/settings/settings-wrapper').then((m) => m.SettingsWrapper),
+    loadComponent: () =>
+      import('./components/settings/settings-wrapper').then((m) => m.SettingsWrapper),
     children: [
       {
         path: '',
@@ -98,7 +98,9 @@ export const routes: Routes = [
             path: 'feature-toggles',
             canDeactivate: [confirmUnsavedChanges],
             loadComponent: () =>
-              import('./components/settings/pages/feature-toggles/feature-toggles').then((m) => m.FeatureToggles),
+              import('./components/settings/pages/feature-toggles/feature-toggles').then(
+                (m) => m.FeatureToggles,
+              ),
           },
           {
             path: 'mock-driver',
@@ -109,13 +111,17 @@ export const routes: Routes = [
                 inject(Router).createUrlTree(['/settings/general/feature-toggles']),
             ],
             loadComponent: () =>
-              import('./components/settings/pages/mock-driver/mock-driver').then((m) => m.MockDriver),
+              import('./components/settings/pages/mock-driver/mock-driver').then(
+                (m) => m.MockDriver,
+              ),
           },
           {
             path: 'notifications',
             canDeactivate: [confirmUnsavedChanges],
             loadComponent: () =>
-              import('./components/settings/pages/notifications/notifications').then((m) => m.Notifications),
+              import('./components/settings/pages/notifications/notifications').then(
+                (m) => m.Notifications,
+              ),
           },
         ],
       },

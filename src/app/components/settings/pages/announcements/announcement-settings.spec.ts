@@ -13,7 +13,12 @@ describe('AnnouncementSettings', () => {
   let dialogSpy: jasmine.SpyObj<MatDialog>;
   const announcements: Announcement[] = [
     { id: 'draft', title: 'Draft announcement', status: 'Draft' },
-    { id: 'expired', title: 'Expired announcement', status: 'Expired', endDate: new Date(2020, 0, 1) },
+    {
+      id: 'expired',
+      title: 'Expired announcement',
+      status: 'Expired',
+      endDate: new Date(2020, 0, 1),
+    },
     { id: 'scheduled', title: 'Scheduled announcement', status: 'Scheduled' },
   ];
   const activeAnnouncements: Announcement[] = [
@@ -28,12 +33,8 @@ describe('AnnouncementSettings', () => {
 
   beforeEach(async () => {
     announcementsService = jasmine.createSpyObj<AnnouncementsActionService>(
-      'AnnouncementsActionService', [
-        'getAllAnnouncements',
-        'getAnnouncements',
-        'saveAnnouncements',
-        'addAnnouncement',
-      ],
+      'AnnouncementsActionService',
+      ['getAllAnnouncements', 'getAnnouncements', 'saveAnnouncements', 'addAnnouncement'],
       { canAddAnnouncement: true },
     );
     announcementsService.addAnnouncement.and.returnValue(true);
@@ -51,8 +52,10 @@ describe('AnnouncementSettings', () => {
     });
     await TestBed.compileComponents();
     fixture = TestBed.createComponent(AnnouncementSettings);
-    spyOn((fixture.componentInstance as unknown as { dialog: MatDialog }).dialog, 'open')
-      .and.returnValue({ afterClosed: () => of(true) } as never);
+    spyOn(
+      (fixture.componentInstance as unknown as { dialog: MatDialog }).dialog,
+      'open',
+    ).and.returnValue({ afterClosed: () => of(true) } as never);
     fixture.detectChanges();
   });
 
@@ -69,7 +72,9 @@ describe('AnnouncementSettings', () => {
     await fixture.whenStable();
     fixture.detectChanges();
     const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
-    expect(fixture.nativeElement.querySelector('app-announcement-preview.preview-pane')).toBeTruthy();
+    expect(
+      fixture.nativeElement.querySelector('app-announcement-preview.preview-pane'),
+    ).toBeTruthy();
     expect(fixture.nativeElement.querySelector('.list-pane')).toBeTruthy();
     expect(fixture.nativeElement.querySelector('.preview-pane app-announcements')).toBeTruthy();
     expect(fixture.nativeElement.querySelector('.preview-pane .announcements-list')).toBeTruthy();
@@ -78,15 +83,24 @@ describe('AnnouncementSettings', () => {
     expect(text).toContain('Expired announcement');
     expect(text).toContain('Draft');
     expect(text).toContain('Expired');
-    expect(fixture.nativeElement.querySelector('.announcement-row .status-badge[data-status="Draft"]')?.textContent)
-      .toContain('Draft');
-    expect(fixture.nativeElement.querySelector('.announcement-row .status-badge[data-status="Expired"]')?.textContent)
-      .toContain('Expired');
-    expect(fixture.nativeElement.querySelector('.announcement-row .status-badge[data-status="Scheduled"]')?.textContent)
-      .toContain('Scheduled');
+    expect(
+      fixture.nativeElement.querySelector('.announcement-row .status-badge[data-status="Draft"]')
+        ?.textContent,
+    ).toContain('Draft');
+    expect(
+      fixture.nativeElement.querySelector('.announcement-row .status-badge[data-status="Expired"]')
+        ?.textContent,
+    ).toContain('Expired');
+    expect(
+      fixture.nativeElement.querySelector(
+        '.announcement-row .status-badge[data-status="Scheduled"]',
+      )?.textContent,
+    ).toContain('Scheduled');
     expect(fixture.nativeElement.querySelector('.row-title')?.hasAttribute('tabindex')).toBeFalse();
     expect(fixture.nativeElement.querySelector('.announcement-state')).toBeNull();
-    const editButton = fixture.nativeElement.querySelector('.announcement-edit') as HTMLButtonElement;
+    const editButton = fixture.nativeElement.querySelector(
+      '.announcement-edit',
+    ) as HTMLButtonElement;
     expect(editButton.getAttribute('aria-label')).toBe('Edit Draft announcement');
     expect(editButton.querySelector('mat-icon')?.textContent).toContain('edit');
     expect(announcementsService.getAllAnnouncements).toHaveBeenCalledOnceWith();
@@ -96,13 +110,17 @@ describe('AnnouncementSettings', () => {
       page.querySelectorAll<HTMLButtonElement>('.announcement-settings-page button'),
     ).filter((button) => button.textContent?.includes('Save'));
     expect(saveButtons.length).toBe(1);
-    expect(page.querySelector('app-sticky-footer button[matButton="filled"]')?.textContent).toContain('Save changes');
+    expect(
+      page.querySelector('app-sticky-footer button[matButton="filled"]')?.textContent,
+    ).toContain('Save changes');
     expect(page.querySelector('app-sticky-footer .sticky-footer--fixed')).not.toBeNull();
   });
 
   it('reorders and deletes items locally, then saves the complete list', () => {
     const component = fixture.componentInstance;
-    const saveButton = fixture.nativeElement.querySelector('app-sticky-footer button') as HTMLButtonElement;
+    const saveButton = fixture.nativeElement.querySelector(
+      'app-sticky-footer button',
+    ) as HTMLButtonElement;
     expect(saveButton.disabled).toBeTrue();
 
     component.moveAnnouncement(0, 1);
@@ -117,7 +135,8 @@ describe('AnnouncementSettings', () => {
     component.save();
 
     expect(announcementsService.saveAnnouncements).toHaveBeenCalledOnceWith([
-      announcements[1], announcements[0],
+      announcements[1],
+      announcements[0],
     ]);
     expect(component.saved).toBeTrue();
     expect(component.hasUnsavedChanges).toBeFalse();
@@ -129,7 +148,7 @@ describe('AnnouncementSettings', () => {
     fixture.componentInstance.announcements = Array.from({ length: 10 }, (_, index) => ({
       id: `announcement-${index}`,
       title: `Announcement ${index}`,
-      status: index % 2 === 0 ? 'Published' as const : 'Draft' as const,
+      status: index % 2 === 0 ? ('Published' as const) : ('Draft' as const),
       ...(index === 0 ? { endDate: new Date(2020, 0, 1) } : {}),
     }));
     fixture.componentInstance.deleteAnnouncement('missing');
@@ -143,8 +162,9 @@ describe('AnnouncementSettings', () => {
     fixture.componentInstance.deleteAnnouncement('announcement-0');
     fixture.detectChanges();
     fixture.detectChanges();
-    expect((fixture.nativeElement.querySelector('.announcement-add') as HTMLButtonElement).disabled)
-      .toBeFalse();
+    expect(
+      (fixture.nativeElement.querySelector('.announcement-add') as HTMLButtonElement).disabled,
+    ).toBeFalse();
   });
 
   it('opens the shared create form in the settings drawer and saves the new announcement', () => {
@@ -157,8 +177,11 @@ describe('AnnouncementSettings', () => {
 
     expect(fixture.componentInstance.editorOpen).toBeTrue();
     expect(fixture.componentInstance.editorData?.mode).toBe('create');
-    expect(fixture.nativeElement.querySelector('.announcement-settings-drawer app-create-announcement-dialog'))
-      .not.toBeNull();
+    expect(
+      fixture.nativeElement.querySelector(
+        '.announcement-settings-drawer app-create-announcement-dialog',
+      ),
+    ).not.toBeNull();
 
     fixture.componentInstance.saveAnnouncementFromEditor(created);
     expect(announcementsService.saveAnnouncements).not.toHaveBeenCalled();
@@ -178,8 +201,11 @@ describe('AnnouncementSettings', () => {
 
     expect(component.editorOpen).toBeTrue();
     expect(component.editorData).toEqual({ mode: 'edit', announcement: announcements[0] });
-    expect(fixture.nativeElement.querySelector('.announcement-settings-drawer app-create-announcement-dialog'))
-      .not.toBeNull();
+    expect(
+      fixture.nativeElement.querySelector(
+        '.announcement-settings-drawer app-create-announcement-dialog',
+      ),
+    ).not.toBeNull();
     component.saveAnnouncementFromEditor(result);
     expect(component.announcements[0]).toEqual(
       jasmine.objectContaining({ title: 'Updated announcement', status: 'Published' }),
@@ -191,19 +217,27 @@ describe('AnnouncementSettings', () => {
 
   it('makes the editor modal, inerts the page, and restores focus to its opener', async () => {
     fixture.detectChanges();
-    const editButton = fixture.nativeElement.querySelector('.announcement-edit') as HTMLButtonElement;
+    const editButton = fixture.nativeElement.querySelector(
+      '.announcement-edit',
+    ) as HTMLButtonElement;
     editButton.focus();
     fixture.componentInstance.openEditAnnouncement('draft');
     fixture.detectChanges();
     await fixture.whenStable();
 
-    const drawer = fixture.nativeElement.querySelector('.announcement-settings-drawer') as HTMLElement;
+    const drawer = fixture.nativeElement.querySelector(
+      '.announcement-settings-drawer',
+    ) as HTMLElement;
     expect(drawer.getAttribute('aria-modal')).toBe('true');
     expect(drawer.hasAttribute('cdktrapfocus')).toBeTrue();
-    expect(fixture.nativeElement.querySelector('.announcement-settings-page > div').hasAttribute('inert'))
-      .toBeTrue();
-    expect(fixture.nativeElement.querySelector('.announcement-settings-footer').hasAttribute('inert'))
-      .toBeTrue();
+    expect(
+      fixture.nativeElement
+        .querySelector('.announcement-settings-page > div')
+        .hasAttribute('inert'),
+    ).toBeTrue();
+    expect(
+      fixture.nativeElement.querySelector('.announcement-settings-footer').hasAttribute('inert'),
+    ).toBeTrue();
     expect(drawer.contains(document.activeElement)).toBeTrue();
 
     fixture.componentInstance.dismissAnnouncementEditor();

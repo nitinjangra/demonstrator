@@ -12,7 +12,9 @@ describe('SettingsWrapper', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [SettingsWrapper],
-      providers: [provideRouter([{ path: 'settings/announcements', component: SettingsTestRoute }])],
+      providers: [
+        provideRouter([{ path: 'settings/announcements', component: SettingsTestRoute }]),
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(SettingsWrapper);

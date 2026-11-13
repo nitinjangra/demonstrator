@@ -15,7 +15,9 @@ describe('MaterialTable', () => {
     queryParams = new BehaviorSubject(convertToParamMap({}));
     await TestBed.configureTestingModule({
       imports: [MaterialTable],
-      providers: [{ provide: ActivatedRoute, useValue: { queryParamMap: queryParams.asObservable() } }],
+      providers: [
+        { provide: ActivatedRoute, useValue: { queryParamMap: queryParams.asObservable() } },
+      ],
     }).compileComponents();
     fixture = TestBed.createComponent(MaterialTable);
     fixture.detectChanges();
@@ -32,9 +34,13 @@ describe('MaterialTable', () => {
     expect(table).not.toBeNull();
     const summary = fixture.nativeElement.querySelector('.actions-summary') as HTMLElement;
     expect(summary.textContent).toContain('20 actions');
-    const highBadge = summary.querySelector('.priority-filter--high .priority-count') as HTMLButtonElement;
+    const highBadge = summary.querySelector(
+      '.priority-filter--high .priority-count',
+    ) as HTMLButtonElement;
     expect(highBadge.querySelector('.priority-count-number')?.textContent).toBe('6');
-    expect(highBadge.querySelector('.priority-count-label span:last-child')?.textContent).toBe('High');
+    expect(highBadge.querySelector('.priority-count-label span:last-child')?.textContent).toBe(
+      'High',
+    );
     expect(table.querySelectorAll('th[mat-header-cell]').length).toBe(4);
     expect(table.querySelectorAll('tr[mat-row]').length).toBe(10);
     expect(fixture.componentInstance.dataSource.paginator?.pageSize).toBe(10);
@@ -78,8 +84,9 @@ describe('MaterialTable', () => {
 
     expect(paginator?.pageIndex).toBe(1);
     expect(fixture.nativeElement.querySelectorAll('tr[mat-row]').length).toBe(10);
-    expect(fixture.nativeElement.querySelector('tbody tr td.mat-column-entityName')?.textContent?.trim())
-      .toBe('Electric vehicle market outlook');
+    expect(
+      fixture.nativeElement.querySelector('tbody tr td.mat-column-entityName')?.textContent?.trim(),
+    ).toBe('Electric vehicle market outlook');
   });
 
   it('does not advance beyond the last page and resets paging after a priority filter', async () => {
@@ -134,13 +141,17 @@ describe('MaterialTable', () => {
   });
 
   it('applies the priority supplied by the route query parameter', async () => {
-    queryParams.next(convertToParamMap({ priority: 'High', highlightActions: 'true', tab: 'actions' }));
+    queryParams.next(
+      convertToParamMap({ priority: 'High', highlightActions: 'true', tab: 'actions' }),
+    );
 
     expect(fixture.componentInstance.selectedPriority()).toBe(Priority.High);
     expect(fixture.componentInstance.routeAppliedPriority()).toBe(Priority.High);
     expect(fixture.componentInstance.dataSource.filter).toBe('High');
     fixture.detectChanges();
-    expect(fixture.nativeElement.querySelector('table')?.classList).toContain('table-route-highlight');
+    expect(fixture.nativeElement.querySelector('table')?.classList).toContain(
+      'table-route-highlight',
+    );
   });
 
   it('filters no-priority rows and toggles priority filters on and off', () => {

@@ -6,21 +6,25 @@ $primary: mat.m2-define-palette(mat.$m2-indigo-palette, 500);
 $accent: mat.m2-define-palette(mat.$m2-purple-palette, 400);
 $warn: mat.m2-define-palette(mat.$m2-red-palette);
 
-$light-theme: mat.m2-define-light-theme((
-  color: (
-    primary: $primary,
-    accent: $accent,
-    warn: $warn,
-  ),
-));
+$light-theme: mat.m2-define-light-theme(
+  (
+    color: (
+      primary: $primary,
+      accent: $accent,
+      warn: $warn,
+    ),
+  )
+);
 
-$dark-theme: mat.m2-define-dark-theme((
-  color: (
-    primary: $primary,
-    accent: $accent,
-    warn: $warn,
-  ),
-));
+$dark-theme: mat.m2-define-dark-theme(
+  (
+    color: (
+      primary: $primary,
+      accent: $accent,
+      warn: $warn,
+    ),
+  )
+);
 
 :root {
   @include mat.all-component-themes($light-theme);
@@ -32,71 +36,89 @@ $dark-theme: mat.m2-define-dark-theme((
 
 // Keep Angular Material controls on the same runtime color tokens as the rest of the app.
 :root {
-  @include mat.button-overrides((
-    filled-container-color: var(--color-primary-action, var(--color-primary)),
-    filled-label-text-color: #fff,
-    outlined-outline-color: var(--color-border),
-    outlined-label-text-color: var(--color-text),
-    text-label-text-color: var(--color-primary),
-  ));
+  @include mat.button-overrides(
+    (
+      filled-container-color: var(--color-primary-action, var(--color-primary)),
+      filled-label-text-color: #fff,
+      outlined-outline-color: var(--color-border),
+      outlined-label-text-color: var(--color-text),
+      text-label-text-color: var(--color-primary),
+    )
+  );
 
-  @include mat.dialog-overrides((
-    container-color: var(--color-surface),
-    subhead-color: var(--color-text),
-    supporting-text-color: var(--color-muted-text),
-  ));
+  @include mat.dialog-overrides(
+    (
+      container-color: var(--color-surface),
+      subhead-color: var(--color-text),
+      supporting-text-color: var(--color-muted-text),
+    )
+  );
 
-  @include mat.form-field-overrides((
-    outlined-outline-color: var(--color-border),
-    outlined-hover-outline-color: var(--color-primary),
-    outlined-focus-outline-color: var(--color-primary),
-    outlined-label-text-color: var(--color-muted-text),
-    outlined-focus-label-text-color: var(--color-primary),
-    outlined-input-text-color: var(--color-text),
-    outlined-input-text-placeholder-color: var(--color-muted-text),
-  ));
+  @include mat.form-field-overrides(
+    (
+      outlined-outline-color: var(--color-border),
+      outlined-hover-outline-color: var(--color-primary),
+      outlined-focus-outline-color: var(--color-primary),
+      outlined-label-text-color: var(--color-muted-text),
+      outlined-focus-label-text-color: var(--color-primary),
+      outlined-input-text-color: var(--color-text),
+      outlined-input-text-placeholder-color: var(--color-muted-text),
+    )
+  );
 
-  @include mat.select-overrides((
-    panel-background-color: var(--color-surface),
-    enabled-trigger-text-color: var(--color-text),
-    placeholder-text-color: var(--color-muted-text),
-    enabled-arrow-color: var(--color-muted-text),
-    focused-arrow-color: var(--color-primary),
-  ));
+  @include mat.select-overrides(
+    (
+      panel-background-color: var(--color-surface),
+      enabled-trigger-text-color: var(--color-text),
+      placeholder-text-color: var(--color-muted-text),
+      enabled-arrow-color: var(--color-muted-text),
+      focused-arrow-color: var(--color-primary),
+    )
+  );
 
-  @include mat.menu-overrides((
-    container-color: var(--color-surface),
-    item-label-text-color: var(--color-text),
-    item-icon-color: var(--color-muted-text),
-    item-hover-state-layer-color: var(--color-hover),
-  ));
+  @include mat.menu-overrides(
+    (
+      container-color: var(--color-surface),
+      item-label-text-color: var(--color-text),
+      item-icon-color: var(--color-muted-text),
+      item-hover-state-layer-color: var(--color-hover),
+    )
+  );
 
-  @include mat.button-toggle-overrides((
-    divider-color: var(--color-border),
-    selected-state-background-color: var(--color-primary-action, var(--color-primary)),
-    selected-state-text-color: #fff,
-    text-color: var(--color-text),
-  ));
+  @include mat.button-toggle-overrides(
+    (
+      divider-color: var(--color-border),
+      selected-state-background-color: var(--color-primary-action, var(--color-primary)),
+      selected-state-text-color: #fff,
+      text-color: var(--color-text),
+    )
+  );
 
-  @include mat.checkbox-overrides((
-    selected-icon-color: var(--color-primary),
-    selected-focus-icon-color: var(--color-primary),
-    selected-hover-icon-color: var(--color-primary),
-    selected-pressed-icon-color: var(--color-primary),
-    label-text-color: var(--color-text),
-  ));
+  @include mat.checkbox-overrides(
+    (
+      selected-icon-color: var(--color-primary),
+      selected-focus-icon-color: var(--color-primary),
+      selected-hover-icon-color: var(--color-primary),
+      selected-pressed-icon-color: var(--color-primary),
+      label-text-color: var(--color-text),
+    )
+  );
 
-  @include mat.paginator-overrides((
-    container-background-color: var(--color-surface),
-    container-text-color: var(--color-text),
-    enabled-icon-color: var(--color-muted-text),
-    disabled-icon-color: color-mix(in srgb, var(--color-text) 38%, transparent),
-  ));
+  @include mat.paginator-overrides(
+    (
+      container-background-color: var(--color-surface),
+      container-text-color: var(--color-text),
+      enabled-icon-color: var(--color-muted-text),
+      disabled-icon-color: color-mix(in srgb, var(--color-text) 38%, transparent),
+    )
+  );
 
-  @include mat.slide-toggle-overrides((
-    selected-track-color: var(--color-primary),
-    selected-focus-track-color: var(--color-primary),
-    selected-hover-track-color: var(--color-primary),
-    selected-pressed-track-color: var(--color-primary),
-  ));
+  @include mat.slide-toggle-overrides(
+    (
+      selected-track-color: var(--color-primary),
+      selected-focus-track-color: var(--color-primary),
+      selected-hover-track-color: var(--color-primary),
+      selected-pressed-track-color: var(--color-primary),
+    )
+  );
 }
