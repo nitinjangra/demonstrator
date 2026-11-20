@@ -1,7 +1,8 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, HostListener, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { StickyFooterComponent } from '../../../../shared/components/sticky-footer/sticky-footer.component';
+import { UnsavedChangesDialogService } from '../../../../shared/components/unsaved-changes-dialog/unsaved-changes-dialog.component';
 import { ThemePreference, ThemeService } from '../../../../shared/services/theme.service';
 
 @Component({
@@ -13,6 +14,7 @@ import { ThemePreference, ThemeService } from '../../../../shared/services/theme
 })
 export class ThemeSetting {
   private readonly themeService = inject(ThemeService);
+  private readonly unsavedChangesDialog = inject(UnsavedChangesDialogService);
   readonly theme = this.themeService.theme;
   readonly preference = this.themeService.preference;
   readonly draftPreference = signal(this.preference());
@@ -24,5 +26,14 @@ export class ThemeSetting {
 
   saveChanges(): void {
     this.themeService.setTheme(this.draftPreference());
+  }
+
+  @HostListener('window:beforeunload', ['$event'])
+  warnBeforeLeaving(event: BeforeUnloadEvent): void {
+    this.unsavedChangesDialog.warnBeforeUnload(event, this.hasUnsavedChanges());
+  }
+
+  canDeactivate(): boolean | import('rxjs').Observable<boolean> {
+    return this.unsavedChangesDialog.confirmIfNeeded(this.hasUnsavedChanges());
   }
 }

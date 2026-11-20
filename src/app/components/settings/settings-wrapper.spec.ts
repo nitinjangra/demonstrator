@@ -12,7 +12,9 @@ describe('SettingsWrapper', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [SettingsWrapper],
-      providers: [provideRouter([{ path: 'settings/announcements', component: SettingsTestRoute }])],
+      providers: [
+        provideRouter([{ path: 'settings/announcements', component: SettingsTestRoute }]),
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(SettingsWrapper);
@@ -20,22 +22,27 @@ describe('SettingsWrapper', () => {
     await fixture.whenStable();
   });
 
-  it('should show the General navigation group and its settings links', () => {
+  it('shows settings links grouped by organization, preferences, and developer tools', () => {
     const sidebar = fixture.nativeElement.querySelector(
       '[aria-label="Settings navigation"]',
     ) as HTMLElement;
 
-    expect(sidebar.textContent).toContain('General');
+    expect(sidebar.textContent).toContain('Organization');
+    expect(sidebar.textContent).toContain('Preferences');
+    expect(sidebar.textContent).toContain('Developer / Demo');
     expect(sidebar.textContent).toContain('Branding');
-    expect(sidebar.textContent).toContain('Time setting');
+    expect(sidebar.textContent).toContain('Date & time');
     expect(sidebar.textContent).toContain('Theme');
+    expect(sidebar.textContent).toContain('Language');
     expect(sidebar.textContent).toContain('Feature toggles');
     expect(sidebar.textContent).toContain('Notifications');
     expect(sidebar.textContent).toContain('Announcement settings');
     expect(sidebar.querySelector('a[href="/settings/general/branding"]')).not.toBeNull();
     expect(sidebar.querySelector('a[href="/settings/general/time"]')).not.toBeNull();
     expect(sidebar.querySelector('a[href="/settings/general/theme"]')).not.toBeNull();
+    expect(sidebar.querySelector('a[href="/settings/general/language"]')).not.toBeNull();
     expect(sidebar.querySelector('a[href="/settings/general/feature-toggles"]')).not.toBeNull();
+    expect(sidebar.querySelector('a[href="/settings/general/mock-driver"]')).toBeNull();
     expect(sidebar.querySelector('a[href="/settings/general/notifications"]')).not.toBeNull();
     expect(sidebar.querySelector('a[href="/settings/announcements"]')).not.toBeNull();
 
@@ -45,11 +52,12 @@ describe('SettingsWrapper', () => {
     expect(itemNames).toEqual([
       'Overview',
       'Branding',
-      'Feature toggles',
-      'Notifications',
-      'Theme',
-      'Time setting',
       'Announcement settings',
+      'Notifications',
+      'Date & time',
+      'Theme',
+      'Language',
+      'Feature toggles',
     ]);
   });
 
@@ -57,7 +65,7 @@ describe('SettingsWrapper', () => {
     let toggle = fixture.nativeElement.querySelector('.sidebar-toggle') as HTMLButtonElement;
     const sidebar = fixture.nativeElement.querySelector('.settings-sidebar') as HTMLElement;
 
-    expect(toggle.getAttribute('aria-label')).toBe('Minimize settings menu');
+    expect(toggle.getAttribute('aria-label')).toBe('Collapse settings menu');
     toggle.click();
     fixture.detectChanges();
 
@@ -71,7 +79,7 @@ describe('SettingsWrapper', () => {
 
     expect(sidebar.classList).not.toContain('settings-sidebar--minimized');
     toggle = fixture.nativeElement.querySelector('.sidebar-toggle') as HTMLButtonElement;
-    expect(toggle.getAttribute('aria-label')).toBe('Minimize settings menu');
+    expect(toggle.getAttribute('aria-label')).toBe('Collapse settings menu');
   });
 
   it('highlights announcement settings when its route is active', async () => {

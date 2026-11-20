@@ -64,14 +64,18 @@ describe('AnnouncementsActionService', () => {
     const existing = Array.from({ length: 9 }, (_, index) => ({
       id: `existing-${index}`,
       title: `Existing ${index}`,
-      status: index % 2 === 0 ? 'Published' as const : 'Draft' as const,
+      status: index % 2 === 0 ? ('Published' as const) : ('Draft' as const),
       ...(index === 0 ? { endDate: yesterday } : {}),
     }));
     service.saveAnnouncements(existing);
 
-    expect(service.addAnnouncement({ title: 'Tenth announcement', status: 'Published' })).toBeTrue();
+    expect(
+      service.addAnnouncement({ title: 'Tenth announcement', status: 'Published' }),
+    ).toBeTrue();
     expect(service.canAddAnnouncement).toBeFalse();
-    expect(service.addAnnouncement({ title: 'Eleventh announcement', status: 'Draft' })).toBeFalse();
+    expect(
+      service.addAnnouncement({ title: 'Eleventh announcement', status: 'Draft' }),
+    ).toBeFalse();
 
     const allAnnouncements = await firstValueFrom(service.getAllAnnouncements());
     expect(allAnnouncements.length).toBe(10);
@@ -107,8 +111,9 @@ describe('AnnouncementsActionService', () => {
 
     expect(allAnnouncements.map(({ title }) => title)).toContain('Draft notice');
     expect(homeAnnouncements.map(({ title }) => title)).not.toContain('Draft notice');
-    const savedTitles = (JSON.parse(localStorage.getItem('announcements') ?? '[]') as Announcement[])
-      .map(({ title }) => title);
+    const savedTitles = (
+      JSON.parse(localStorage.getItem('announcements') ?? '[]') as Announcement[]
+    ).map(({ title }) => title);
     expect(savedTitles).toEqual(allAnnouncements.map(({ title }) => title));
   });
 
@@ -139,7 +144,12 @@ describe('AnnouncementsActionService', () => {
     service.saveAnnouncements([
       { id: 'future-start', title: 'Starts tomorrow', status: 'Published', startDate: tomorrow },
       { id: 'starts-today', title: 'Starts today', status: 'Published', startDate: today },
-      { id: 'already-started', title: 'Already started', status: 'Published', startDate: yesterday },
+      {
+        id: 'already-started',
+        title: 'Already started',
+        status: 'Published',
+        startDate: yesterday,
+      },
     ]);
 
     const announcements = await firstValueFrom(service.getAnnouncements());
@@ -150,10 +160,30 @@ describe('AnnouncementsActionService', () => {
   it('applies inclusive start and end date boundaries to the active feed', () => {
     const now = new Date(2026, 10, 3, 14, 30);
     const announcements: Announcement[] = [
-      { id: 'starts-today', title: 'Starts today', status: 'Published', startDate: new Date(2026, 10, 3) },
-      { id: 'ends-today', title: 'Ends today', status: 'Published', endDate: new Date(2026, 10, 3) },
-      { id: 'starts-tomorrow', title: 'Starts tomorrow', status: 'Published', startDate: new Date(2026, 10, 4) },
-      { id: 'ended-yesterday', title: 'Ended yesterday', status: 'Published', endDate: new Date(2026, 10, 2) },
+      {
+        id: 'starts-today',
+        title: 'Starts today',
+        status: 'Published',
+        startDate: new Date(2026, 10, 3),
+      },
+      {
+        id: 'ends-today',
+        title: 'Ends today',
+        status: 'Published',
+        endDate: new Date(2026, 10, 3),
+      },
+      {
+        id: 'starts-tomorrow',
+        title: 'Starts tomorrow',
+        status: 'Published',
+        startDate: new Date(2026, 10, 4),
+      },
+      {
+        id: 'ended-yesterday',
+        title: 'Ended yesterday',
+        status: 'Published',
+        endDate: new Date(2026, 10, 2),
+      },
     ];
 
     expect(filterAnnouncementsForDisplay(announcements, now).map(({ id }) => id)).toEqual([
@@ -171,8 +201,9 @@ describe('AnnouncementsActionService', () => {
     const saved = JSON.parse(localStorage.getItem('announcements') ?? '[]') as Announcement[];
     expect(saved[1].attachmentUrl).toBeUndefined();
     expect(saved[1].attachmentName).toBeUndefined();
-    expect((await firstValueFrom(service.getAllAnnouncements()))[1].attachmentUrl)
-      .toBe('blob:temporary-attachment');
+    expect((await firstValueFrom(service.getAllAnnouncements()))[1].attachmentUrl).toBe(
+      'blob:temporary-attachment',
+    );
   });
 
   describe('handleAnnouncementClick', () => {

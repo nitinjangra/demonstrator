@@ -1,7 +1,8 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, HostListener, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { StickyFooterComponent } from '../../../../shared/components/sticky-footer/sticky-footer.component';
+import { UnsavedChangesDialogService } from '../../../../shared/components/unsaved-changes-dialog/unsaved-changes-dialog.component';
 import {
   CalendarFormat,
   ClockFormat,
@@ -41,7 +42,7 @@ import {
         </mat-button-toggle-group>
       </div>
     </section>
-    <app-sticky-footer [fixed]="false">
+    <app-sticky-footer [fixed]="true">
       <button
         matButton="filled"
         type="button"
@@ -111,6 +112,7 @@ import {
 })
 export class TimeSetting {
   private readonly settings = inject(DateTimeSettingsService);
+  private readonly unsavedChangesDialog = inject(UnsavedChangesDialogService);
   readonly clockFormat = this.settings.clockFormat;
   readonly calendarFormat = this.settings.calendarFormat;
   readonly draftClockFormat = signal(this.clockFormat());
@@ -132,5 +134,14 @@ export class TimeSetting {
   saveChanges(): void {
     this.settings.setClockFormat(this.draftClockFormat());
     this.settings.setCalendarFormat(this.draftCalendarFormat());
+  }
+
+  @HostListener('window:beforeunload', ['$event'])
+  warnBeforeLeaving(event: BeforeUnloadEvent): void {
+    this.unsavedChangesDialog.warnBeforeUnload(event, this.hasUnsavedChanges());
+  }
+
+  canDeactivate(): boolean | import('rxjs').Observable<boolean> {
+    return this.unsavedChangesDialog.confirmIfNeeded(this.hasUnsavedChanges());
   }
 }

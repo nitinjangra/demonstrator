@@ -4,9 +4,14 @@ on:
   push:
     branches:
       - development
+      - master
   pull_request:
     branches:
       - development
+      - master
+
+permissions:
+  contents: read
 
 jobs:
   test:
@@ -25,8 +30,5 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Lint
-        run: npm run lint
-
-      - name: Run tests
-        run: npm test -- --watch=false --browsers=ChromeHeadless
+      - name: Verify
+        run: npm run ci

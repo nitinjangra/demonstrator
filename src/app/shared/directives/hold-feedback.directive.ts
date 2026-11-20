@@ -81,11 +81,14 @@ export class HoldFeedbackDirective {
       return;
     }
 
-    this.holdTimer = setTimeout(() => {
-      this.holdTimer = undefined;
-      this.isHolding = false;
-      this.holdFeedbackComplete.emit();
-    }, Math.max(0, this.holdFeedbackDuration));
+    this.holdTimer = setTimeout(
+      () => {
+        this.holdTimer = undefined;
+        this.isHolding = false;
+        this.holdFeedbackComplete.emit();
+      },
+      Math.max(0, this.holdFeedbackDuration),
+    );
   }
 
   private cancelHold(): void {

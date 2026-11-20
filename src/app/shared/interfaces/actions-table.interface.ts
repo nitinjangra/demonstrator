@@ -1,4 +1,4 @@
-import { Priority } from "../enums/priority.enum";
+import { Priority } from '../enums/priority.enum';
 
 export interface ActionTableRow {
   id: number;

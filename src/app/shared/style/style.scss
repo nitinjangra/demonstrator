@@ -14,8 +14,9 @@
   --color-muted-text: #4b5563;
 }
 
-[data-theme="dark"] {
-  --color-primary: #3b82f6;
+[data-theme='dark'] {
+  --color-primary: #93c5fd;
+  --color-primary-action: #1d4ed8;
   --color-secondary: #a78bfa;
   --color-success: #22c55e;
   --color-warning: #fbbf24;

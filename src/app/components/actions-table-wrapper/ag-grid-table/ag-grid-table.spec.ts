@@ -5,6 +5,7 @@ import { ActivatedRoute, convertToParamMap, ParamMap } from '@angular/router';
 import { BehaviorSubject } from 'rxjs';
 import { AgGridAngular } from 'ag-grid-angular';
 import { By } from '@angular/platform-browser';
+import { clearActionTableTestData, seedActionTableTestData } from '../actions-table-test-data';
 
 describe('AgGridTable', () => {
   let component: AgGridTable;
@@ -12,14 +13,19 @@ describe('AgGridTable', () => {
   let queryParams: BehaviorSubject<ParamMap>;
 
   beforeEach(() => {
+    seedActionTableTestData();
     queryParams = new BehaviorSubject(convertToParamMap({}));
     TestBed.configureTestingModule({
       imports: [AgGridTable],
-      providers: [{ provide: ActivatedRoute, useValue: { queryParamMap: queryParams.asObservable() } }],
+      providers: [
+        { provide: ActivatedRoute, useValue: { queryParamMap: queryParams.asObservable() } },
+      ],
     });
     fixture = TestBed.createComponent(AgGridTable);
     component = fixture.componentInstance;
   });
+
+  afterEach(() => clearActionTableTestData());
 
   it('formats present and missing due dates and each priority level', () => {
     const dueDate = component.columnDefs.find((column) => column.field === 'dueDate');
@@ -28,7 +34,7 @@ describe('AgGridTable', () => {
     const priorityFormatter = priority?.valueFormatter as (params: { value: unknown }) => string;
 
     expect(dateFormatter({ value: null })).toBe('—');
-    expect(dateFormatter({ value: '2024-01-05T13:07:00' })).toContain('05-01-2024');
+    expect(dateFormatter({ value: '2024-01-05T13:07:00' })).toBe('Jan 5, 2024');
     expect(priorityFormatter({ value: Priority.High })).toContain('High');
     expect(priorityFormatter({ value: Priority.Medium })).toContain('Medium');
     expect(priorityFormatter({ value: Priority.Low })).toContain('Low');
@@ -48,13 +54,16 @@ describe('AgGridTable', () => {
   });
 
   it('applies the priority supplied by the route query parameter', () => {
-    queryParams.next(convertToParamMap({ priority: 'High', highlightActions: 'true', tab: 'actions' }));
+    queryParams.next(
+      convertToParamMap({ priority: 'High', highlightActions: 'true', tab: 'actions' }),
+    );
 
     expect(component.selectedPriority()).toBe(Priority.High);
     expect(component.routeAppliedPriority()).toBe(Priority.High);
     fixture.detectChanges();
-    expect(fixture.nativeElement.querySelector('.ag-grid-frame')?.classList)
-      .toContain('table-route-highlight');
+    expect(fixture.nativeElement.querySelector('.ag-grid-frame')?.classList).toContain(
+      'table-route-highlight',
+    );
   });
 
   it('enables pagination with ten rows per page by default', async () => {
@@ -63,7 +72,8 @@ describe('AgGridTable', () => {
 
     expect(fixture.nativeElement.querySelector('.ag-paging-panel')).not.toBeNull();
     expect(fixture.nativeElement.querySelector('.ag-paging-row-summary-panel')).not.toBeNull();
-    const grid = fixture.debugElement.query(By.directive(AgGridAngular)).componentInstance as AgGridAngular;
+    const grid = fixture.debugElement.query(By.directive(AgGridAngular))
+      .componentInstance as AgGridAngular;
     expect(grid.api.paginationGetPageSize()).toBe(10);
     expect(grid.api.paginationGetTotalPages()).toBe(2);
     grid.api.paginationGoToNextPage();
@@ -77,5 +87,16 @@ describe('AgGridTable', () => {
     expect(component.selectedPriority()).toBeNull();
     expect(component.routeAppliedPriority()).toBeNull();
     expect(component.rowData().length).toBe(20);
+  });
+
+  it('filters rows without a priority and toggles the selected priority off', () => {
+    component.togglePriorityFilter('none');
+    expect(component.rowData().length).toBe(2);
+    component.togglePriorityFilter('none');
+    expect(component.rowData().length).toBe(20);
+    component.togglePriorityFilter(Priority.Low);
+    expect(component.rowData().length).toBe(6);
+    component.clearPriorityFilter();
+    expect(component.selectedPriority()).toBeNull();
   });
 });

@@ -2,7 +2,23 @@ mat-form-field {
   display: block;
 }
 
-:host { display: block; min-width: 0; }
+.announcement-date-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+@media (max-width: 520px) {
+  .announcement-date-fields {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+  }
+}
+
+:host {
+  display: block;
+  min-width: 0;
+}
 
 .announcement-form-title {
   display: flex;
@@ -17,7 +33,7 @@ mat-form-field {
 
   h2 {
     margin: 0;
-    text-align: left;
+    text-align: start;
   }
 
   p {
@@ -63,7 +79,11 @@ mat-form-field {
   padding: 1rem 1.5rem 0.5rem;
 }
 
-mat-form-field { display: block; width: 100%; min-width: 0; }
+mat-form-field {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
 
 mat-dialog-content:not(.announcement-form-content--embedded) {
   max-height: min(65dvh, calc(100dvh - 13rem));

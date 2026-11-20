@@ -42,6 +42,20 @@ describe('DateTimeSettingsService', () => {
     expect(service.formatDateTime('not a date')).toBe('');
   });
 
+  it('formats a localized date-only label and rejects invalid dates', () => {
+    expect(service.formatDateOnly(new Date(2024, 0, 5), 'en-US')).toBe('Jan 5, 2024');
+    expect(service.formatDateOnly('not a date', 'en-US')).toBe('');
+    expect(service.formatDateOnly('2024-01-05', 'ar')).toContain('يناير');
+  });
+
+  it('formats a date and time tooltip using the selected clock format', () => {
+    const date = new Date(2024, 0, 5, 13, 7);
+    expect(service.formatDateTooltip(date, 'en-US')).toContain('1:07 PM');
+    service.setClockFormat('24h');
+    expect(service.formatDateTooltip(date, 'en-US')).toContain('13:07');
+    expect(service.formatDateTooltip('not a date', 'en-US')).toBe('');
+  });
+
   it('uses stored formats when the service is initialized', () => {
     localStorage.setItem('clock-format', '24h');
     localStorage.setItem('calendar-format', 'mm-dd-yyyy');

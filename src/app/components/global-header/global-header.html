@@ -8,18 +8,101 @@
       <button mat-menu-item>Item 2</button>
     </mat-menu>
   }
-  <a class="global-header-brand" routerLink="/landing" [attr.aria-label]="brandName() + ' home'">
+  <a
+    class="global-header-brand global-header-home-link"
+    routerLink="/landing"
+    aria-label="Home"
+    title="Home"
+  >
     <mat-icon class="global-header-home-icon" aria-hidden="true">home</mat-icon>
-    {{ brandName() }}
+    @if (brandMode() === 'image' && brandLogo()) {
+      <img
+        class="global-header-brand-image"
+        [src]="brandLogo()"
+        [alt]="brandAltText() || brandName()"
+      />
+    } @else {
+      <span class="global-header-brand-label" [title]="brandName()">{{ brandName() }}</span>
+    }
   </a>
   <span class="example-spacer"></span>
-  @if (dashboardEnabled()) {
-    <a class="global-header-dashboard" routerLink="/dashboard" aria-label="Dashboard" title="Dashboard">
+  @if (dashboardEnabled() && isAdmin()) {
+    <a
+      class="global-header-dashboard"
+      routerLink="/dashboard"
+      aria-label="Dashboard"
+      title="Dashboard"
+    >
       <mat-icon aria-hidden="true">dashboard</mat-icon>
     </a>
   }
   <app-theme-toggle></app-theme-toggle>
-  <button class="settings-icon" type="button" routerLink="/settings/overview" aria-label="Open settings">
-    <mat-icon aria-hidden="true">settings</mat-icon>
+  <button
+    class="user-icon"
+    type="button"
+    [matMenuTriggerFor]="userProfileMenu"
+    [matTooltip]="userName()"
+    aria-haspopup="menu"
+    [attr.aria-label]="'Switch user profile. Current user: ' + userName()"
+    title="Switch user profile"
+  >
+    <mat-icon aria-hidden="true">person</mat-icon>
   </button>
+  <mat-menu #userProfileMenu="matMenu" aria-label="Predefined user profiles">
+    <button mat-menu-item type="button" disabled>
+      <mat-icon aria-hidden="true">info</mat-icon>
+      <span>Demo profiles only; no access authorization</span>
+    </button>
+    @for (profile of userProfiles; track profile.id) {
+      @if (userName() === profile.name) {
+        <button mat-menu-item type="button" disabled>
+          <mat-icon aria-hidden="true">{{ profile.id === 'invited' ? 'mail' : 'person' }}</mat-icon>
+          <span>Current profile: {{ profile.name }}</span>
+        </button>
+      }
+    }
+    <mat-divider />
+    <button mat-menu-item type="button" [matMenuTriggerFor]="languageMenu">
+      <mat-icon aria-hidden="true">language</mat-icon>
+      <span>Language · {{ language() === 'ar' ? 'العربية' : 'English (US)' }}</span>
+    </button>
+    <mat-menu #languageMenu="matMenu" aria-label="Choose language">
+      <button mat-menu-item type="button" (click)="setLanguage('en-US')">
+        <span>English (United States)</span>
+        @if (language() === 'en-US') {
+          <mat-icon aria-hidden="true">check</mat-icon>
+        }
+      </button>
+      <button mat-menu-item type="button" (click)="setLanguage('ar')">
+        <span>العربية · Arabic</span>
+        @if (language() === 'ar') {
+          <mat-icon aria-hidden="true">check</mat-icon>
+        }
+      </button>
+      <mat-divider />
+      <button mat-menu-item type="button" routerLink="/settings/general/language">
+        <mat-icon aria-hidden="true">tune</mat-icon>
+        <span>Language &amp; region settings</span>
+      </button>
+    </mat-menu>
+    <mat-divider />
+    @for (profile of userProfiles; track profile.id) {
+      @if (userName() !== profile.name) {
+        <button mat-menu-item type="button" (click)="selectProfile(profile.id)">
+          <mat-icon aria-hidden="true">{{ profile.id === 'invited' ? 'mail' : 'person' }}</mat-icon>
+          <span>Switch to {{ profile.name }}</span>
+        </button>
+      }
+    }
+  </mat-menu>
+  @if (isAdmin()) {
+    <button
+      class="settings-icon"
+      type="button"
+      routerLink="/settings/overview"
+      aria-label="Open settings"
+    >
+      <mat-icon aria-hidden="true">settings</mat-icon>
+    </button>
+  }
 </mat-toolbar>

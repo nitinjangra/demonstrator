@@ -1,21 +1,26 @@
-import { Component, EventEmitter, inject, Input, OnInit, Output } from '@angular/core';
+import { Component, DestroyRef, EventEmitter, inject, Input, OnInit, Output } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule, MatOptionModule } from '@angular/material/core';
+import { MatNativeDateModule } from '@angular/material/core';
 import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
 import { StickyFooterComponent } from '../../../shared/components/sticky-footer/sticky-footer.component';
+import { UnsavedChangesDialogService } from '../../../shared/components/unsaved-changes-dialog/unsaved-changes-dialog.component';
+import { filter, take } from 'rxjs';
 import type { FooterStyles } from '../../../shared/components/sticky-footer/sticky-footer.component';
 import {
   announcementDateRangeValidator,
   httpUrlValidator,
   trimmedRequiredValidator,
 } from '../../../shared/validators/announcement.validators';
-import type { AnnouncementEditorData, CreateAnnouncementResult } from '../types/create-announcement.types';
+import type {
+  AnnouncementEditorData,
+  CreateAnnouncementResult,
+} from '../types/create-announcement.types';
 
 const ACCEPTED_ATTACHMENT_TYPES = '.jpg,.jpeg,.png,image/jpeg,image/png';
 
@@ -29,8 +34,6 @@ const ACCEPTED_ATTACHMENT_TYPES = '.jpg,.jpeg,.png,image/jpeg,image/png';
     MatFormFieldModule,
     MatIconModule,
     MatInputModule,
-    MatOptionModule,
-    MatSelectModule,
     MatNativeDateModule,
     ReactiveFormsModule,
     StickyFooterComponent,
@@ -41,13 +44,21 @@ const ACCEPTED_ATTACHMENT_TYPES = '.jpg,.jpeg,.png,image/jpeg,image/png';
 export class CreateAnnouncementDialogComponent implements OnInit {
   private static readonly maxAttachmentSizeBytes = 2 * 1024 * 1024;
   readonly acceptedAttachmentTypes = ACCEPTED_ATTACHMENT_TYPES;
+  readonly minimumDate = new Date(
+    new Date().getFullYear(),
+    new Date().getMonth(),
+    new Date().getDate(),
+  );
   private readonly formBuilder = inject(FormBuilder);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly unsavedChangesDialog = inject(UnsavedChangesDialogService);
   private readonly injectedData = inject<AnnouncementEditorData | null>(MAT_DIALOG_DATA, {
     optional: true,
   });
-  private readonly dialogRef = inject<
-    MatDialogRef<CreateAnnouncementDialogComponent, CreateAnnouncementResult> | null
-  >(MatDialogRef, { optional: true });
+  private readonly dialogRef = inject<MatDialogRef<
+    CreateAnnouncementDialogComponent,
+    CreateAnnouncementResult
+  > | null>(MatDialogRef, { optional: true });
 
   @Input() editorData: AnnouncementEditorData | null = null;
   @Output() saved = new EventEmitter<CreateAnnouncementResult>();
@@ -81,6 +92,12 @@ export class CreateAnnouncementDialogComponent implements OnInit {
     return this.modeData.mode === 'edit';
   }
 
+  readonly startDateFilter = (date: Date | null): boolean =>
+    this.isDateSelectable(date, this.modeData.announcement?.startDate);
+
+  readonly endDateFilter = (date: Date | null): boolean =>
+    this.isDateSelectable(date, this.modeData.announcement?.endDate);
+
   get isEmbedded(): boolean {
     return this.dialogRef === null;
   }
@@ -89,7 +106,26 @@ export class CreateAnnouncementDialogComponent implements OnInit {
     return this.removeExistingAttachment ? undefined : this.modeData.announcement?.attachmentName;
   }
 
+  get hasUnsavedChanges(): boolean {
+    return this.form.dirty || !!this.selectedAttachment || this.removeExistingAttachment;
+  }
+
   ngOnInit(): void {
+    this.dialogRef
+      ?.backdropClick()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => this.cancel());
+    this.dialogRef
+      ?.keydownEvents()
+      .pipe(
+        filter((event) => event.key === 'Escape'),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe((event) => {
+        event.preventDefault();
+        this.cancel();
+      });
+
     const announcement = this.modeData.announcement;
     if (!announcement) return;
 
@@ -131,7 +167,7 @@ export class CreateAnnouncementDialogComponent implements OnInit {
     this.attachmentError = null;
   }
 
-  submit(): void {
+  submit(intent: 'draft' | 'publish' = 'publish'): void {
     if (this.selectedAttachment) {
       this.attachmentError = this.getAttachmentError(this.selectedAttachment);
     }
@@ -148,6 +184,7 @@ export class CreateAnnouncementDialogComponent implements OnInit {
     const result: CreateAnnouncementResult = {
       title: (value.title ?? '').trim(),
       status: value.status ?? 'Draft',
+      intent,
       description: value.description?.trim() || undefined,
       linkUrl: value.linkUrl?.trim() || undefined,
       startDate: this.toDate(value.startDate),
@@ -161,6 +198,18 @@ export class CreateAnnouncementDialogComponent implements OnInit {
   }
 
   cancel(): void {
+    const confirmation = this.unsavedChangesDialog.confirmIfNeeded(this.hasUnsavedChanges);
+    if (typeof confirmation === 'boolean') {
+      if (confirmation) this.dismiss();
+      return;
+    }
+
+    confirmation.pipe(take(1)).subscribe((confirmed) => {
+      if (confirmed) this.dismiss();
+    });
+  }
+
+  private dismiss(): void {
     if (this.dialogRef) this.dialogRef.close();
     else this.cancelled.emit();
   }
@@ -168,6 +217,19 @@ export class CreateAnnouncementDialogComponent implements OnInit {
   private toDate(value: Date | null): Date | undefined {
     if (!value) return undefined;
     return new Date(value.getFullYear(), value.getMonth(), value.getDate());
+  }
+
+  private isDateSelectable(date: Date | null, existingDate: Date | string | undefined): boolean {
+    if (!date) return false;
+    if (date >= this.minimumDate) return true;
+    if (!this.isEditing || !existingDate) return false;
+
+    const existing = new Date(existingDate);
+    return (
+      date.getFullYear() === existing.getFullYear() &&
+      date.getMonth() === existing.getMonth() &&
+      date.getDate() === existing.getDate()
+    );
   }
 
   private isAllowedImage(file: File): boolean {

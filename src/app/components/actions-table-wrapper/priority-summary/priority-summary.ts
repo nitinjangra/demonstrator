@@ -1,4 +1,5 @@
 import { Component, computed, input, output } from '@angular/core';
+import { MatIconModule } from '@angular/material/icon';
 import { Priority } from '../../../shared/enums/priority.enum';
 import { ActionTableRow } from '../../../shared/interfaces/actions-table.interface';
 
@@ -7,6 +8,7 @@ type PriorityFilter = Priority | 'none';
 @Component({
   selector: 'app-priority-summary',
   standalone: true,
+  imports: [MatIconModule],
   templateUrl: './priority-summary.html',
   styleUrl: './priority-summary.scss',
 })

@@ -1,15 +1,28 @@
-<section class="announcements" aria-labelledby="announcements-title">
+<section
+  class="announcements"
+  [class.announcements--scrollable]="enableKeyboardScrolling"
+  [attr.aria-labelledby]="enableKeyboardScrolling ? null : 'announcements-title'"
+  [attr.aria-busy]="isBusy"
+>
   <h2 id="announcements-title" class="announcements-title">
     <mat-icon aria-hidden="true">campaign</mat-icon>
     Announcements
-    @if (showContextMenu) {
+    @if (displayedLoadStatus === 'refreshing') {
+      <span class="announcement-updating" role="status"
+        ><span class="announcement-spinner" aria-hidden="true"></span> Updating...</span
+      >
+    }
+    @if (showContextMenu && canManageAnnouncements) {
       <button
         class="announcement-menu-trigger"
         appHoldFeedback
         mat-icon-button
         type="button"
         [matMenuTriggerFor]="announcementMenu"
-        aria-label="Announcement options"
+        #menuTrigger="matMenuTrigger"
+        aria-haspopup="menu"
+        [attr.aria-expanded]="menuTrigger.menuOpen"
+        aria-label="Announcements options"
       >
         <mat-icon aria-hidden="true">more_vert</mat-icon>
       </button>
@@ -20,16 +33,54 @@
       <mat-icon aria-hidden="true">settings</mat-icon>
       <span>Settings</span>
     </button>
-    <button mat-menu-item type="button" [disabled]="!canAddAnnouncement" (click)="openCreateAnnouncementDialog()">
+    <button
+      mat-menu-item
+      type="button"
+      [disabled]="!canAddAnnouncement"
+      (click)="openCreateAnnouncementDialog()"
+    >
       <mat-icon aria-hidden="true">add</mat-icon>
       <span>{{ canAddAnnouncement ? 'Add announcement' : 'Announcement limit reached (10)' }}</span>
     </button>
   </mat-menu>
+
   @let announcementsData = announcements | async;
-  <div class="announcements-panel">
-    <ul class="announcements-list">
-      @if (announcementsData) {
-        @for (announcement of announcementsData; track announcement.id) {
+
+  <div
+    class="announcements-panel"
+    [class.announcements-panel--refreshing]="displayedLoadStatus === 'refreshing'"
+    [attr.role]="enableKeyboardScrolling ? 'region' : null"
+    [attr.aria-labelledby]="enableKeyboardScrolling ? 'announcements-title' : null"
+    [attr.tabindex]="enableKeyboardScrolling ? 0 : null"
+  >
+    @if (displayedLoadStatus === 'loading') {
+      <app-loading text="Loading announcements..." />
+    } @else if (displayedLoadStatus === 'error') {
+      <div class="announcements-load-error" role="alert">
+        <strong>Couldn't load announcements</strong>
+        <span>Check your connection and try again.</span>
+        <button matButton type="button" (click)="retryAnnouncements()">Try again</button>
+      </div>
+    } @else {
+      <ul class="announcements-list">
+        @if (displayedLoadStatus === 'loaded' && announcementsData?.length === 0) {
+          <li class="announcements-empty-state" role="status">
+            <mat-icon aria-hidden="true">campaign</mat-icon>
+            <p class="announcements-empty-state-title">No announcements yet</p>
+            <p class="announcements-empty-state-description">New announcements will appear here.</p>
+            @if (canManageAnnouncements) {
+              <button
+                matButton="filled"
+                type="button"
+                [disabled]="previewOnly || !canAddAnnouncement"
+                (click)="openCreateAnnouncementDialog()"
+              >
+                Add announcement
+              </button>
+            }
+          </li>
+        }
+        @for (announcement of announcementsData ?? []; track announcement.id) {
           <li class="announcements-list-item">
             <article>
               <h3 class="announcement-title">{{ announcement.title }}</h3>
@@ -52,8 +103,10 @@
                   rel="noopener noreferrer"
                 >
                   Read announcement
-                  <span aria-hidden="true"> →</span>
-                  <span class="visually-hidden">: {{ announcement.title }} (opens in a new tab)</span>
+                  <span aria-hidden="true"> &rarr;</span>
+                  <span class="visually-hidden"
+                    >: {{ announcement.title }} (opens in a new tab)</span
+                  >
                 </a>
               }
               @if (announcement.attachmentUrl && announcement.attachmentName) {
@@ -66,7 +119,10 @@
                   {{ announcement.attachmentName }}
                 </a>
               }
-              @if (announcement.description && (isTruncated(announcement.id) || isExpanded(announcement.id))) {
+              @if (
+                announcement.description &&
+                (isTruncated(announcement.id) || isExpanded(announcement.id))
+              ) {
                 <button
                   class="announcement-expand"
                   type="button"
@@ -86,7 +142,7 @@
             </article>
           </li>
         }
-      }
-    </ul>
+      </ul>
+    }
   </div>
 </section>

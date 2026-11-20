@@ -7,8 +7,6 @@ on:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
   group: pages
@@ -24,7 +22,7 @@ jobs:
           node-version: '22.22.3'
           cache: npm
       - run: npm ci
-      - run: npx ng build --base-href /demonstrator/
+      - run: npm run ci
       - run: cp dist/demonstrator/browser/index.html dist/demonstrator/browser/404.html
       - uses: actions/upload-pages-artifact@v3
         with:
@@ -36,6 +34,9 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+    permissions:
+      pages: write
+      id-token: write
     steps:
       - id: deployment
         uses: actions/deploy-pages@v4

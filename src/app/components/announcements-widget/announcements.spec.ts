@@ -7,6 +7,7 @@ import { mockAnnouncements } from '../../shared/mocks/mock-announcements';
 import { CoreTestingModule } from '../../shared/core/core-testing.module';
 import { AsyncPipe } from '@angular/common';
 import { AnnouncementsActionService } from './services/announcements-action.service';
+import { signal } from '@angular/core';
 describe('AnnouncementsWidgetComponent', () => {
   let component: AnnouncementsWidgetComponent;
   let fixture: ComponentFixture<AnnouncementsWidgetComponent>;
@@ -15,7 +16,11 @@ describe('AnnouncementsWidgetComponent', () => {
   beforeEach(async () => {
     announcementsActionServiceSpy = jasmine.createSpyObj<AnnouncementsActionService>(
       'announcementsActionService',
-      ['getAnnouncements', 'handleAnnouncementClick'],
+      ['getAnnouncements', 'handleAnnouncementClick', 'loadAnnouncements'],
+      {
+        loadStatus: signal<'loading' | 'loaded' | 'refreshing' | 'error'>('loaded'),
+        canAddAnnouncement: false,
+      },
     );
 
     await TestBed.configureTestingModule({
@@ -37,6 +42,56 @@ describe('AnnouncementsWidgetComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('shows an accessible empty state when no announcements are available', async () => {
+    fixture.componentRef.setInput('announcementItems', []);
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const emptyState = fixture.nativeElement.querySelector(
+      '.announcements-empty-state[role="status"]',
+    ) as HTMLElement;
+
+    expect(emptyState).not.toBeNull();
+    expect(emptyState.textContent).toContain('No announcements yet');
+    expect(fixture.nativeElement.querySelector('.announcements-list-item')).toBeNull();
+  });
+
+  it('does not show the empty state while announcements are loading', () => {
+    announcementsActionServiceSpy.loadStatus.set('loading');
+    fixture.detectChanges();
+
+    expect(fixture.nativeElement.querySelector('.announcements-empty-state')).toBeNull();
+    expect(fixture.nativeElement.querySelector('app-loading')?.textContent).toContain(
+      'Loading announcements',
+    );
+  });
+
+  it('shows a retry control when announcements fail to load', () => {
+    announcementsActionServiceSpy.loadStatus.set('error');
+    fixture.detectChanges();
+
+    const error = fixture.nativeElement.querySelector('.announcements-load-error') as HTMLElement;
+    expect(error.textContent).toContain("Couldn't load announcements");
+    expect(error.querySelector('button')?.textContent).toContain('Try again');
+    (error.querySelector('button') as HTMLButtonElement).click();
+    expect(announcementsActionServiceSpy.loadAnnouncements).toHaveBeenCalled();
+    expect(fixture.nativeElement.querySelector('.announcements-empty-state')).toBeNull();
+  });
+
+  it('does not show the empty state when announcements are available', async () => {
+    const activeAnnouncement = {
+      ...mockAnnouncements[0],
+      startDate: new Date('2020-01-01'),
+      endDate: new Date('2099-01-01'),
+    };
+    fixture.componentRef.setInput('announcementItems', [activeAnnouncement]);
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    expect(fixture.nativeElement.querySelector('.announcements-empty-state')).toBeNull();
+    expect(fixture.nativeElement.querySelectorAll('.announcements-list-item').length).toBe(1);
   });
 
   describe('ngOnInit', () => {
@@ -92,9 +147,7 @@ describe('AnnouncementsWidgetComponent', () => {
     fixture.detectChanges();
     await fixture.whenStable();
 
-    const button = fixture.nativeElement.querySelector(
-      '.announcement-expand',
-    ) as HTMLButtonElement;
+    const button = fixture.nativeElement.querySelector('.announcement-expand') as HTMLButtonElement;
     const descriptionId = button.getAttribute('aria-controls');
 
     expect(button.textContent.trim()).toBe('Show more');
@@ -152,9 +205,7 @@ describe('AnnouncementsWidgetComponent', () => {
     fixture.detectChanges();
 
     const host = fixture.nativeElement as HTMLElement;
-    const description = host.querySelector(
-      '.announcement-content',
-    ) as HTMLParagraphElement;
+    const description = host.querySelector('.announcement-content') as HTMLParagraphElement;
     Object.defineProperties(description, {
       scrollHeight: { configurable: true, value: 100 },
       clientHeight: { configurable: true, value: 80 },
@@ -187,9 +238,7 @@ describe('AnnouncementsWidgetComponent', () => {
     fixture.detectChanges();
 
     const host = fixture.nativeElement as HTMLElement;
-    const description = host.querySelector(
-      '.announcement-content',
-    ) as HTMLParagraphElement;
+    const description = host.querySelector('.announcement-content') as HTMLParagraphElement;
     Object.defineProperties(description, {
       scrollHeight: { configurable: true, value: 40 },
       clientHeight: { configurable: true, value: 40 },
@@ -203,7 +252,9 @@ describe('AnnouncementsWidgetComponent', () => {
   it('should render the heading above and outside the announcement panel', () => {
     fixture.detectChanges();
 
-    const heading = fixture.nativeElement.querySelector('.announcements-title') as HTMLHeadingElement;
+    const heading = fixture.nativeElement.querySelector(
+      '.announcements-title',
+    ) as HTMLHeadingElement;
     const panel = fixture.nativeElement.querySelector('.announcements-panel') as HTMLElement;
 
     expect(heading.tagName).toBe('H2');

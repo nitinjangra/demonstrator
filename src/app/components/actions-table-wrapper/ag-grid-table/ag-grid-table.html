@@ -6,17 +6,49 @@
   (filterCleared)="clearPriorityFilter()"
 />
 
-<div class="ag-grid-frame" [class.table-route-highlight]="routeAppliedPriority() !== null">
-  <ag-grid-angular
-    class="actions-grid"
-    aria-label="Actions"
-    [domLayout]="'autoHeight'"
-    [pagination]="true"
-    [paginationPageSize]="10"
-    [paginationPageSizeSelector]="[10, 20, 50]"
-    [rowData]="rowData()"
-    [columnDefs]="columnDefs"
-    [defaultColDef]="defaultColDef"
-    [theme]="gridTheme"
-  />
+<div
+  class="ag-grid-frame"
+  [class.table-route-highlight]="routeAppliedPriority() !== null"
+  [class.ag-grid-frame--empty]="rowData().length === 0"
+>
+  @if (rowData().length > 0) {
+    <ag-grid-angular
+      class="actions-grid"
+      [attr.aria-label]="'Actions, ' + rowData().length + ' items'"
+      [pagination]="rowData().length > 10"
+      [paginationPageSize]="pageSize()"
+      [paginationPageSizeSelector]="[10, 20, 50]"
+      (paginationChanged)="onPaginationChanged($event)"
+      [rowData]="rowData()"
+      [columnDefs]="columnDefs"
+      [defaultColDef]="defaultColDef"
+      [theme]="gridTheme"
+    />
+  } @else {
+    @if (loadStatus() === 'loading') {
+      <div class="actions-empty-state">
+        <app-loading text="Loading actions..." />
+      </div>
+    } @else if (loadStatus() === 'error') {
+      <div class="actions-empty-state" role="alert">
+        <mat-icon aria-hidden="true">error_outline</mat-icon>
+        <p class="actions-empty-state-title">Couldn’t load actions</p>
+        <p class="actions-empty-state-description">Try again to load your actions.</p>
+        <button matButton type="button" (click)="retryLoad()">Retry</button>
+      </div>
+    } @else {
+      <div class="actions-empty-state" role="status">
+        <mat-icon aria-hidden="true">checklist</mat-icon>
+        @if (
+          sourceRowData().length === 0 &&
+          (loadStatus() === 'loaded' || loadStatus() === 'refreshing')
+        ) {
+          <p class="actions-empty-state-title">You’re all caught up</p>
+          <p class="actions-empty-state-description">No actions need your attention.</p>
+        } @else {
+          <p class="actions-empty-state-description">No actions match this priority filter.</p>
+        }
+      </div>
+    }
+  }
 </div>

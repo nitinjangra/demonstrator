@@ -9,7 +9,10 @@
 				"mcp"
 			],
 			"tools": [
-				"*"
+				"list_projects",
+				"get_best_practices",
+				"search_documentation",
+				"run_target"
 			]
 		}
 	}

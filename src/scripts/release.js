@@ -18,25 +18,25 @@
  * Requirements: Node.js, npm, git, and a package.json in the current directory.
  */
 
-const fs = require("fs");
-const path = require("path");
-const { execSync, execFileSync } = require("child_process");
+const fs = require('fs');
+const path = require('path');
+const { execSync, execFileSync } = require('child_process');
 
 const CWD = process.cwd();
-const PKG_PATH = path.join(CWD, "package.json");
-const CHANGELOG_PATH = path.join(CWD, "CHANGELOG.md");
+const PKG_PATH = path.join(CWD, 'package.json');
+const CHANGELOG_PATH = path.join(CWD, 'CHANGELOG.md');
 
 const args = process.argv.slice(2);
-const dryRun = args.includes("--dry-run");
-const shouldPush = args.includes("--push");
-const bumpArg = args.find((a) => !a.startsWith("--"));
+const dryRun = args.includes('--dry-run');
+const shouldPush = args.includes('--push');
+const bumpArg = args.find((a) => !a.startsWith('--'));
 
 function run(cmd, options = {}) {
-  return execSync(cmd, { encoding: "utf8", cwd: CWD, ...options }).trim();
+  return execSync(cmd, { encoding: 'utf8', cwd: CWD, ...options }).trim();
 }
 
 function runFile(file, fileArgs, options = {}) {
-  return execFileSync(file, fileArgs, { encoding: "utf8", cwd: CWD, ...options }).trim();
+  return execFileSync(file, fileArgs, { encoding: 'utf8', cwd: CWD, ...options }).trim();
 }
 
 function fail(msg) {
@@ -51,33 +51,30 @@ function log(msg) {
 // --- 1. Pre-flight checks -------------------------------------------------
 
 if (!fs.existsSync(PKG_PATH)) {
-  fail("No package.json found in the current directory.");
+  fail('No package.json found in the current directory.');
 }
 
 let isGitRepo = true;
 try {
-  run("git rev-parse --is-inside-work-tree");
+  run('git rev-parse --is-inside-work-tree');
 } catch {
   isGitRepo = false;
 }
-if (!isGitRepo) fail("Not inside a git repository.");
+if (!isGitRepo) fail('Not inside a git repository.');
 
-const statusOutput = run("git status --porcelain");
+const statusOutput = run('git status --porcelain');
 if (statusOutput && !dryRun) {
-  fail(
-    "Working tree is not clean. Commit or stash changes before releasing:\n\n" +
-      statusOutput
-  );
+  fail('Working tree is not clean. Commit or stash changes before releasing:\n\n' + statusOutput);
 }
 
 // --- 2. Determine current and next version --------------------------------
 
-const pkg = JSON.parse(fs.readFileSync(PKG_PATH, "utf8"));
+const pkg = JSON.parse(fs.readFileSync(PKG_PATH, 'utf8'));
 const currentVersion = pkg.version;
-if (!currentVersion) fail("package.json has no \"version\" field.");
+if (!currentVersion) fail('package.json has no "version" field.');
 
 if (!bumpArg) {
-  fail("Specify a bump type: patch, minor, major, or an explicit version (e.g. 1.5.0).");
+  fail('Specify a bump type: patch, minor, major, or an explicit version (e.g. 1.5.0).');
 }
 
 function bumpVersion(current, bump) {
@@ -89,16 +86,14 @@ function bumpVersion(current, bump) {
     return bump; // explicit version passed in
   }
 
-  let [, major, minor, patch] = match.map((value, index) =>
-    index === 0 ? value : Number(value),
-  );
+  let [, major, minor, patch] = match.map((value, index) => (index === 0 ? value : Number(value)));
 
   switch (bump) {
-    case "major":
+    case 'major':
       return `${major + 1}.0.0`;
-    case "minor":
+    case 'minor':
       return `${major}.${minor + 1}.0`;
-    case "patch":
+    case 'patch':
       return `${major}.${minor}.${patch + 1}`;
     default:
       fail(`Unknown bump type "${bump}". Use patch, minor, major, or an explicit version.`);
@@ -109,7 +104,7 @@ const nextVersion = bumpVersion(currentVersion, bumpArg);
 const tagName = `v${nextVersion}`;
 
 // Refuse to reuse an existing tag
-const existingTags = run("git tag --list").split("\n").filter(Boolean);
+const existingTags = run('git tag --list').split('\n').filter(Boolean);
 if (existingTags.includes(tagName)) {
   fail(`Tag ${tagName} already exists.`);
 }
@@ -119,24 +114,24 @@ log(`Next version:    ${nextVersion}`);
 
 // --- 3. Gather commits since the last tag for the changelog ---------------
 
-let lastTag = "";
+let lastTag = '';
 try {
-  lastTag = run("git describe --tags --abbrev=0");
+  lastTag = run('git describe --tags --abbrev=0');
 } catch {
-  lastTag = ""; // no previous tags
+  lastTag = ''; // no previous tags
 }
 
-const logRange = lastTag ? `${lastTag}..HEAD` : "HEAD";
+const logRange = lastTag ? `${lastTag}..HEAD` : 'HEAD';
 let commits = [];
 try {
   const rawLog = run(`git log ${logRange} --pretty=format:%s`);
-  commits = rawLog ? rawLog.split("\n").filter(Boolean) : [];
+  commits = rawLog ? rawLog.split('\n').filter(Boolean) : [];
 } catch {
   commits = [];
 }
 
 if (commits.length === 0) {
-  log("\n⚠ No new commits found since the last tag — changelog entry will be minimal.");
+  log('\n⚠ No new commits found since the last tag — changelog entry will be minimal.');
 }
 
 // Group commits by conventional-commit type where possible
@@ -162,17 +157,17 @@ for (const c of commits) {
 }
 
 const sectionTitles = {
-  feat: "Features",
-  fix: "Fixes",
-  docs: "Documentation",
-  refactor: "Refactoring",
-  perf: "Performance",
-  test: "Tests",
-  chore: "Chores",
-  other: "Other Changes",
+  feat: 'Features',
+  fix: 'Fixes',
+  docs: 'Documentation',
+  refactor: 'Refactoring',
+  perf: 'Performance',
+  test: 'Tests',
+  chore: 'Chores',
+  other: 'Other Changes',
 };
 
-const today = new Date().toISOString().split("T")[0];
+const today = new Date().toISOString().split('T')[0];
 let changelogEntry = `## [${nextVersion}] - ${today}\n\n`;
 
 let hasContent = false;
@@ -183,19 +178,19 @@ for (const key of Object.keys(sectionTitles)) {
     for (const item of groups[key]) {
       changelogEntry += `- ${item}\n`;
     }
-    changelogEntry += "\n";
+    changelogEntry += '\n';
   }
 }
 if (!hasContent) {
-  changelogEntry += "- No notable changes recorded.\n\n";
+  changelogEntry += '- No notable changes recorded.\n\n';
 }
 
 // --- 4. Preview in dry-run mode --------------------------------------------
 
 if (dryRun) {
-  log("\n--- DRY RUN: no files changed, nothing committed or tagged ---\n");
+  log('\n--- DRY RUN: no files changed, nothing committed or tagged ---\n');
   log(`package.json version would become: ${nextVersion}`);
-  if (fs.existsSync(path.join(CWD, "package-lock.json"))) {
+  if (fs.existsSync(path.join(CWD, 'package-lock.json'))) {
     log(`package-lock.json version would become: ${nextVersion}`);
   }
   log(`\nCHANGELOG.md entry that would be added:\n`);
@@ -208,16 +203,16 @@ if (dryRun) {
 run(`npm version ${nextVersion} --no-git-tag-version`);
 log(`\nUpdated package.json to ${nextVersion}`);
 
-const lockPath = path.join(CWD, "package-lock.json");
+const lockPath = path.join(CWD, 'package-lock.json');
 if (fs.existsSync(lockPath)) {
   try {
-    const lock = JSON.parse(fs.readFileSync(lockPath, "utf8"));
+    const lock = JSON.parse(fs.readFileSync(lockPath, 'utf8'));
     lock.version = nextVersion;
-    if (lock.packages && lock.packages[""]) {
-      lock.packages[""].version = nextVersion;
+    if (lock.packages && lock.packages['']) {
+      lock.packages[''].version = nextVersion;
     }
-    fs.writeFileSync(lockPath, JSON.stringify(lock, null, 2) + "\n");
-    log("Updated package-lock.json version fields");
+    fs.writeFileSync(lockPath, JSON.stringify(lock, null, 2) + '\n');
+    log('Updated package-lock.json version fields');
   } catch (error) {
     fail(`Could not update package-lock.json: ${error.message}`);
   }
@@ -225,11 +220,12 @@ if (fs.existsSync(lockPath)) {
 
 // --- 6. Write CHANGELOG.md --------------------------------------------------
 
-let existingChangelog = "";
+let existingChangelog = '';
 if (fs.existsSync(CHANGELOG_PATH)) {
-  existingChangelog = fs.readFileSync(CHANGELOG_PATH, "utf8");
+  existingChangelog = fs.readFileSync(CHANGELOG_PATH, 'utf8');
 } else {
-  existingChangelog = "# Changelog\n\nAll notable changes to this project will be documented here.\n\n";
+  existingChangelog =
+    '# Changelog\n\nAll notable changes to this project will be documented here.\n\n';
 }
 
 // Insert the new entry right after the top header/description, before any prior entries
@@ -245,13 +241,13 @@ if (headerMatch) {
 }
 
 fs.writeFileSync(CHANGELOG_PATH, updatedChangelog);
-log("✔ Updated CHANGELOG.md");
+log('✔ Updated CHANGELOG.md');
 
 // --- 7. Commit and tag -------------------------------------------------------
 
-const filesToCommit = ["package.json", "CHANGELOG.md"];
-if (fs.existsSync(lockPath)) filesToCommit.splice(1, 0, "package-lock.json");
-runFile("git", ["add", "--", ...filesToCommit]);
+const filesToCommit = ['package.json', 'CHANGELOG.md'];
+if (fs.existsSync(lockPath)) filesToCommit.splice(1, 0, 'package-lock.json');
+runFile('git', ['add', '--', ...filesToCommit]);
 run(`git commit -m "chore: release ${tagName}"`);
 log(`✔ Committed release ${tagName}`);
 
@@ -264,7 +260,7 @@ if (!shouldPush) {
   log(`\nSkipping push. Run manually when ready, or pass --push next time:`);
   log(`  git push && git push origin ${tagName}`);
 } else {
-  run("git push");
+  run('git push');
   run(`git push origin ${tagName}`);
   log(`✔ Pushed commit and tag ${tagName}`);
 }

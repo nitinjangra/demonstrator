@@ -6,6 +6,7 @@ export type ChartLibrary = 'chartjs' | 'highcharts';
 const TABLE_FEATURE_KEY = 'table-feature';
 const DASHBOARD_FEATURE_KEY = 'dashboard-feature';
 const CHART_LIBRARY_KEY = 'chart-library-feature';
+const MOCK_DRIVER_FEATURE_KEY = 'mock-driver-feature';
 
 @Injectable({ providedIn: 'root' })
 export class FeatureToggleService {
@@ -13,11 +14,15 @@ export class FeatureToggleService {
   private readonly dashboardEnabledSignal = signal(
     localStorage.getItem(DASHBOARD_FEATURE_KEY) !== 'false',
   );
+  private readonly mockDriverEnabledSignal = signal(
+    localStorage.getItem(MOCK_DRIVER_FEATURE_KEY) === 'true',
+  );
   private readonly chartLibrarySignal = signal<ChartLibrary>(this.readChartLibrary());
 
   readonly agGridEnabled = computed(() => this.selectedTable() === 'ag-grid');
   readonly materialTableEnabled = computed(() => this.selectedTable() === 'material-table');
   readonly dashboardEnabled = this.dashboardEnabledSignal.asReadonly();
+  readonly mockDriverEnabled = this.mockDriverEnabledSignal.asReadonly();
   readonly chartJsEnabled = computed(() => this.chartLibrarySignal() === 'chartjs');
   readonly highchartsEnabled = computed(() => this.chartLibrarySignal() === 'highcharts');
   readonly chartLibrary = this.chartLibrarySignal.asReadonly();
@@ -38,6 +43,11 @@ export class FeatureToggleService {
   setDashboardEnabled(enabled: boolean): void {
     this.dashboardEnabledSignal.set(enabled);
     localStorage.setItem(DASHBOARD_FEATURE_KEY, String(enabled));
+  }
+
+  setMockDriverEnabled(enabled: boolean): void {
+    this.mockDriverEnabledSignal.set(enabled);
+    localStorage.setItem(MOCK_DRIVER_FEATURE_KEY, String(enabled));
   }
 
   setChartLibrary(library: ChartLibrary, enabled: boolean): void {

@@ -20,7 +20,9 @@ import { AsyncPipe } from '@angular/common';
 import { Observable, filter, of } from 'rxjs';
 import type { Announcement } from '../../shared/interfaces/announcement.interface';
 import { HoldFeedbackDirective } from '../../shared/directives/hold-feedback.directive';
+import { LoadingComponent } from '../../shared/components/loading/loading.component';
 import { CreateAnnouncementDialogComponent } from './create-announcement-dialog/create-announcement-dialog';
+import { UserSettingsService } from '../../shared/services/user-settings.service';
 import type { CreateAnnouncementResult } from './types/create-announcement.types';
 import {
   AnnouncementsActionService,
@@ -38,6 +40,7 @@ import {
     MatMenuModule,
     RouterLink,
     HoldFeedbackDirective,
+    LoadingComponent,
   ],
   templateUrl: './announcements.html',
   styleUrls: ['./announcements.scss'],
@@ -45,7 +48,19 @@ import {
 })
 export class AnnouncementsWidgetComponent implements OnInit, OnChanges {
   @Input() showContextMenu = true;
+  @Input() previewOnly = false;
+  @Input() previewRole: 'admin' | 'user' | null = null;
   @Input() announcementItems: Announcement[] | null = null;
+  @Input() showAllProvidedAnnouncements = false;
+  @Input() enableKeyboardScrolling = false;
+  readonly isAdmin = inject(UserSettingsService).isAdmin;
+  private readonly announcementsActionService = inject(AnnouncementsActionService);
+  readonly loadStatus = this.announcementsActionService.loadStatus;
+  private readonly hasProvidedAnnouncements = signal(false);
+
+  get canManageAnnouncements(): boolean {
+    return this.previewRole ? this.previewRole === 'admin' : this.isAdmin();
+  }
 
   private readonly expandedAnnouncementIds = signal<ReadonlySet<string>>(new Set());
   private readonly truncatedAnnouncementIds = signal<ReadonlySet<string>>(new Set());
@@ -55,7 +70,6 @@ export class AnnouncementsWidgetComponent implements OnInit, OnChanges {
   private readonly resizeObserver = new ResizeObserver(() => this.updateTruncatedDescriptions());
 
   announcements: Observable<Announcement[]> = of([]);
-  private readonly announcementsActionService = inject(AnnouncementsActionService);
   private readonly dialog = inject(MatDialog);
 
   get canAddAnnouncement(): boolean {
@@ -95,25 +109,43 @@ export class AnnouncementsWidgetComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(): void {
+    this.hasProvidedAnnouncements.set(this.announcementItems !== null);
     this.updateAnnouncementsFeed();
+  }
+
+  get displayedLoadStatus(): 'loading' | 'loaded' | 'refreshing' | 'error' {
+    return this.announcementItems !== null ? 'loaded' : this.loadStatus();
+  }
+
+  get isBusy(): boolean {
+    return this.displayedLoadStatus === 'loading' || this.displayedLoadStatus === 'refreshing';
+  }
+
+  retryAnnouncements(): void {
+    this.announcementsActionService.loadAnnouncements();
   }
 
   private updateAnnouncementsFeed(): void {
     this.announcements = this.announcementItems
-      ? of(filterAnnouncementsForDisplay(this.announcementItems))
+      ? of(
+          this.showAllProvidedAnnouncements
+            ? this.announcementItems
+            : filterAnnouncementsForDisplay(this.announcementItems),
+        )
       : this.announcementsActionService.getAnnouncements();
   }
 
   openCreateAnnouncementDialog(): void {
+    if (this.previewOnly) return;
+
     this.dialog
       .open(CreateAnnouncementDialogComponent, {
         width: 'min(32rem, calc(100vw - 3rem))',
         maxWidth: 'calc(100vw - 3rem)',
+        disableClose: true,
       })
       .afterClosed()
-      .pipe(
-        filter((announcement): announcement is CreateAnnouncementResult => !!announcement),
-      )
+      .pipe(filter((announcement): announcement is CreateAnnouncementResult => !!announcement))
       .subscribe((announcement) => this.announcementsActionService.addAnnouncement(announcement));
   }
 

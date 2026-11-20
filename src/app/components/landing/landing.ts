@@ -1,4 +1,14 @@
-import { Component, DestroyRef, ElementRef, inject, OnInit, signal, ViewChild } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  ElementRef,
+  effect,
+  inject,
+  OnInit,
+  signal,
+  ViewChild,
+} from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { MatIconModule } from '@angular/material/icon';
 import { MatNativeDateModule } from '@angular/material/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -10,11 +20,21 @@ import { WeatherIcon } from '../../shared/constants/icon.const';
 import { ActionsTableWrapper } from '../actions-table-wrapper/actions-table-wrapper';
 import { parsePriorityFilter } from '../actions-table-wrapper/shared/priority-filter';
 import type { PriorityFilter } from '../actions-table-wrapper/shared/priority-filter';
+import { AgTableStateService } from '../actions-table-wrapper/shared/services/ag-table-state.service';
+import { UserSettingsService } from '../../shared/services/user-settings.service';
+import type { ActionTableRow } from '../../shared/interfaces/actions-table.interface';
+import { LoadingComponent } from '../../shared/components/loading/loading.component';
 
 @Component({
   selector: 'app-landing',
   standalone: true,
-  imports: [AnnouncementsWidgetComponent, ActionsTableWrapper, MatIconModule, MatNativeDateModule],
+  imports: [
+    AnnouncementsWidgetComponent,
+    ActionsTableWrapper,
+    LoadingComponent,
+    MatIconModule,
+    MatNativeDateModule,
+  ],
   templateUrl: './landing.html',
   styleUrls: ['./landing.scss'],
 })
@@ -23,11 +43,18 @@ export class Landing implements OnInit {
   private readonly route = inject(ActivatedRoute);
   private readonly destroyRef = inject(DestroyRef);
   private readonly liveAnnouncer = inject(LiveAnnouncer);
+  private readonly tableState = inject(AgTableStateService);
+  readonly userName = inject(UserSettingsService).firstName;
+  readonly actionCount = toSignal(this.tableState.getRowData(), {
+    initialValue: [] as ActionTableRow[],
+  });
   private highlightTimeout?: ReturnType<typeof setTimeout>;
   private pendingHighlightCleanup: { priority: PriorityFilter } | null = null;
   private pendingActionsFocus = false;
   private actionsHeadingElement?: HTMLElement;
   readonly highlightActions = signal(false);
+  readonly showLoading = signal(false);
+
   timeGreeting = '';
   greetingIcon = '';
   get greetingIconData(): string {
@@ -35,6 +62,18 @@ export class Landing implements OnInit {
   }
   get timeGreetingData(): string {
     return this.timeGreeting;
+  }
+
+  constructor() {
+    effect((onCleanup) => {
+      if (this.tableState.loadStatus() !== 'loading') {
+        this.showLoading.set(false);
+        return;
+      }
+
+      const timer = setTimeout(() => this.showLoading.set(true), 300);
+      onCleanup(() => clearTimeout(timer));
+    });
   }
 
   @ViewChild('actionsHeading', { read: ElementRef })
@@ -80,16 +119,18 @@ export class Landing implements OnInit {
       if (params.has('highlightActions')) {
         const cleanupRequest = { priority };
         this.pendingHighlightCleanup = cleanupRequest;
-        void this.router.navigate([], {
-          relativeTo: this.route,
-          queryParams: { highlightActions: null },
-          queryParamsHandling: 'merge',
-          replaceUrl: true,
-        }).then((navigated) => {
-          if (!navigated && this.pendingHighlightCleanup === cleanupRequest) {
-            this.pendingHighlightCleanup = null;
-          }
-        });
+        void this.router
+          .navigate([], {
+            relativeTo: this.route,
+            queryParams: { highlightActions: null },
+            queryParamsHandling: 'merge',
+            replaceUrl: true,
+          })
+          .then((navigated) => {
+            if (!navigated && this.pendingHighlightCleanup === cleanupRequest) {
+              this.pendingHighlightCleanup = null;
+            }
+          });
       }
     });
   }
@@ -107,13 +148,13 @@ export class Landing implements OnInit {
     const hour = new Date().getHours();
     if (hour < Hours.Twelve) {
       this.greetingIcon = WeatherIcon.Sun;
-      return 'Good Morning!!';
+      return 'Good morning';
     }
     if (hour < Hours.Seventeen) {
       this.greetingIcon = WeatherIcon.Cloud;
-      return 'Good Afternoon!!';
+      return 'Good afternoon';
     }
     this.greetingIcon = WeatherIcon.Moon;
-    return 'Good Evening!!';
+    return 'Good evening';
   }
 }

@@ -27,6 +27,19 @@ body {
   color: var(--color-text);
 }
 
+.cdk-overlay-backdrop.unsaved-changes-dialog-backdrop {
+  background-color: rgb(0 0 0 / 62%);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .cdk-overlay-backdrop.unsaved-changes-dialog-backdrop {
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
 .announcement-context-menu .mat-mdc-menu-item {
   min-height: 3rem;
   color: var(--color-text);

@@ -1,35 +1,34 @@
-<mat-sidenav-container class="settings-layout">
-  <mat-sidenav class="settings-sidebar" [class.settings-sidebar--minimized]="isSidebarMinimized" mode="side" opened aria-label="Settings navigation">
+<mat-sidenav-container
+  class="settings-layout"
+  [class.settings-layout--sidebar-minimized]="isSidebarMinimized && !isMobile()"
+  [class.settings-layout--mobile]="isMobile()"
+  autosize
+>
+  <mat-sidenav
+    class="settings-sidebar"
+    id="settings-navigation"
+    [class.settings-sidebar--minimized]="isSidebarMinimized && !isMobile()"
+    [mode]="isMobile() ? 'over' : 'side'"
+    [opened]="!isMobile() || mobileSidebarOpen"
+    (closedStart)="mobileSidebarOpen = false"
+    aria-label="Settings navigation"
+  >
     <div class="settings-sidebar-heading">
+      <button
+        mat-icon-button
+        type="button"
+        class="sidebar-toggle"
+        (click)="toggleSidebar()"
+        [attr.aria-label]="isSidebarMinimized ? 'Expand settings menu' : 'Collapse settings menu'"
+        [title]="isSidebarMinimized ? 'Expand settings menu' : 'Collapse settings menu'"
+      >
+        <mat-icon aria-hidden="true">dock_to_right</mat-icon>
+      </button>
       @if (!isSidebarMinimized) {
         <h1 class="settings-title">Settings</h1>
       }
-      @if (!isSidebarMinimized) {
-        <button
-          mat-icon-button
-          type="button"
-          class="sidebar-toggle"
-          (click)="toggleSidebar()"
-          aria-label="Minimize settings menu"
-          title="Minimize menu"
-        >
-          <mat-icon aria-hidden="true">chevron_left</mat-icon>
-        </button>
-      }
     </div>
     <mat-nav-list>
-      @if (isSidebarMinimized) {
-        <button
-          mat-icon-button
-          type="button"
-          class="sidebar-toggle sidebar-toggle--nav-item"
-          (click)="toggleSidebar()"
-          [attr.aria-label]="isSidebarMinimized ? 'Expand settings menu' : 'Minimize settings menu'"
-          title="Expand menu"
-        >
-          <mat-icon aria-hidden="true">chevron_right</mat-icon>
-        </button>
-      }
       <a
         mat-list-item
         matTooltip="Overview"
@@ -37,68 +36,34 @@
         routerLink="/settings/overview"
         routerLinkActive="settings-nav-link--active"
         ariaCurrentWhenActive="page"
+        aria-label="Overview"
+        (click)="closeMobileSidebar()"
         [routerLinkActiveOptions]="{ exact: true }"
       >
         <mat-icon matListItemIcon aria-hidden="true">grid_view</mat-icon>
-        @if (!isSidebarMinimized) { <span matListItemTitle>Overview</span> }
+        @if (!isSidebarMinimized) {
+          <span matListItemTitle>Overview</span>
+        }
       </a>
-      @if (!isSidebarMinimized) { <h2 matSubheader>General</h2> }
+      @if (!isSidebarMinimized) {
+        <h2 class="settings-nav-group" matSubheader>Organization</h2>
+      }
       <a
         mat-list-item
         matTooltip="Branding"
         [matTooltipDisabled]="!isSidebarMinimized"
         routerLink="/settings/general/branding"
         routerLinkActive="settings-nav-link--active"
+        ariaCurrentWhenActive="page"
+        aria-label="Branding"
+        (click)="closeMobileSidebar()"
         [routerLinkActiveOptions]="{ exact: true }"
       >
         <mat-icon matListItemIcon aria-hidden="true">palette</mat-icon>
-        @if (!isSidebarMinimized) { <span matListItemTitle>Branding</span> }
+        @if (!isSidebarMinimized) {
+          <span matListItemTitle>Branding</span>
+        }
       </a>
-      <a
-        mat-list-item
-        matTooltip="Feature toggles"
-        [matTooltipDisabled]="!isSidebarMinimized"
-        routerLink="/settings/general/feature-toggles"
-        routerLinkActive="settings-nav-link--active"
-        [routerLinkActiveOptions]="{ exact: true }"
-      >
-        <mat-icon matListItemIcon aria-hidden="true">toggle_on</mat-icon>
-        @if (!isSidebarMinimized) { <span matListItemTitle>Feature toggles</span> }
-      </a>
-      <a
-        mat-list-item
-        matTooltip="Notifications"
-        [matTooltipDisabled]="!isSidebarMinimized"
-        routerLink="/settings/general/notifications"
-        routerLinkActive="settings-nav-link--active"
-        [routerLinkActiveOptions]="{ exact: true }"
-      >
-        <mat-icon matListItemIcon aria-hidden="true">notifications</mat-icon>
-        @if (!isSidebarMinimized) { <span matListItemTitle>Notifications</span> }
-      </a>
-      <a
-        mat-list-item
-        matTooltip="Theme"
-        [matTooltipDisabled]="!isSidebarMinimized"
-        routerLink="/settings/general/theme"
-        routerLinkActive="settings-nav-link--active"
-        [routerLinkActiveOptions]="{ exact: true }"
-      >
-        <mat-icon matListItemIcon aria-hidden="true">contrast</mat-icon>
-        @if (!isSidebarMinimized) { <span matListItemTitle>Theme</span> }
-      </a>
-      <a
-        mat-list-item
-        matTooltip="Time setting"
-        [matTooltipDisabled]="!isSidebarMinimized"
-        routerLink="/settings/general/time"
-        routerLinkActive="settings-nav-link--active"
-        [routerLinkActiveOptions]="{ exact: true }"
-      >
-        <mat-icon matListItemIcon aria-hidden="true">schedule</mat-icon>
-        @if (!isSidebarMinimized) { <span matListItemTitle>Time setting</span> }
-      </a>
-      @if (!isSidebarMinimized) { <h2 matSubheader>Announcements</h2> }
       <a
         mat-list-item
         matTooltip="Announcement settings"
@@ -106,15 +71,155 @@
         routerLink="/settings/announcements"
         routerLinkActive="settings-nav-link--active"
         ariaCurrentWhenActive="page"
+        aria-label="Announcement settings"
+        (click)="closeMobileSidebar()"
         [routerLinkActiveOptions]="{ exact: true }"
       >
         <mat-icon matListItemIcon aria-hidden="true">campaign</mat-icon>
-        @if (!isSidebarMinimized) { <span matListItemTitle>Announcement settings</span> }
+        @if (!isSidebarMinimized) {
+          <span matListItemTitle>Announcement settings</span>
+        }
       </a>
+      @if (!isSidebarMinimized) {
+        <h2 class="settings-nav-group" matSubheader>Preferences</h2>
+      }
+      <a
+        mat-list-item
+        matTooltip="Notifications"
+        [matTooltipDisabled]="!isSidebarMinimized"
+        routerLink="/settings/general/notifications"
+        routerLinkActive="settings-nav-link--active"
+        ariaCurrentWhenActive="page"
+        aria-label="Notifications"
+        (click)="closeMobileSidebar()"
+        [routerLinkActiveOptions]="{ exact: true }"
+      >
+        <mat-icon matListItemIcon aria-hidden="true">notifications</mat-icon>
+        @if (!isSidebarMinimized) {
+          <span matListItemTitle>Notifications</span>
+        }
+      </a>
+      <a
+        mat-list-item
+        matTooltip="Date & time"
+        [matTooltipDisabled]="!isSidebarMinimized"
+        routerLink="/settings/general/time"
+        routerLinkActive="settings-nav-link--active"
+        ariaCurrentWhenActive="page"
+        aria-label="Date & time"
+        (click)="closeMobileSidebar()"
+        [routerLinkActiveOptions]="{ exact: true }"
+      >
+        <mat-icon matListItemIcon aria-hidden="true">schedule</mat-icon>
+        @if (!isSidebarMinimized) {
+          <span matListItemTitle>Date &amp; time</span>
+        }
+      </a>
+      <a
+        mat-list-item
+        matTooltip="Theme"
+        [matTooltipDisabled]="!isSidebarMinimized"
+        routerLink="/settings/general/theme"
+        routerLinkActive="settings-nav-link--active"
+        ariaCurrentWhenActive="page"
+        aria-label="Theme"
+        (click)="closeMobileSidebar()"
+        [routerLinkActiveOptions]="{ exact: true }"
+      >
+        <mat-icon matListItemIcon aria-hidden="true">contrast</mat-icon>
+        @if (!isSidebarMinimized) {
+          <span matListItemTitle>Theme</span>
+        }
+      </a>
+      <a
+        mat-list-item
+        matTooltip="Language"
+        [matTooltipDisabled]="!isSidebarMinimized"
+        routerLink="/settings/general/language"
+        routerLinkActive="settings-nav-link--active"
+        ariaCurrentWhenActive="page"
+        aria-label="Language"
+        (click)="closeMobileSidebar()"
+        [routerLinkActiveOptions]="{ exact: true }"
+      >
+        <mat-icon matListItemIcon aria-hidden="true">language</mat-icon>
+        @if (!isSidebarMinimized) {
+          <span matListItemTitle>Language</span>
+        }
+      </a>
+      @if (!isSidebarMinimized) {
+        <h2 class="settings-nav-group" matSubheader>Developer / Demo</h2>
+      }
+      <a
+        mat-list-item
+        matTooltip="Feature toggles"
+        [matTooltipDisabled]="!isSidebarMinimized"
+        routerLink="/settings/general/feature-toggles"
+        routerLinkActive="settings-nav-link--active"
+        ariaCurrentWhenActive="page"
+        aria-label="Feature toggles"
+        (click)="closeMobileSidebar()"
+        [routerLinkActiveOptions]="{ exact: true }"
+      >
+        <mat-icon matListItemIcon aria-hidden="true">toggle_on</mat-icon>
+        @if (!isSidebarMinimized) {
+          <span matListItemTitle>Feature toggles</span>
+        }
+      </a>
+      @if (mockDriverEnabled()) {
+        <a
+          mat-list-item
+          matTooltip="Mock data driver"
+          [matTooltipDisabled]="!isSidebarMinimized"
+          routerLink="/settings/general/mock-driver"
+          routerLinkActive="settings-nav-link--active"
+          ariaCurrentWhenActive="page"
+          aria-label="Mock data driver"
+          (click)="closeMobileSidebar()"
+          [routerLinkActiveOptions]="{ exact: true }"
+        >
+          <mat-icon matListItemIcon aria-hidden="true">data_object</mat-icon>
+          @if (!isSidebarMinimized) {
+            <span matListItemTitle>Mock data driver</span>
+          }
+        </a>
+      }
     </mat-nav-list>
   </mat-sidenav>
 
   <mat-sidenav-content class="settings-content">
-    <router-outlet></router-outlet>
+    @if (isMobile()) {
+      <button
+        class="mobile-settings-nav-toggle"
+        mat-icon-button
+        type="button"
+        (click)="toggleSidebar()"
+        [attr.aria-expanded]="mobileSidebarOpen"
+        aria-controls="settings-navigation"
+        [attr.aria-label]="
+          mobileSidebarOpen ? 'Close settings navigation' : 'Open settings navigation'
+        "
+      >
+        <mat-icon aria-hidden="true">menu</mat-icon>
+      </button>
+    }
+    <main class="settings-page-content">
+      <nav class="settings-breadcrumb" aria-label="Breadcrumb">
+        <ol>
+          @if (currentPage === 'Overview') {
+            <li aria-current="page"><span>Settings</span></li>
+          } @else {
+            <li><a routerLink="/settings/overview">Settings</a></li>
+            <li aria-current="page">
+              <span>{{ currentPage }}</span>
+            </li>
+          }
+        </ol>
+      </nav>
+      <router-outlet
+        (activate)="registerActivePage($event)"
+        (deactivate)="unregisterActivePage($event)"
+      ></router-outlet>
+    </main>
   </mat-sidenav-content>
 </mat-sidenav-container>

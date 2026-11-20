@@ -10,14 +10,15 @@ import {
 } from '@angular/core';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { Chart, registerables } from 'chart.js';
-import Highcharts from 'highcharts';
-import 'highcharts/modules/accessibility';
+import Highcharts from 'highcharts/es-modules/masters/highcharts.src.js';
+import 'highcharts/es-modules/masters/modules/accessibility.src.js';
 import { ActionTableRow } from '../../shared/interfaces/actions-table.interface';
 import { Priority } from '../../shared/enums/priority.enum';
 import { AgTableActionService } from '../actions-table-wrapper/shared/services/ag-table-action.service';
 import { AgTableStateService } from '../actions-table-wrapper/shared/services/ag-table-state.service';
 import { FeatureToggleService } from '../../shared/services/feature-toggle.service';
 import { Router, RouterLink } from '@angular/router';
+import { UserSettingsService } from '../../shared/services/user-settings.service';
 
 Chart.register(...registerables);
 
@@ -35,6 +36,7 @@ export class Dashboard implements AfterViewInit {
   private readonly platformId = inject(PLATFORM_ID);
   private readonly features = inject(FeatureToggleService);
   private readonly router = inject(Router);
+  readonly userName = inject(UserSettingsService).userName;
   private charts: Chart[] = [];
   private highchartsInstances: Highcharts.Chart[] = [];
 
