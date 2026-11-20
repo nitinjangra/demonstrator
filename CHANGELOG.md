@@ -1,5 +1,71 @@
 # Changelog
 
+## [1.4.0] - 2026-11-20
+
+### Features
+
+- add loading indicator with delay for better user experience
+- keep scenario edits preview-only
+- add language switching and RTL layout
+- improve table urgency and pagination
+- add actionable empty chart state (#73)
+- limit rows for standard profiles (#72)
+- show content loading feedback (#71)
+- refine navigation and page layouts (#70)
+- add shared accessible breadcrumb (#69)
+- add published announcement fixtures (#68)
+- support drafts scheduling and attachments (#67)
+- warn before leaving unsaved changes (#66)
+- support organization logo and text header (#64)
+- add tenant-scoped profiles and role guards (#65)
+- enhance empty states and user settings integration across components
+- implement mock data driver component and feature toggle
+- improve action tables and announcement empty states
+
+### Fixes
+
+- address CodeRabbit findings for PR #63
+- update chart descriptions and action link for clarity
+- address announcement and dashboard feedback
+
+### Documentation
+
+- align project docs with Angular demo
+
+### Refactoring
+
+- share priority query parsing
+
+### Tests
+
+- improve coverage for settings and table flows (#74)
+- raise announcement coverage above threshold
+- cover route guard and hold directive
+- enforce coverage thresholds in karma
+- cover dashboard and settings workflows
+- cover announcement settings save flow
+- add Jasmine coverage for app components
+
+### Chores
+
+- configure formatting and pre-commit tooling
+- add MCP configuration
+- remove obsolete eslint ignore file
+
+### Other Changes
+
+- style: improve SCSS formatting and adjust z-index values for focus backdrop
+- style: format codebase with Prettier
+- ci: gate GitHub Pages deployment on project checks
+- build(deps): bump the npm_and_yarn group across 1 directory with 3 updates
+- build(deps): bump fast-uri
+- style(settings): align page and sidebar layouts
+- style(announcements): refine editor dialog spacing
+- style(material): use app theme colors for controls
+- style: group landing widgets in cards
+- Revert "feat: add version check and improve changelog generation in release script"
+- build(deps): bump @modelcontextprotocol/server
+
 ## [1.3.0] - 2026-11-03
 
 ### Features
