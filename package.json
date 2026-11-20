@@ -1,6 +1,6 @@
 {
   "name": "demonstrator",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "private": true,
   "description": "An Angular demo workspace for actions, announcements, dashboards, and settings.",
   "packageManager": "npm@10.9.3",
