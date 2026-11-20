@@ -28,7 +28,7 @@
 
   &-focus-backdrop {
     position: fixed;
-    z-index: 1;
+    z-index: 3;
     inset: 0;
     background: rgb(5 10 20 / 48%);
     opacity: 0;
@@ -78,7 +78,7 @@
 
     &-content {
       position: relative;
-      z-index: 2;
+      z-index: 4;
       box-sizing: border-box;
       display: flex;
       min-width: 0;

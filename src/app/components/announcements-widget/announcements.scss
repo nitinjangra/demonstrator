@@ -287,11 +287,14 @@
     display: -webkit-box;
     overflow: hidden;
     -webkit-box-orient: vertical;
-    -webkit-line-clamp: 4;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
 
     &--expanded {
       display: block;
       overflow: visible;
+      -webkit-line-clamp: none;
+      line-clamp: none;
     }
   }
 
